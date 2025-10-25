@@ -1,0 +1,49 @@
+fileFormatVersion: 2
+guid: d654757d7437c44478c415936594b7f9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - GameManager: {instanceID: 0}
+  - UIManager: {fileID: 8534121587088130031, guid: 491199a6f0c98314c8afa2c23baa6f8a,
+      type: 3}
+  - Canvas: {instanceID: 0}
+  - Ping: {fileID: 7077375012133088510, guid: 0aa9942672739f44e9d54474f30a8e81, type: 3}
+  - PlayerArea: {fileID: 1178332457469945595, guid: 4324225649e9a064fadbc6e2eff5e4bb,
+      type: 3}
+  - EnemyArea: {fileID: 4443227279431335423, guid: b0d9b9341aac7aa40aafe4df6111e31a,
+      type: 3}
+  - PlayerSlot1: {fileID: 5326650798908680913, guid: c478dba6f4c5cf44e85a3b90bf71b98e,
+      type: 3}
+  - PlayerSlot2: {fileID: 5326650798908680913, guid: 1a68ac8eac10bf343bd999cdc9bd301e,
+      type: 3}
+  - PlayerSlot3: {fileID: 5326650798908680913, guid: b7e3e363341ecb6429ca4f73ab6a6a7b,
+      type: 3}
+  - PlayerSlot4: {fileID: 5326650798908680913, guid: 44036b9139f852a49b24c9e9bd2b2336,
+      type: 3}
+  - PlayerSlot5: {fileID: 5326650798908680913, guid: 10e4704d462faa049883b11065e500fc,
+      type: 3}
+  - EnemySlot1: {fileID: 5326650798908680913, guid: eccbf41204c098c4080ab8e7aefaaf64,
+      type: 3}
+  - EnemySlot2: {fileID: 5326650798908680913, guid: 0bb37eb3e5ff83b4ba0a3b29c6b6e792,
+      type: 3}
+  - EnemySlot3: {fileID: 5326650798908680913, guid: a26ea08e85c43004ab914e969bb184f2,
+      type: 3}
+  - EnemySlot4: {fileID: 5326650798908680913, guid: 0886cf8cfdde6554ea82c92574acd641,
+      type: 3}
+  - EnemySlot5: {fileID: 5326650798908680913, guid: 007340e844e7696488689c3840f57b01,
+      type: 3}
+  - PlayerYard: {fileID: 1178332457469945595, guid: 4e8bfbb18bb93da4c8d9254cba935b06,
+      type: 3}
+  - EnemyYard: {fileID: 1178332457469945595, guid: 783f1aca15a77754d862656a4cc3e651,
+      type: 3}
+  - Card1: {fileID: 7077375012133088510, guid: b8d26673b7884824c9b268a58e534341, type: 3}
+  - Card: {fileID: 5874341644732258968, guid: e0e260de2db7298488f2d1766ffb4266, type: 3}
+  - Magic: {fileID: 7540810118024730414, guid: c5a767c04e1f39e45bc4f5a655592fe4, type: 3}
+  - CardToHand: {fileID: 1260750737870900169, guid: ddfaf1d468e354446bf7bf1c1c530a34,
+      type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

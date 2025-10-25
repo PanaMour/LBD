@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: bda9e1d49f09d7c4ba6efc9d49596f45
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - GameManager: {instanceID: 0}
+  - Canvas: {instanceID: 0}
+  - PlayerManager: {instanceID: 0}
+  - Card: {instanceID: 0}
+  - nameText: {instanceID: 0}
+  - starsText: {instanceID: 0}
+  - ATKText: {instanceID: 0}
+  - DEFText: {instanceID: 0}
+  - descriptionText: {instanceID: 0}
+  - thisSprite: {instanceID: 0}
+  - thatImage: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
