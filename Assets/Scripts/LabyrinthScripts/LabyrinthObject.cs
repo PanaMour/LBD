@@ -22,7 +22,21 @@ public class LabyrinthObject : MonoBehaviour
 
     public void ObjectToMove()
     {
-        if(card.GetComponent<ThisCard>().canMove == true)
-        gridGenerator.GetComponent<GridBehavior>().ShowPossiblePaths(labyrinthObject);
+        GridBehavior gb = gridGenerator.GetComponent<GridBehavior>();
+
+        if (gb.objectToMove != null && gb.objectToMove != labyrinthObject)
+        {
+            gb.HighlightRange(false);
+            gb.ShowPossiblePaths(labyrinthObject);
+        }
+        else if (gb.objectToMove == labyrinthObject)
+        {
+            gb.HighlightRange(false);
+            gb.objectToMove = null;
+        }
+        else if (card.GetComponent<ThisCard>().canMove == true)
+        {
+            gb.ShowPossiblePaths(labyrinthObject);
+        }
     }
 }

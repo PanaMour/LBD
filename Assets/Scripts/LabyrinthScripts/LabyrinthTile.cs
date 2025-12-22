@@ -1,43 +1,66 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class LabyrinthTile : MonoBehaviour
+public class LabyrinthTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
     public GameObject gridtile;
     public GameObject gridGenerator;
     public Color red => Color.red;
+    public Color green => Color.green;
     public Color white => Color.white;
-    public bool flash = false;
+    public bool isHighlighted = false;
 
-    // Start is called before the first frame update
     void Start()
     {
         gridGenerator = transform.parent.gameObject;
     }
-
-    // Update is called once per frame
-    public void Update()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        if (flash == true)
-            gridtile.GetComponent<Image>().color = LerpRed();
+        gridtile.GetComponent<Image>().color = red;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        gridGenerator.GetComponent<GridBehavior>().FindDistanceTrue(
+        gridtile.GetComponent<GridStat>().x,
+        gridtile.GetComponent<GridStat>().y
+    );
+    }
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (isHighlighted)
+        {
+            gridtile.GetComponent<Image>().color = green;
+        }
         else
-            gridtile.GetComponent<Image>().color = new Color32(255, 255, 255, 255);
+        {
+            gridtile.GetComponent<Image>().color = white;
+        }
     }
 
     public void StartMoving()
     {
-        gridGenerator.GetComponent<GridBehavior>().FindDistanceTrue(gridtile.GetComponent<GridStat>().x, gridtile.GetComponent<GridStat>().y);
+        if (isHighlighted)
+        {
+            gridGenerator.GetComponent<GridBehavior>().FindDistanceTrue(
+                gridtile.GetComponent<GridStat>().x,
+                gridtile.GetComponent<GridStat>().y
+            );
+        }
     }
     public void GlowBlock()
     {
-        flash = true;
+        isHighlighted = true;
+        gridtile.GetComponent<Image>().color = green;
     }
 
     public void StopGlowBlock()
     {
-        flash = false;
+        isHighlighted = false;
+        gridtile.GetComponent<Image>().color = white;
     }
 
     public Color LerpRed()

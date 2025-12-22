@@ -266,35 +266,37 @@ public class GridBehavior : MonoBehaviour
 
     public void FindDistanceTrue(int ENDX, int ENDY)
     {
-        if (objectToMove != null)
+        if (objectToMove == null) return;
+
+        GameObject targetTile = gridArray[ENDX, ENDY];
+        int dist = targetTile.GetComponent<GridStat>().visited;
+
+        if (dist > 0 && dist <= spaces)
         {
-            GameObject targetTile = gridArray[ENDX, ENDY];
-            int dist = targetTile.GetComponent<GridStat>().visited;
+            endX = ENDX;
+            endY = ENDY;
 
-            // Check if the target is within the 'stars' range and was reachable
-            if (dist > 0 && dist <= spaces)
-            {
-                endX = ENDX;
-                endY = ENDY;
-                findDistance = true;
-                objectToMove.GetComponent<LabyrinthObject>().card.GetComponent<ThisCard>().hasMoved = true;
+            objectToMove.transform.SetParent(gridArray[endX, endY].transform);
+            objectToMove.transform.localPosition = Vector3.zero;
 
-                // Turn off highlights after moving
-                HighlightRange(false);
-            }
-            else
-            {
-                Debug.Log("Out of range or unreachable!");
-                // Optionally clear selection if they click an invalid spot
-                HighlightRange(false);
-                objectToMove = null;
-            }
+            startX = endX;
+            startY = endY;
+
+            objectToMove.GetComponent<LabyrinthObject>().card.GetComponent<ThisCard>().hasMoved = true;
+
+            HighlightRange(false);
+            objectToMove = null;
+        }
+        else
+        {
+            Debug.Log("Clicked outside valid path. Cancelling selection.");
+            HighlightRange(false);
+            objectToMove = null;
         }
     }
 
     public void HighlightRange(bool shouldShow)
     {
-        // First, calculate distances from the current start point
         SetDistance();
 
         foreach (GameObject obj in gridArray)
@@ -304,13 +306,16 @@ public class GridBehavior : MonoBehaviour
             GridStat stat = obj.GetComponent<GridStat>();
             LabyrinthTile tile = obj.GetComponent<LabyrinthTile>();
 
-            // If we want to show paths, check if the tile was reached within 'spaces'
             if (shouldShow)
             {
-                // visited 0 is the start tile, so we check 1 to 'spaces'
+                // If tile is reachable within monster's 'stars'
                 if (stat.visited > 0 && stat.visited <= spaces)
                 {
                     tile.GlowBlock();
+                }
+                else
+                {
+                    tile.StopGlowBlock();
                 }
             }
             else
