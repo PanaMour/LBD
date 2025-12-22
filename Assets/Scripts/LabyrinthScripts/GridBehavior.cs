@@ -20,11 +20,6 @@ public class GridBehavior : MonoBehaviour
     public List<GameObject> path = new List<GameObject>();
     public GameObject objectToMove;
     public int spaces;
-    [SerializeField]
-    Transform[] wayPoints;
-    int currentWayPoint = 0;
-    [SerializeField]
-    float moveSpeed = 5f;
 
     void Start()
     {
@@ -34,25 +29,17 @@ public class GridBehavior : MonoBehaviour
     private void Awake()
     {
         gridArray = new GameObject[columns, rows];
-        wayPoints = new Transform[columns * rows];
-        if (gridPrefab)
-        {
-            GenerateGrid();
-            //objectToMove.transform.SetParent(gridArray[startX, startY].transform);
-        }
-        else print("missing gridprefab, please assign.");
+        if (gridPrefab) GenerateGrid();
+        else Debug.LogError("Missing gridPrefab!");
     }
 
     // Update is called once per frame
     void Update()
     {
-        //
-        
         if (findDistance && objectToMove != null)
         {
             SetDistance();
             SetPath();
-            Movement();
             objectToMove.transform.SetParent(gridArray[endX, endY].transform);
             objectToMove.transform.position = objectToMove.transform.parent.position;
             startX = objectToMove.transform.parent.GetComponent<GridStat>().x;
@@ -78,7 +65,6 @@ public class GridBehavior : MonoBehaviour
                 obj.GetComponent<Image>().sprite = transform.Find("GridContainer").Find(obj.name).gameObject.GetComponent<Image>().sprite;
                 Debug.Log(obj.GetComponent<Image>().sprite);
                 gridArray[i, j] = obj;
-                wayPoints[k] = obj.transform;
                 k++;
             }
         }
@@ -150,31 +136,82 @@ public class GridBehavior : MonoBehaviour
         gridArray[startX, startY].GetComponent<GridStat>().visited = 0;
     }
 
+    bool BlocksDirection(int x, int y, string side)
+    {
+        if (gridArray[x, y] == null) return true;
+
+        Sprite s = gridArray[x, y].GetComponent<Image>().sprite;
+        if (s == null) return false;
+
+        string spriteName = s.name;
+        string idStr = spriteName.Replace("labyrinthblock", "");
+        int id = -1;
+        if (string.IsNullOrEmpty(idStr)) id = 0; // The base "labyrinthblock"
+        else int.TryParse(idStr, out id);
+
+        switch (side)
+        {
+            case "Top":
+                // 1, 6, 8, 10, 11, 12, 19, 20, 28, 29, 37
+                if (id == 1 || id == 6 || id == 8 || id == 10 || id == 11 || id == 12 || id == 19 || id == 20 || id == 28 || id == 29 || id == 37) return true;
+                break;
+            case "Bottom":
+                // 3, 5, 9, 10, 11, 12, 13, 23, 24, 27, 30, 40
+                if (id == 3 || id == 5 || id == 9 || id == 10 || id == 11 || id == 12 || id == 13 || id == 23 || id == 24 || id == 27 || id == 30 || id == 40) return true;
+                break;
+            case "Left":
+                // 2, 7, 8, 9, 12, 13, 21, 22, 29, 30, 38
+                if (id == 2 || id == 7 || id == 8 || id == 9 || id == 12 || id == 13 || id == 21 || id == 22 || id == 29 || id == 30 || id == 38) return true;
+                break;
+            case "Right":
+                // 4, 5, 6, 7, 11, 13, 25, 26, 27, 28, 39
+                if (id == 4 || id == 5 || id == 6 || id == 7 || id == 11 || id == 13 || id == 25 || id == 26 || id == 27 || id == 28 || id == 39) return true;
+                break;
+        }
+
+        return false;
+    }
+
     bool TestDirection(int x, int y, int step, int direction)
     {
-        // int direction tells which case to use 1 is up, 2 is right, 3 is down, 4 is left
-        switch(direction)
+        // direction: 1 is up, 2 is right, 3 is down, 4 is left
+        switch (direction)
         {
-            case 4:
-                if (x -1 >-1 && gridArray[x -1, y ] && gridArray[x-1, y].GetComponent<GridStat>().visited == step)
-                    return true;
-                else
-                    return false;
-            case 3:
+            case 4: // Attempting to move LEFT
+                if (x - 1 > -1 && gridArray[x - 1, y] && gridArray[x - 1, y].GetComponent<GridStat>().visited == step)
+                {
+                    // Current tile cannot block Left AND Next tile cannot block Right
+                    if (!BlocksDirection(x, y, "Left") && !BlocksDirection(x - 1, y, "Right"))
+                        return true;
+                }
+                return false;
+
+            case 3: // Attempting to move DOWN
                 if (y - 1 > -1 && gridArray[x, y - 1] && gridArray[x, y - 1].GetComponent<GridStat>().visited == step)
-                    return true;
-                else
-                    return false;
-            case 2:
-                if (x + 1 < columns && gridArray[x+1, y ] && gridArray[x+1, y].GetComponent<GridStat>().visited == step)
-                    return true;
-                else
-                    return false;
-            case 1:
+                {
+                    // Current tile cannot block Bottom AND Next tile cannot block Top
+                    if (!BlocksDirection(x, y, "Bottom") && !BlocksDirection(x, y - 1, "Top"))
+                        return true;
+                }
+                return false;
+
+            case 2: // Attempting to move RIGHT
+                if (x + 1 < columns && gridArray[x + 1, y] && gridArray[x + 1, y].GetComponent<GridStat>().visited == step)
+                {
+                    // Current tile cannot block Right AND Next tile cannot block Left
+                    if (!BlocksDirection(x, y, "Right") && !BlocksDirection(x + 1, y, "Left"))
+                        return true;
+                }
+                return false;
+
+            case 1: // Attempting to move UP
                 if (y + 1 < rows && gridArray[x, y + 1] && gridArray[x, y + 1].GetComponent<GridStat>().visited == step)
-                    return true;
-                else
-                    return false;
+                {
+                    // Current tile cannot block Top AND Next tile cannot block Bottom
+                    if (!BlocksDirection(x, y, "Up") && !BlocksDirection(x, y + 1, "Bottom"))
+                        return true;
+                }
+                return false;
         }
         return false;
     }
@@ -226,49 +263,73 @@ public class GridBehavior : MonoBehaviour
      *  Right: 12, 
      *  Left: 11, 
      */
-    void Movement()
-    {
-        /*if (objectToMove.transform.position == path[path.Count - 1].transform.position)
-        {
-            path.Reverse();
-            foreach (GameObject pos in path)
-            {
-                Vector3 _dir = (pos.transform.position - objectToMove.transform.position);
-                *//*Debug.Log(objectToMove.transform.position);
-                Debug.Log(objectToMove.transform.position + _dir);*//*
-                objectToMove.GetComponent<Rigidbody>().MovePosition(objectToMove.transform.position + _dir * moveSpeed * Time.deltaTime);
-            }
-        }*/
-        if (objectToMove != null)
-        {
-            if (Vector3.Distance(objectToMove.transform.position, wayPoints[currentWayPoint].position) < .25f)
-            {
-                currentWayPoint += 1;
-                currentWayPoint = currentWayPoint % wayPoints.Length;
-                Debug.Log("current way points: " + currentWayPoint);
-            }
-            Vector3 _dir = (wayPoints[currentWayPoint].position - objectToMove.transform.position).normalized;
-            objectToMove.GetComponent<Rigidbody>().MovePosition(objectToMove.transform.position + _dir * moveSpeed * Time.deltaTime);
-        }
-    }
 
-    public void FindDistanceTrue(int ENDX,int ENDY)
+    public void FindDistanceTrue(int ENDX, int ENDY)
     {
         if (objectToMove != null)
         {
-            //fix spaces error
-            endX = ENDX;
-            endY = ENDY;
-            findDistance = true;
-            objectToMove.GetComponent<LabyrinthObject>().card.GetComponent<ThisCard>().hasMoved = true;
+            GameObject targetTile = gridArray[ENDX, ENDY];
+            int dist = targetTile.GetComponent<GridStat>().visited;
+
+            // Check if the target is within the 'stars' range and was reachable
+            if (dist > 0 && dist <= spaces)
+            {
+                endX = ENDX;
+                endY = ENDY;
+                findDistance = true;
+                objectToMove.GetComponent<LabyrinthObject>().card.GetComponent<ThisCard>().hasMoved = true;
+
+                // Turn off highlights after moving
+                HighlightRange(false);
+            }
+            else
+            {
+                Debug.Log("Out of range or unreachable!");
+                // Optionally clear selection if they click an invalid spot
+                HighlightRange(false);
+                objectToMove = null;
+            }
         }
     }
 
+    public void HighlightRange(bool shouldShow)
+    {
+        // First, calculate distances from the current start point
+        SetDistance();
+
+        foreach (GameObject obj in gridArray)
+        {
+            if (obj == null) continue;
+
+            GridStat stat = obj.GetComponent<GridStat>();
+            LabyrinthTile tile = obj.GetComponent<LabyrinthTile>();
+
+            // If we want to show paths, check if the tile was reached within 'spaces'
+            if (shouldShow)
+            {
+                // visited 0 is the start tile, so we check 1 to 'spaces'
+                if (stat.visited > 0 && stat.visited <= spaces)
+                {
+                    tile.GlowBlock();
+                }
+            }
+            else
+            {
+                tile.StopGlowBlock();
+            }
+        }
+    }
+
+    // Update your existing ShowPossiblePaths to call this
     public void ShowPossiblePaths(GameObject labyrinthObject)
     {
+        HighlightRange(false);
+
         objectToMove = labyrinthObject;
         startX = objectToMove.transform.parent.GetComponent<GridStat>().x;
         startY = objectToMove.transform.parent.GetComponent<GridStat>().y;
+
         spaces = labyrinthObject.GetComponent<LabyrinthObject>().card.GetComponent<ThisCard>().stars;
+        HighlightRange(true);
     }
 }
