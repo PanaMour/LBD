@@ -1,27 +1,39 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
+using Mirror;
+using UnityEngine.UI;
 
-public class LabyrinthObject : MonoBehaviour
+public class LabyrinthObject : NetworkBehaviour
 {
     public GameObject labyrinthObject;
     public GameObject gridGenerator;
     public GameObject card;
 
-    // Start is called before the first frame update
+    [SyncVar(hook = nameof(OnMonsterIDChanged))]
+    public int monsterID;
+
     void Start()
     {
-        gridGenerator = transform.parent.parent.gameObject;
+        gridGenerator = GameObject.Find("GridGenerator");
+
+        if (monsterID != 0)
+        {
+            OnMonsterIDChanged(0, monsterID);
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    void OnMonsterIDChanged(int oldID, int newID)
     {
-        
+        Card cardData = CardDataBase.cardList[newID];
+
+        Sprite monsterSprite = cardData.thisImage;
+
+        GetComponent<Image>().sprite = monsterSprite;
     }
 
     public void ObjectToMove()
     {
+        if (!hasAuthority) return;
+
         GridBehavior gb = gridGenerator.GetComponent<GridBehavior>();
 
         if (gb.objectToMove != null && gb.objectToMove != labyrinthObject)
