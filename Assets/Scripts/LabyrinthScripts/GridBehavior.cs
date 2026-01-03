@@ -273,23 +273,24 @@ public class GridBehavior : MonoBehaviour
 
         if (dist > 0 && dist <= spaces)
         {
-            endX = ENDX;
-            endY = ENDY;
+            // 1. Get the script
+            LabyrinthObject labScript = objectToMove.GetComponent<LabyrinthObject>();
 
-            objectToMove.transform.SetParent(gridArray[endX, endY].transform);
-            objectToMove.transform.localPosition = Vector3.zero;
+            // 2. ONLY the owner sends the command to move
+            if (labScript.hasAuthority)
+            {
+                labScript.CmdMoveToTile(targetTile.name);
 
-            startX = endX;
-            startY = endY;
-
-            objectToMove.GetComponent<LabyrinthObject>().card.GetComponent<ThisCard>().hasMoved = true;
+                // Handle local logic (turn usage)
+                if (labScript.card != null)
+                    labScript.card.GetComponent<ThisCard>().hasMoved = true;
+            }
 
             HighlightRange(false);
             objectToMove = null;
         }
         else
         {
-            Debug.Log("Clicked outside valid path. Cancelling selection.");
             HighlightRange(false);
             objectToMove = null;
         }

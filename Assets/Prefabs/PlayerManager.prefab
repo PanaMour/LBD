@@ -84,24 +84,32 @@ MonoBehaviour:
   GameManager: {fileID: 0}
   UIManager: {fileID: 0}
   Canvas: {fileID: 0}
-  Ping: {fileID: 7077375012133088510, guid: 0aa9942672739f44e9d54474f30a8e81, type: 3}
   PlayerArea: {fileID: 0}
   EnemyArea: {fileID: 0}
   PlayerSlot1: {fileID: 0}
   PlayerSlot2: {fileID: 0}
   PlayerSlot3: {fileID: 0}
   PlayerSlot4: {fileID: 0}
-  PlayerSlot5: {fileID: 0}
+  ActionSlot1: {fileID: 0}
+  ActionSlot2: {fileID: 0}
+  ActionSlot3: {fileID: 0}
+  ActionSlot4: {fileID: 0}
   EnemySlot1: {fileID: 0}
   EnemySlot2: {fileID: 0}
   EnemySlot3: {fileID: 0}
   EnemySlot4: {fileID: 0}
-  EnemySlot5: {fileID: 0}
+  EnemyActionSlot1: {fileID: 0}
+  EnemyActionSlot2: {fileID: 0}
+  EnemyActionSlot3: {fileID: 0}
+  EnemyActionSlot4: {fileID: 0}
   PlayerYard: {fileID: 0}
   EnemyYard: {fileID: 0}
+  LabyrinthObjectPrefab: {fileID: 7951009996680074172, guid: 7170bd098f1d54c4e9eb2598bc51ed9d,
+    type: 3}
   PlayerSockets: []
   EnemySockets: []
-  Card1: {fileID: 7077375012133088510, guid: b8d26673b7884824c9b268a58e534341, type: 3}
+  PlayerActionSockets: []
+  EnemyActionSockets: []
   Card: {fileID: 5874341644732258968, guid: e0e260de2db7298488f2d1766ffb4266, type: 3}
   Magic: {fileID: 7540810118024730414, guid: c5a767c04e1f39e45bc4f5a655592fe4, type: 3}
   CardToHand: {fileID: 1260750737870900169, guid: ddfaf1d468e354446bf7bf1c1c530a34,

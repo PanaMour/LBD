@@ -29,6 +29,7 @@ public class PlayerManager : NetworkBehaviour
     public GameObject EnemyActionSlot4;
     public GameObject PlayerYard;
     public GameObject EnemyYard;
+    public GameObject LabyrinthObjectPrefab;
     public List<GameObject> PlayerSockets = new List<GameObject>();
     public List<GameObject> EnemySockets = new List<GameObject>();
     public List<GameObject> PlayerActionSockets = new List<GameObject>();
@@ -532,5 +533,18 @@ public class PlayerManager : NetworkBehaviour
     {
         NetworkServer.Destroy(zoomCard);
     }
-    ///////////////////////////////////////////////////////////////////////////////////
+    // /// // // / // / / / /// // //////////////////////////////////////
+
+    [Command]
+    public void CmdSpawnMonster(int id, Vector3 pos, NetworkIdentity cardIdentity)
+    {
+        GameObject monster = Instantiate(LabyrinthObjectPrefab, pos, Quaternion.identity);
+        LabyrinthObject script = monster.GetComponent<LabyrinthObject>();
+
+        script.monsterID = id;
+
+        script.card = cardIdentity.gameObject;
+
+        NetworkServer.Spawn(monster, connectionToClient);
+    }
 }

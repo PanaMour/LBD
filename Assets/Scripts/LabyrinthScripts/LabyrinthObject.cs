@@ -10,15 +10,22 @@ public class LabyrinthObject : NetworkBehaviour
 
     [SyncVar(hook = nameof(OnMonsterIDChanged))]
     public int monsterID;
+    [SyncVar(hook = nameof(OnTileNameChanged))]
+    public string currentTileName;
 
     void Start()
     {
         gridGenerator = GameObject.Find("GridGenerator");
 
-        if (monsterID != 0)
+        Transform targetTile = gridGenerator.transform.Find("GridObject(4,0)");
+
+        if (targetTile != null)
         {
-            OnMonsterIDChanged(0, monsterID);
+            transform.SetParent(targetTile, false);
+            transform.localPosition = Vector3.zero;
         }
+
+        if (monsterID != 0) OnMonsterIDChanged(0, monsterID);
     }
 
     void OnMonsterIDChanged(int oldID, int newID)
@@ -46,9 +53,28 @@ public class LabyrinthObject : NetworkBehaviour
             gb.HighlightRange(false);
             gb.objectToMove = null;
         }
-        else if (card.GetComponent<ThisCard>().canMove == true)
+
+        else if (card == null || card.GetComponent<ThisCard>().canMove == true)
         {
             gb.ShowPossiblePaths(labyrinthObject);
         }
+    }
+
+    void OnTileNameChanged(string oldName, string newName)
+    {
+        if (string.IsNullOrEmpty(newName)) return;
+
+        GameObject targetTile = GameObject.Find(newName);
+        if (targetTile != null)
+        {
+            transform.SetParent(targetTile.transform, false);
+            transform.localPosition = Vector3.zero;
+        }
+    }
+
+    [Command]
+    public void CmdMoveToTile(string tileName)
+    {
+        currentTileName = tileName;
     }
 }

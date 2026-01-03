@@ -115,21 +115,9 @@ public class DragDrop : NetworkBehaviour
             PlayerManager.PlayCard(gameObject, index);
             PlayerManager.CmdChangeBattlePosition(gameObject, true);
             //gameObject.GetComponent<ThisCard>().attackmode = true;
-            GameObject LabObject = Instantiate(gameObject.GetComponent<ThisCard>().LabyrinthObject, new Vector3(0, 0, 0), Quaternion.identity);
-            LabObject.transform.GetComponent<Image>().sprite = gameObject.GetComponent<ThisCard>().thisSprite;
-            Debug.Log(transform);
-            if(PlayerManager.CardsPlayed%2 == 0)
-            {
-                LabObject.transform.GetComponent<LabyrinthObject>().card = transform.gameObject;
-                LabObject.transform.SetParent(transform.parent.parent.parent.Find("GridGenerator").Find("GridObject(4,0)"));
-                LabObject.transform.position = transform.parent.parent.parent.Find("GridGenerator").Find("GridObject(4,0)").position;
-            }
-            else
-            {
-                LabObject.transform.GetComponent<LabyrinthObject>().card = transform.gameObject;
-                LabObject.transform.SetParent(transform.parent.parent.parent.Find("GridGenerator").Find("GridObject(6,0)"));
-                LabObject.transform.position = transform.parent.parent.parent.Find("GridGenerator").Find("GridObject(6,0)").position;
-            }
+            int cardId = gameObject.GetComponent<ThisCard>().thisId;
+            NetworkIdentity ni = gameObject.GetComponent<NetworkIdentity>();
+            PlayerManager.CmdSpawnMonster(cardId, Vector3.zero, ni);
             gameObject.GetComponent<ThisCard>().confirmationfinished = true;
         }
         else
@@ -141,20 +129,9 @@ public class DragDrop : NetworkBehaviour
             PlayerManager.PlayCard(gameObject, index);
             PlayerManager.CmdChangeBattlePosition(gameObject, false);
             //gameObject.GetComponent<ThisCard>().attackmode = false;
-            GameObject LabObject = Instantiate(gameObject.GetComponent<ThisCard>().LabyrinthObject, new Vector3(0, 0, 0), Quaternion.identity);
-            LabObject.transform.GetComponent<Image>().sprite = gameObject.GetComponent<ThisCard>().thisSprite;
-            if (PlayerManager.CardsPlayed % 2 == 0)
-            {
-                LabObject.transform.GetComponent<LabyrinthObject>().card = transform.gameObject;
-                LabObject.transform.SetParent(transform.parent.parent.parent.Find("GridGenerator").Find("GridObject(4,0)"));
-                LabObject.transform.position = transform.parent.parent.parent.Find("GridGenerator").Find("GridObject(4,0)").position;
-            }
-            else
-            {
-                LabObject.transform.GetComponent<LabyrinthObject>().card = transform.gameObject;
-                LabObject.transform.SetParent(transform.parent.parent.parent.Find("GridGenerator").Find("GridObject(6,0)"));
-                LabObject.transform.position = transform.parent.parent.parent.Find("GridGenerator").Find("GridObject(6,0)").position;
-            }
+            int cardId = gameObject.GetComponent<ThisCard>().thisId;
+            NetworkIdentity ni = gameObject.GetComponent<NetworkIdentity>();
+            PlayerManager.CmdSpawnMonster(cardId, Vector3.zero, ni);
             gameObject.GetComponent<ThisCard>().confirmationfinished = true;
             /*transform.position = startPosition;
             transform.SetParent(startParent.transform, true);*/
