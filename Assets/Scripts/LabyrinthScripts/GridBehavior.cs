@@ -326,16 +326,25 @@ public class GridBehavior : MonoBehaviour
         }
     }
 
-    // Update your existing ShowPossiblePaths to call this
     public void ShowPossiblePaths(GameObject labyrinthObject)
     {
         HighlightRange(false);
-
         objectToMove = labyrinthObject;
+
         startX = objectToMove.transform.parent.GetComponent<GridStat>().x;
         startY = objectToMove.transform.parent.GetComponent<GridStat>().y;
 
-        spaces = labyrinthObject.GetComponent<LabyrinthObject>().card.GetComponent<ThisCard>().stars;
+        LabyrinthObject labScript = labyrinthObject.GetComponent<LabyrinthObject>();
+        if (labScript.card != null)
+        {
+            spaces = labScript.card.GetComponent<ThisCard>().stars;
+        }
+        else
+        {
+            spaces = 3;
+            Debug.LogWarning("Card reference missing on client, using default spaces.");
+        }
+
         HighlightRange(true);
     }
 }

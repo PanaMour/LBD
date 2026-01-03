@@ -155,7 +155,7 @@ public class DragDrop : NetworkBehaviour
             }else if (gameObject.GetComponent<ThisCard>().stars <= 4)
             {
                 GameObject box = Instantiate(ConfirmationBox);
-                NetworkServer.Spawn(box, connectionToClient);
+                //NetworkServer.Spawn(box, connectionToClient);
                 box.GetComponentInChildren<Text>().text = "Do you want to summon " + gameObject.GetComponent<ThisCard>().cardName + "?";
                 box.transform.SetParent(Canvas.transform);
                 YesButton = GameObject.Find("YESButton").GetComponent<Button>();
@@ -178,7 +178,7 @@ public class DragDrop : NetworkBehaviour
         else if (isOverDropZone && PlayerManager.IsMyTurn && dropZone.transform.childCount == 1 && dropZone.transform.GetChild(0).GetComponent<ThisCard>().canBeTributed == true && gameObject.GetComponent<ThisCard>().stars >= 5 && gameObject.GetComponent<ThisCard>().stars <= 6 && (PlayerManager.nomoresummons == false || gameObject.GetComponent<ThisMagic>() != null))
         {
             GameObject box = Instantiate(ConfirmationBox);
-            NetworkServer.Spawn(box, connectionToClient);
+            //NetworkServer.Spawn(box, connectionToClient);
             box.GetComponentInChildren<Text>().text = "Do you want to tribute " + dropZone.transform.GetChild(0).GetComponent<ThisCard>().cardName + " to summon " + gameObject.GetComponent<ThisCard>().cardName + "?";
             box.transform.SetParent(Canvas.transform);
             YesButton = GameObject.Find("YESButton").GetComponent<Button>();

@@ -41,7 +41,18 @@ public class LabyrinthObject : NetworkBehaviour
     {
         if (!hasAuthority) return;
 
+        if (gridGenerator == null)
+            gridGenerator = GameObject.Find("GridGenerator");
+
+        if (gridGenerator == null) return;
+
         GridBehavior gb = gridGenerator.GetComponent<GridBehavior>();
+
+        bool canMoveNow = true;
+        if (card != null)
+        {
+            canMoveNow = card.GetComponent<ThisCard>().canMove;
+        }
 
         if (gb.objectToMove != null && gb.objectToMove != labyrinthObject)
         {
@@ -53,8 +64,7 @@ public class LabyrinthObject : NetworkBehaviour
             gb.HighlightRange(false);
             gb.objectToMove = null;
         }
-
-        else if (card == null || card.GetComponent<ThisCard>().canMove == true)
+        else if (canMoveNow)
         {
             gb.ShowPossiblePaths(labyrinthObject);
         }
