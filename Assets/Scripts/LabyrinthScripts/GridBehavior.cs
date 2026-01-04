@@ -23,7 +23,13 @@ public class GridBehavior : MonoBehaviour
 
     void Start()
     {
-
+        if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
+        {
+            transform.localRotation = Quaternion.Euler(0, 0, 180);
+            RectTransform rect = GetComponent<RectTransform>();
+            float targetX = leftBottomLocation.x - 40;
+            rect.anchoredPosition = new Vector2(targetX, rect.anchoredPosition.y);
+        }
     }
 
     private void Awake()
@@ -335,15 +341,8 @@ public class GridBehavior : MonoBehaviour
         startY = objectToMove.transform.parent.GetComponent<GridStat>().y;
 
         LabyrinthObject labScript = labyrinthObject.GetComponent<LabyrinthObject>();
-        if (labScript.card != null)
-        {
-            spaces = labScript.card.GetComponent<ThisCard>().stars;
-        }
-        else
-        {
-            spaces = 3;
-            Debug.LogWarning("Card reference missing on client, using default spaces.");
-        }
+
+        spaces = labScript.moveRange;
 
         HighlightRange(true);
     }

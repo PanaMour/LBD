@@ -106,18 +106,21 @@ public class DragDrop : NetworkBehaviour
     {
         var waitForButton = new WaitForUIButtons(YesButton, NoButton);
         yield return waitForButton.Reset();
+
+        string startTileName = isServer ? "GridObject(4,0)" : "GridObject(6,15)";
+
         if (waitForButton.PressedButton == YesButton)
         {
-            transform.Rotate(0, 0, 0);
             transform.SetParent(dropZone.transform, false);
             int index = FindSocketIndex(dropZone);
             isDraggable = false;
             PlayerManager.PlayCard(gameObject, index);
             PlayerManager.CmdChangeBattlePosition(gameObject, true);
-            //gameObject.GetComponent<ThisCard>().attackmode = true;
+
             int cardId = gameObject.GetComponent<ThisCard>().thisId;
             NetworkIdentity ni = gameObject.GetComponent<NetworkIdentity>();
-            PlayerManager.CmdSpawnMonster(cardId, Vector3.zero, ni);
+
+            PlayerManager.CmdSpawnMonster(cardId, startTileName, ni);
             gameObject.GetComponent<ThisCard>().confirmationfinished = true;
         }
         else
@@ -128,14 +131,14 @@ public class DragDrop : NetworkBehaviour
             isDraggable = false;
             PlayerManager.PlayCard(gameObject, index);
             PlayerManager.CmdChangeBattlePosition(gameObject, false);
-            //gameObject.GetComponent<ThisCard>().attackmode = false;
+
             int cardId = gameObject.GetComponent<ThisCard>().thisId;
             NetworkIdentity ni = gameObject.GetComponent<NetworkIdentity>();
-            PlayerManager.CmdSpawnMonster(cardId, Vector3.zero, ni);
+
+            PlayerManager.CmdSpawnMonster(cardId, startTileName, ni);
             gameObject.GetComponent<ThisCard>().confirmationfinished = true;
-            /*transform.position = startPosition;
-            transform.SetParent(startParent.transform, true);*/
         }
+
         Destroy(box);
     }
 

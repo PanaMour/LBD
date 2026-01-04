@@ -12,20 +12,27 @@ public class LabyrinthObject : NetworkBehaviour
     public int monsterID;
     [SyncVar(hook = nameof(OnTileNameChanged))]
     public string currentTileName;
+    [SyncVar]
+    public int moveRange;
 
     void Start()
     {
         gridGenerator = GameObject.Find("GridGenerator");
 
-        Transform targetTile = gridGenerator.transform.Find("GridObject(4,0)");
-
-        if (targetTile != null)
+        if (!string.IsNullOrEmpty(currentTileName))
         {
-            transform.SetParent(targetTile, false);
-            transform.localPosition = Vector3.zero;
+            OnTileNameChanged("", currentTileName);
         }
 
         if (monsterID != 0) OnMonsterIDChanged(0, monsterID);
+    }
+
+    void Update()
+    {
+        if (transform.rotation != Quaternion.identity)
+        {
+            transform.rotation = Quaternion.identity;
+        }
     }
 
     void OnMonsterIDChanged(int oldID, int newID)

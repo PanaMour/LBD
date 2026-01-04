@@ -536,14 +536,17 @@ public class PlayerManager : NetworkBehaviour
     // /// // // / // / / / /// // //////////////////////////////////////
 
     [Command]
-    public void CmdSpawnMonster(int id, Vector3 pos, NetworkIdentity cardNetId)
+    public void CmdSpawnMonster(int id, string tileName, NetworkIdentity cardNetId)
     {
-        GameObject monster = Instantiate(LabyrinthObjectPrefab, pos, Quaternion.identity);
+        GameObject monster = Instantiate(LabyrinthObjectPrefab);
         LabyrinthObject script = monster.GetComponent<LabyrinthObject>();
+
+        // Get the stars from the card on the Server side
+        script.moveRange = cardNetId.gameObject.GetComponent<ThisCard>().stars;
         script.monsterID = id;
-        script.card = cardNetId.gameObject;
+        script.currentTileName = tileName;
+
         NetworkServer.Spawn(monster, connectionToClient);
-        RpcLinkMonsterToCard(monster, cardNetId.gameObject);
     }
 
     [ClientRpc]
