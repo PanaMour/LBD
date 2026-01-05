@@ -24,10 +24,8 @@ public class LabyrinthTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        gridGenerator.GetComponent<GridBehavior>().FindDistanceTrue(
-        gridtile.GetComponent<GridStat>().x,
-        gridtile.GetComponent<GridStat>().y
-    );
+        GridStat stats = gridtile.GetComponent<GridStat>();
+        gridGenerator.GetComponent<GridBehavior>().OnTileClicked(stats.x, stats.y);
     }
     public void OnPointerExit(PointerEventData eventData)
     {

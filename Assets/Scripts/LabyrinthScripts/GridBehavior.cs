@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Mirror;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -20,6 +21,7 @@ public class GridBehavior : MonoBehaviour
     public List<GameObject> path = new List<GameObject>();
     public GameObject objectToMove;
     public int spaces;
+    public GameObject cardWaitingToSpawn;
 
     void Start()
     {
@@ -177,7 +179,49 @@ public class GridBehavior : MonoBehaviour
 
         return false;
     }
+    public void ShowSummonZone(GameObject card)
+    {
+        cardWaitingToSpawn = card;
+        HighlightRange(false); // Clear any old highlights
 
+        // Determine the row based on who is playing
+        int row = Mirror.NetworkServer.active ? 0 : 15;
+
+        // Loop through your specific allowed columns (2 to 8)
+        for (int col = 2; col <= 8; col++)
+        {
+            if (gridArray[col, row] != null)
+            {
+                // Use your existing tile glow logic
+                gridArray[col, row].GetComponent<LabyrinthTile>().GlowBlock();
+            }
+        }
+    }
+
+    public void OnTileClicked(int x, int y)
+    {
+        if (cardWaitingToSpawn != null)
+        {
+            int validRow = Mirror.NetworkServer.active ? 0 : 15;
+
+            if (y == validRow && x >= 2 && x <= 8)
+            {
+                int cardId = cardWaitingToSpawn.GetComponent<ThisCard>().thisId;
+                NetworkIdentity ni = cardWaitingToSpawn.GetComponent<NetworkIdentity>();
+                string tileName = gridArray[x, y].name;
+
+                PlayerManager pm = Mirror.NetworkClient.connection.identity.GetComponent<PlayerManager>();
+                pm.CmdSpawnMonster(cardId, tileName, ni);
+
+                HighlightRange(false);
+                cardWaitingToSpawn = null;
+            }
+        }
+        else if (objectToMove != null)
+        {
+            FindDistanceTrue(x, y);
+        }
+    }
     bool TestDirection(int x, int y, int step, int direction)
     {
         // direction: 1 is up, 2 is right, 3 is down, 4 is left

@@ -107,41 +107,21 @@ public class DragDrop : NetworkBehaviour
         var waitForButton = new WaitForUIButtons(YesButton, NoButton);
         yield return waitForButton.Reset();
 
-        string startTileName = isServer ? "GridObject(4,0)" : "GridObject(6,15)";
+        bool isAttack = (waitForButton.PressedButton == YesButton);
 
-        if (waitForButton.PressedButton == YesButton)
-        {
-            transform.SetParent(dropZone.transform, false);
-            int index = FindSocketIndex(dropZone);
-            isDraggable = false;
-            PlayerManager.PlayCard(gameObject, index);
-            PlayerManager.CmdChangeBattlePosition(gameObject, true);
+        transform.SetParent(dropZone.transform, false);
+        int index = FindSocketIndex(dropZone);
+        isDraggable = false;
+        PlayerManager.PlayCard(gameObject, index);
+        PlayerManager.CmdChangeBattlePosition(gameObject, isAttack);
 
-            int cardId = gameObject.GetComponent<ThisCard>().thisId;
-            NetworkIdentity ni = gameObject.GetComponent<NetworkIdentity>();
+        GridBehavior gb = GameObject.Find("GridGenerator").GetComponent<GridBehavior>();
 
-            PlayerManager.CmdSpawnMonster(cardId, startTileName, ni);
-            gameObject.GetComponent<ThisCard>().confirmationfinished = true;
-        }
-        else
-        {
-            transform.Rotate(0, 0, 90);
-            transform.SetParent(dropZone.transform, false);
-            int index = FindSocketIndex(dropZone);
-            isDraggable = false;
-            PlayerManager.PlayCard(gameObject, index);
-            PlayerManager.CmdChangeBattlePosition(gameObject, false);
+        gb.ShowSummonZone(gameObject);
 
-            int cardId = gameObject.GetComponent<ThisCard>().thisId;
-            NetworkIdentity ni = gameObject.GetComponent<NetworkIdentity>();
-
-            PlayerManager.CmdSpawnMonster(cardId, startTileName, ni);
-            gameObject.GetComponent<ThisCard>().confirmationfinished = true;
-        }
-
+        gameObject.GetComponent<ThisCard>().confirmationfinished = true;
         Destroy(box);
     }
-
     public void EndDrag()
     {
         if (!isDraggable) return;
