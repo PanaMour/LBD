@@ -464,21 +464,25 @@ public class PlayerManager : NetworkBehaviour
     public void RpcGMChangeTurn()
     {
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-        //pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-        pm.IsMyTurn = !pm.IsMyTurn;         //changes the turn
-        GameManager.turn++;                 //increments turn number
-        UIManager.updateTurnText();         //update the turn text for both
+        pm.IsMyTurn = !pm.IsMyTurn;
+        GameManager.turn++;
+        UIManager.updateTurnText();
+
         if (!hasAuthority)
-        {
             UIManager.updateEndButtonColourMagenta();
-        }
         if (hasAuthority)
-        {
             UIManager.updateEndButtonColourBlue();
+
+        LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
+        foreach (LabyrinthObject monster in allMonsters)
+        {
+            if (isServer)
+            {
+                monster.hasMovedThisTurn = false;
+            }
         }
+
         nomoresummons = false;
-        //if (IsMyTurn)
-           // StartCoroutine(DrawCard());
     }
 
     [Command]

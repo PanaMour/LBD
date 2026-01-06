@@ -323,24 +323,18 @@ public class GridBehavior : MonoBehaviour
 
         if (dist > 0 && dist <= spaces)
         {
-            // 1. Get the script
             LabyrinthObject labScript = objectToMove.GetComponent<LabyrinthObject>();
 
-            // 2. ONLY the owner sends the command to move
             if (labScript.hasAuthority)
             {
                 labScript.CmdMoveToTile(targetTile.name);
 
-                // Handle local logic (turn usage)
                 if (labScript.card != null)
+                {
                     labScript.card.GetComponent<ThisCard>().hasMoved = true;
+                }
             }
 
-            HighlightRange(false);
-            objectToMove = null;
-        }
-        else
-        {
             HighlightRange(false);
             objectToMove = null;
         }
