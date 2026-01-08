@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Mirror;
-using UnityEngine.UI;
 
 public class LabyrinthObject : NetworkBehaviour
 {
@@ -29,16 +28,16 @@ public class LabyrinthObject : NetworkBehaviour
 
     void Update()
     {
-        if (transform.rotation != Quaternion.identity)
-        {
-            transform.rotation = Quaternion.identity;
-        }
     }
 
     void OnMonsterIDChanged(int oldID, int newID)
     {
         Card cardData = CardDataBase.cardList[newID];
-        GetComponent<Image>().sprite = cardData.thisImage;
+
+        if (GetComponent<SpriteRenderer>() != null)
+        {
+            GetComponent<SpriteRenderer>().sprite = cardData.thisImage;
+        }
     }
 
     public void ObjectToMove()
@@ -74,7 +73,8 @@ public class LabyrinthObject : NetworkBehaviour
         if (targetTile != null)
         {
             transform.SetParent(targetTile.transform, false);
-            transform.localPosition = Vector3.zero;
+
+            transform.localPosition = new Vector3(0, 0.5f, 0);
         }
     }
 

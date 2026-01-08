@@ -27,10 +27,8 @@ public class GridBehavior : MonoBehaviour
     {
         if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
         {
-            transform.localRotation = Quaternion.Euler(0, 0, 180);
-            RectTransform rect = GetComponent<RectTransform>();
-            float targetX = leftBottomLocation.x - 40;
-            rect.anchoredPosition = new Vector2(targetX, rect.anchoredPosition.y);
+            transform.localRotation = Quaternion.Euler(0, 180, 0);
+            transform.position = new Vector3(columns * 1.1f, 0, rows * 1.1f);
         }
     }
 
@@ -41,39 +39,64 @@ public class GridBehavior : MonoBehaviour
         else Debug.LogError("Missing gridPrefab!");
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (findDistance && objectToMove != null)
         {
             SetDistance();
             SetPath();
+
             objectToMove.transform.SetParent(gridArray[endX, endY].transform);
-            objectToMove.transform.position = objectToMove.transform.parent.position;
+
+            objectToMove.transform.localPosition = new Vector3(0, 0.5f, 0);
+
             startX = objectToMove.transform.parent.GetComponent<GridStat>().x;
             startY = objectToMove.transform.parent.GetComponent<GridStat>().y;
             findDistance = false;
             objectToMove = null;
         }
-        //Debug.Log(startX + " " + startY);
     }
 
     void GenerateGrid()
     {
-        int k = 0;
+        Transform refContainer = transform.Find("GridContainer");
+
+        if (refContainer == null)
+        {
+            Debug.LogError("Could not find GridContainer in the scene! Make sure the 2D map exists.");
+            return;
+        }
+
+        gridArray = new GameObject[columns, rows];
+        float spacing = 1f;
         for (int i = 0; i < columns; i++)
         {
             for (int j = 0; j < rows; j++)
             {
-                GameObject obj = Instantiate(gridPrefab, new Vector3(leftBottomLocation.x + scale * i*50, leftBottomLocation.y + scale * j * 50, leftBottomLocation.z + scale * j * 50),Quaternion.identity);
-                obj.transform.SetParent(gameObject.transform);
-                obj.GetComponent<GridStat>().x = i;
-                obj.GetComponent<GridStat>().y = j;
-                obj.name = "GridObject(" + i.ToString() + "," + j.ToString() + ")";
-                obj.GetComponent<Image>().sprite = transform.Find("GridContainer").Find(obj.name).gameObject.GetComponent<Image>().sprite;
-                Debug.Log(obj.GetComponent<Image>().sprite);
+                Vector3 pos = new Vector3(leftBottomLocation.x + (i * spacing), 0, leftBottomLocation.z + (j * spacing));
+                GameObject obj = Instantiate(gridPrefab, pos, Quaternion.identity);
+                obj.transform.SetParent(this.transform);
+
+                GridStat stat = obj.GetComponent<GridStat>();
+                stat.x = i;
+                stat.y = j;
+                obj.name = "GridObject(" + i + "," + j + ")";
+
+                Transform refTile = refContainer.transform.Find(obj.name);
+                if (refTile != null)
+                {
+                    Sprite refSprite = refTile.GetComponent<Image>().sprite;
+
+                    Transform quad = obj.transform.Find("Quad");
+                    if (quad != null && refSprite != null)
+                    {
+                        Renderer quadRenderer = quad.GetComponent<Renderer>();
+
+                        quadRenderer.material.mainTexture = refSprite.texture;
+                    }
+                }
+
                 gridArray[i, j] = obj;
-                k++;
             }
         }
     }
@@ -148,31 +171,31 @@ public class GridBehavior : MonoBehaviour
     {
         if (gridArray[x, y] == null) return true;
 
-        Sprite s = gridArray[x, y].GetComponent<Image>().sprite;
-        if (s == null) return false;
+        Transform quad = gridArray[x, y].transform.Find("Quad");
+        if (quad == null) return false;
 
-        string spriteName = s.name;
-        string idStr = spriteName.Replace("labyrinthblock", "");
+        Texture tex = quad.GetComponent<Renderer>().material.mainTexture;
+        if (tex == null) return false;
+
+        string textureName = tex.name;
+
+        string idStr = textureName.Replace("labyrinthblock", "");
         int id = -1;
-        if (string.IsNullOrEmpty(idStr)) id = 0; // The base "labyrinthblock"
+        if (string.IsNullOrEmpty(idStr)) id = 0;
         else int.TryParse(idStr, out id);
 
         switch (side)
         {
             case "Top":
-                // 1, 6, 8, 10, 11, 12, 19, 20, 28, 29, 37
                 if (id == 1 || id == 6 || id == 8 || id == 10 || id == 11 || id == 12 || id == 19 || id == 20 || id == 28 || id == 29 || id == 37) return true;
                 break;
             case "Bottom":
-                // 3, 5, 9, 10, 11, 12, 13, 23, 24, 27, 30, 40
                 if (id == 3 || id == 5 || id == 9 || id == 10 || id == 11 || id == 12 || id == 13 || id == 23 || id == 24 || id == 27 || id == 30 || id == 40) return true;
                 break;
             case "Left":
-                // 2, 7, 8, 9, 12, 13, 21, 22, 29, 30, 38
                 if (id == 2 || id == 7 || id == 8 || id == 9 || id == 12 || id == 13 || id == 21 || id == 22 || id == 29 || id == 30 || id == 38) return true;
                 break;
             case "Right":
-                // 4, 5, 6, 7, 11, 13, 25, 26, 27, 28, 39
                 if (id == 4 || id == 5 || id == 6 || id == 7 || id == 11 || id == 13 || id == 25 || id == 26 || id == 27 || id == 28 || id == 39) return true;
                 break;
         }

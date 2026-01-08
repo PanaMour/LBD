@@ -15,28 +15,41 @@ public class LabyrinthTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     void Start()
     {
-        gridGenerator = transform.parent.gameObject;
+        if (gridGenerator == null)
+            gridGenerator = GameObject.Find("GridGenerator");
+
+        if (gridtile == null)
+            gridtile = this.gameObject;
     }
     public void OnPointerEnter(PointerEventData eventData)
     {
-        gridtile.GetComponent<Image>().color = red;
+        Color hoverColor = isHighlighted ? Color.cyan : Color.red;
+
+        GetComponent<Renderer>().material.color = hoverColor;
+
+        Transform quad = transform.Find("Quad");
+        if (quad != null)
+        {
+            quad.GetComponent<Renderer>().material.color = hoverColor;
+        }
     }
 
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        Color resetColor = isHighlighted ? Color.green : Color.white;
+
+        GetComponent<Renderer>().material.color = resetColor;
+
+        Transform quad = transform.Find("Quad");
+        if (quad != null)
+        {
+            quad.GetComponent<Renderer>().material.color = resetColor;
+        }
+    }
     public void OnPointerClick(PointerEventData eventData)
     {
         GridStat stats = gridtile.GetComponent<GridStat>();
         gridGenerator.GetComponent<GridBehavior>().OnTileClicked(stats.x, stats.y);
-    }
-    public void OnPointerExit(PointerEventData eventData)
-    {
-        if (isHighlighted)
-        {
-            gridtile.GetComponent<Image>().color = green;
-        }
-        else
-        {
-            gridtile.GetComponent<Image>().color = white;
-        }
     }
 
     public void StartMoving()
@@ -52,13 +65,27 @@ public class LabyrinthTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public void GlowBlock()
     {
         isHighlighted = true;
-        gridtile.GetComponent<Image>().color = green;
+
+        GetComponent<Renderer>().material.color = Color.green;
+
+        Transform quad = transform.Find("Quad");
+        if (quad != null)
+        {
+            quad.GetComponent<Renderer>().material.color = Color.green;
+        }
     }
 
     public void StopGlowBlock()
     {
         isHighlighted = false;
-        gridtile.GetComponent<Image>().color = white;
+
+        GetComponent<Renderer>().material.color = Color.white;
+
+        Transform quad = transform.Find("Quad");
+        if (quad != null)
+        {
+            quad.GetComponent<Renderer>().material.color = Color.white;
+        }
     }
 
     public Color LerpRed()
