@@ -252,80 +252,53 @@ public class PlayerManager : NetworkBehaviour
             if (hasAuthority)
             {
                 card.transform.SetParent(PlayerArea.transform, false);
-                //card.GetComponent<CardFlipper>().SetSprite("cyan");
-                if (card.GetComponent<ThisMagic>() != null)
-                {
-                    card.GetComponent<ThisMagic>().cardBack = false;
-                }
-                if (card.GetComponent<ThisCard>() != null)
-                {
-                    card.GetComponent<ThisCard>().cardBack = false;
-                }
+                if (card.GetComponent<ThisMagic>() != null) card.GetComponent<ThisMagic>().cardBack = false;
+                if (card.GetComponent<ThisCard>() != null) card.GetComponent<ThisCard>().cardBack = false;
             }
-            if (!hasAuthority)
+            else
             {
                 card.transform.SetParent(EnemyArea.transform, false);
-                //card.GetComponent<CardFlipper>().SetSprite("magenta");
-                //card.GetComponent<CardFlipper>().Flip();
-                if (card.GetComponent<ThisMagic>() != null)
-                {
-                    card.GetComponent<ThisMagic>().cardBack = true;
-                }
-                if (card.GetComponent<ThisCard>() != null)
-                {
-                    card.GetComponent<ThisCard>().cardBack = true;
-                }
+                if (card.GetComponent<ThisMagic>() != null) card.GetComponent<ThisMagic>().cardBack = true;
+                if (card.GetComponent<ThisCard>() != null) card.GetComponent<ThisCard>().cardBack = true;
             }
         }
         else if (type == "Played")
         {
-            if (CardsPlayed == 5)
-            {
-                CardsPlayed = 0;
-            }
+            Transform targetSocket = null;
+
             if (hasAuthority)
             {
-                //card.transform.SetParent(PlayerSockets[CardsPlayed].transform, false);
-                //card.transform.SetParent(PlayerSockets[index].transform, false);
-                if (card.GetComponent<ThisMagic>() != null)
-                {
-                    card.transform.SetParent(PlayerActionSockets[index].transform, false);
-                    card.GetComponent<ThisMagic>().cardBack = false;
-                    card.GetComponent<ThisMagic>().activated = true;
-                    card.GetComponent<ThisMagic>().faceup = true;
-                }
-                if (card.GetComponent<ThisCard>() != null)
-                {
-                    card.transform.SetParent(PlayerSockets[index].transform, false);
-                    card.GetComponent<ThisCard>().cardBack = false;
-                    card.GetComponent<ThisCard>().summoned = true;
-                    card.GetComponent<ThisCard>().faceup = true;
-                }
+                if (card.GetComponent<ThisMagic>() != null) targetSocket = PlayerActionSockets[index].transform;
+                if (card.GetComponent<ThisCard>() != null) targetSocket = PlayerSockets[index].transform;
+
                 CmdGMCardPlayed();
             }
-            if (!hasAuthority)
+            else
             {
-                //card.transform.SetParent(EnemySockets[CardsPlayed].transform, false);
-                //card.transform.SetParent(EnemySockets[index].transform, false);
+                if (card.GetComponent<ThisMagic>() != null) targetSocket = EnemyActionSockets[index].transform;
+                if (card.GetComponent<ThisCard>() != null) targetSocket = EnemySockets[index].transform;
+            }
+
+            if (targetSocket != null)
+            {
+                card.transform.SetParent(targetSocket, true);
+                card.transform.localPosition = new Vector3(0, 0.1f, 0);
+                card.transform.localRotation = Quaternion.Euler(90, 0, 0);
+                card.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+
                 if (card.GetComponent<ThisMagic>() != null)
                 {
-                    card.transform.SetParent(EnemyActionSockets[index].transform, false);
                     card.GetComponent<ThisMagic>().cardBack = false;
                     card.GetComponent<ThisMagic>().activated = true;
                     card.GetComponent<ThisMagic>().faceup = true;
                 }
                 if (card.GetComponent<ThisCard>() != null)
                 {
-                    card.transform.SetParent(EnemySockets[index].transform, false);
                     card.GetComponent<ThisCard>().cardBack = false;
-                    //card.GetComponent<CardFlipper>().Flip();
                     card.GetComponent<ThisCard>().summoned = true;
                     card.GetComponent<ThisCard>().faceup = true;
                 }
             }
-            CardsPlayed++;
-            //PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-            //pm.IsMyTurn = !pm.IsMyTurn;
         }
         else if (type == "OpponentDestroyed")
         {
