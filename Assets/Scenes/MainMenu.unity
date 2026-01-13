@@ -1153,7 +1153,7 @@ MonoBehaviour:
   showDebugMessages: 0
   serverTickRate: 30
   offlineScene: Assets/Scenes/MainMenu.unity
-  onlineScene: Assets/Scenes/LBDField.unity
+  onlineScene: Assets/Scenes/LBDField3D.unity
   transport: {fileID: 1765181463}
   networkAddress: localhost
   maxConnections: 4

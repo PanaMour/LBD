@@ -147,7 +147,7 @@ public class ThisCard : NetworkBehaviour
 
     void Update()
     {
-        PlayerArea = GameObject.Find("PlayerArea");
+        PlayerArea = GameObject.Find("Hand_Anchor");
         if (this.transform.parent == PlayerArea.transform.parent)
         {
             cardBack = false;

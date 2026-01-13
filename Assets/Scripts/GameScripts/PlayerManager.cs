@@ -57,7 +57,7 @@ public class PlayerManager : NetworkBehaviour
 
         UIManager = GameObject.Find("UIManager").GetComponent<UIManager>();
 
-        PlayerArea = GameObject.Find("PlayerArea");
+        PlayerArea = GameObject.Find("Hand_Anchor");
         EnemyArea = GameObject.Find("EnemyArea");
         PlayerYard = GameObject.Find("PlayerYard");
         EnemyYard = GameObject.Find("EnemyYard");
@@ -251,15 +251,23 @@ public class PlayerManager : NetworkBehaviour
         {
             if (hasAuthority)
             {
-                card.transform.SetParent(PlayerArea.transform, false);
-                if (card.GetComponent<ThisMagic>() != null) card.GetComponent<ThisMagic>().cardBack = false;
-                if (card.GetComponent<ThisCard>() != null) card.GetComponent<ThisCard>().cardBack = false;
+                GameObject handAnchor = GameObject.Find("Hand_Anchor");
+                card.transform.SetParent(handAnchor.transform);
+
+                card.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+
+                card.transform.localPosition = new Vector3(index * 0.1f, 0, 0);
+                card.transform.localRotation = Quaternion.identity;
+
+                if (card.GetComponent<ThisCard>() != null)
+                    card.GetComponent<ThisCard>().cardBack = false;
             }
             else
             {
-                card.transform.SetParent(EnemyArea.transform, false);
-                if (card.GetComponent<ThisMagic>() != null) card.GetComponent<ThisMagic>().cardBack = true;
-                if (card.GetComponent<ThisCard>() != null) card.GetComponent<ThisCard>().cardBack = true;
+                card.transform.SetParent(EnemyArea.transform);
+                card.transform.localPosition = Vector3.zero;
+                if (card.GetComponent<ThisCard>() != null)
+                    card.GetComponent<ThisCard>().cardBack = true;
             }
         }
         else if (type == "Played")

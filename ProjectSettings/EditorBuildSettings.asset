@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/MainMenu.unity
     guid: 84571ea166e24b64681077706c07d92f
   - enabled: 1
+    path: Assets/Scenes/LBDField3D.unity
+    guid: 5715eaef0cb9393459f19e55575f016f
+  - enabled: 0
     path: Assets/Scenes/LBDField.unity
     guid: 2cda990e2423bbf4892e6590ba056729
   m_configObjects: {}

@@ -15,7 +15,7 @@ public class CardToHand : NetworkBehaviour
 
     void Update()
     {
-        PlayerArea = GameObject.Find("PlayerArea");
+        PlayerArea = GameObject.Find("Hand_Anchor");
         It.transform.SetParent(PlayerArea.transform);
         It.transform.localScale = Vector3.one;
         It.transform.position = new Vector3(transform.position.x, transform.position.y, -48);
