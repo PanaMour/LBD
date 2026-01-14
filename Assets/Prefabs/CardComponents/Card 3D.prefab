@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 1277723730298811786}
   - component: {fileID: 8639271636157545478}
   m_Layer: 8
-  m_Name: Card 1
+  m_Name: Card 3D
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -395,6 +395,21 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
+  - eventID: 5
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 3822603671114954310}
+          m_MethodName: RightClickForContextMenu
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!114 &6936565614365339200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -484,30 +499,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  Canvas: {fileID: 0}
-  PlayerManager: {fileID: 0}
-  Card: {fileID: 6605747384558647205}
-  NameText: {fileID: 0}
-  Image: {fileID: 0}
-  DescriptionText: {fileID: 0}
-  ATKtext: {fileID: 0}
-  DEFtext: {fileID: 0}
-  StarsText: {fileID: 0}
-  Background: {fileID: 0}
-  CardCanvas: {fileID: 0}
-  zoomCardNameText: {fileID: 0}
-  zoomText: {fileID: 0}
-  zoomImage: {fileID: 0}
-  zoomDescriptionText: {fileID: 0}
-  zoomATKtext: {fileID: 0}
-  zoomDEFtext: {fileID: 0}
-  zoomStarstext: {fileID: 0}
-  zoomStars: {fileID: 0}
-  zoomATK: {fileID: 0}
-  zoomDEF: {fileID: 0}
-  zoomBackground: {fileID: 0}
-  zoomCanvas: {fileID: 0}
-  zoomCardBack: {fileID: 0}
+  zoomAmount: 0.8
+  liftAmount: 0.4
 --- !u!65 &3132118303870359828
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -519,8 +512,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 1.5, z: 0.1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 95.66923, y: 140.08708, z: 0.1}
+  m_Center: {x: 0.11245533, y: -0.21536647, z: 0}
 --- !u!64 &1277723730298811786
 MeshCollider:
   m_ObjectHideFlags: 0

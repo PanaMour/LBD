@@ -11,11 +11,10 @@ public class DragDrop : NetworkBehaviour
     public PlayerManager PlayerManager;
 
     private bool isDragging = false;
-    private bool isOverDropZone = false;
     private bool isDraggable = true;
     private GameObject dropZone;
     private GameObject startParent;
-    private Vector2 startPosition;
+    private Vector3 startPosition;
 
     public GameObject ConfirmationBox;
     public Button YesButton;
@@ -25,79 +24,149 @@ public class DragDrop : NetworkBehaviour
     {
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         Canvas = GameObject.Find("Main Canvas");
-        NetworkIdentity networkIdentity = NetworkClient.connection.identity;
-        PlayerManager = networkIdentity.GetComponent<PlayerManager>();
+
+        if (NetworkClient.connection.identity != null)
+        {
+            PlayerManager = NetworkClient.connection.identity.GetComponent<PlayerManager>();
+        }
 
         if (!hasAuthority)
         {
             isDraggable = false;
         }
     }
+
     void Update()
     {
         if (isDragging)
         {
-            transform.position = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-            transform.SetParent(Canvas.transform, true);
+            // 3D Mouse Following: 
+            // We project the mouse position into the 3D world at a specific distance (1.2f) from the camera
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = 1.2f;
+            transform.position = Camera.main.ScreenToWorldPoint(mousePos);
+
+            // Keep the card upright while dragging
+            transform.localRotation = Quaternion.Euler(0, 0, 0);
         }
-    }
-
-    private void OnCollisionEnter2D(Collision2D collision)
-    {
-        /*if (collision.gameObject == PlayerManager.PlayerSockets[PlayerManager.CardsPlayed])
-        {
-            isOverDropZone = true;
-            dropZone = collision.gameObject;
-        }*/
-
-
-        // checks all the PlayerSockets for a collision
-        for (int i = 0; i < 4; i++)
-        {
-            if (collision.gameObject == PlayerManager.PlayerSockets[i] && gameObject.GetComponent<ThisCard>() != null)
-            {
-                isOverDropZone = true;
-                dropZone = collision.gameObject;                
-            }
-            else if(collision.gameObject == PlayerManager.PlayerActionSockets[i] && gameObject.GetComponent<ThisMagic>() != null)
-            {
-                isOverDropZone = true;
-                dropZone = collision.gameObject;
-            }
-        }
-    }
-
-    private void OnCollisionExit2D(Collision2D collision)
-    {
-        isOverDropZone = false;
-        dropZone = null;
     }
 
     public void StartDrag()
     {
         if (!isDraggable) return;
+
         startParent = transform.parent.gameObject;
         startPosition = transform.position;
         isDragging = true;
+
+        // Temporarily unparent so it doesn't get squished by HandAnchor layout
+        transform.SetParent(null);
     }
 
-    IEnumerator Confirmation(GameObject dropZone,GameObject box)
+    public void EndDrag()
     {
-        var waitForButton = new WaitForUIButtons(YesButton,NoButton);
-        yield return waitForButton.Reset();
-        if(waitForButton.PressedButton == YesButton)
+        if (!isDraggable) return;
+        isDragging = false;
+
+        // --- 3D RAYCAST DETECTION ---
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        bool isOverDropZone = false;
+        dropZone = null;
+
+        if (Physics.Raycast(ray, out hit))
         {
-            PlayerManager.CmdPlayerDestroyCard(dropZone.transform.GetChild(0).gameObject, 0);
-            transform.SetParent(dropZone.transform, false);
-            int index = FindSocketIndex(dropZone);
-            isDraggable = false;
-            PlayerManager.PlayCard(gameObject, index);
-            gameObject.GetComponent<ThisCard>().confirmationfinished = true;
+            GameObject hitObject = hit.collider.gameObject;
+
+            // Check if the 3D object we hit is one of our sockets
+            if (gameObject.GetComponent<ThisCard>() != null)
+            {
+                if (PlayerManager.PlayerSockets.Contains(hitObject))
+                {
+                    isOverDropZone = true;
+                    dropZone = hitObject;
+                }
+            }
+            else if (gameObject.GetComponent<ThisMagic>() != null)
+            {
+                if (PlayerManager.PlayerActionSockets.Contains(hitObject))
+                {
+                    isOverDropZone = true;
+                    dropZone = hitObject;
+                }
+            }
+        }
+
+        // --- ORIGINAL LOGIC RE-APPLIED TO 3D ---
+        if (isOverDropZone && PlayerManager.IsMyTurn && dropZone.transform.childCount == 0 && (PlayerManager.nomoresummons == false || gameObject.GetComponent<ThisMagic>() != null))
+        {
+            if (gameObject.GetComponent<ThisCard>() == null)
+            {
+                FinalizePlacement(dropZone);
+            }
+            else if (gameObject.GetComponent<ThisCard>().stars <= 4)
+            {
+                // Confirmation Box Logic (Remains 2D UI)
+                GameObject box = Instantiate(ConfirmationBox);
+                box.GetComponentInChildren<Text>().text = "Summon " + gameObject.GetComponent<ThisCard>().cardName + "?";
+                box.transform.SetParent(Canvas.transform, false);
+
+                YesButton = GameObject.Find("YESButton").GetComponent<Button>();
+                NoButton = GameObject.Find("NOButton").GetComponent<Button>();
+
+                YesButton.GetComponentInChildren<Text>().text = "Attack";
+                NoButton.GetComponentInChildren<Text>().text = "Defense";
+
+                StartCoroutine(AttackORDefense(dropZone, box));
+            }
+            else
+            {
+                ReturnToStart();
+            }
+        }
+        else if (isOverDropZone && PlayerManager.IsMyTurn && dropZone.transform.childCount == 1 && dropZone.transform.GetChild(0).GetComponent<ThisCard>().canBeTributed == true && gameObject.GetComponent<ThisCard>().stars >= 5)
+        {
+            // Tribute Logic
+            GameObject box = Instantiate(ConfirmationBox);
+            box.GetComponentInChildren<Text>().text = "Tribute " + dropZone.transform.GetChild(0).GetComponent<ThisCard>().cardName + "?";
+            box.transform.SetParent(Canvas.transform, false);
+
+            YesButton = GameObject.Find("YESButton").GetComponent<Button>();
+            NoButton = GameObject.Find("NOButton").GetComponent<Button>();
+
+            StartCoroutine(Confirmation(dropZone, box));
         }
         else
         {
-            transform.position = startPosition;
-            transform.SetParent(startParent.transform, true);
+            ReturnToStart();
+        }
+    }
+
+    private void FinalizePlacement(GameObject targetZone)
+    {
+        int index = FindSocketIndex(targetZone);
+        isDraggable = false;
+        PlayerManager.PlayCard(gameObject, index);
+    }
+
+    private void ReturnToStart()
+    {
+        transform.SetParent(startParent.transform);
+        transform.position = startPosition;
+    }
+
+    IEnumerator Confirmation(GameObject dropZone, GameObject box)
+    {
+        var waitForButton = new WaitForUIButtons(YesButton, NoButton);
+        yield return waitForButton.Reset();
+        if (waitForButton.PressedButton == YesButton)
+        {
+            PlayerManager.CmdPlayerDestroyCard(dropZone.transform.GetChild(0).gameObject, 0);
+            FinalizePlacement(dropZone);
+        }
+        else
+        {
+            ReturnToStart();
         }
         Destroy(box);
     }
@@ -109,91 +178,20 @@ public class DragDrop : NetworkBehaviour
 
         bool isAttack = (waitForButton.PressedButton == YesButton);
 
-        transform.SetParent(dropZone.transform, false);
-        int index = FindSocketIndex(dropZone);
-        isDraggable = false;
-        PlayerManager.PlayCard(gameObject, index);
+        FinalizePlacement(dropZone);
         PlayerManager.CmdChangeBattlePosition(gameObject, isAttack);
 
         GridBehavior gb = GameObject.Find("GridGenerator").GetComponent<GridBehavior>();
-
         gb.ShowSummonZone(gameObject);
 
-        gameObject.GetComponent<ThisCard>().confirmationfinished = true;
         Destroy(box);
     }
-    public void EndDrag()
-    {
-        if (!isDraggable) return;
-        isDragging = false;
 
-        if (isOverDropZone && PlayerManager.IsMyTurn && dropZone.transform.childCount == 0 && (PlayerManager.nomoresummons == false || gameObject.GetComponent<ThisMagic>() != null))
-        {
-            if(gameObject.GetComponent<ThisCard>() == null)
-            {
-                transform.SetParent(dropZone.transform, false);
-                int index = FindSocketIndex(dropZone);
-                isDraggable = false;
-                PlayerManager.PlayCard(gameObject, index);
-            }else if (gameObject.GetComponent<ThisCard>().stars <= 4)
-            {
-                GameObject box = Instantiate(ConfirmationBox);
-                //NetworkServer.Spawn(box, connectionToClient);
-                box.GetComponentInChildren<Text>().text = "Do you want to summon " + gameObject.GetComponent<ThisCard>().cardName + "?";
-                box.transform.SetParent(Canvas.transform);
-                YesButton = GameObject.Find("YESButton").GetComponent<Button>();
-                YesButton.GetComponentInChildren<Text>().text = "Attack";
-                NoButton = GameObject.Find("NOButton").GetComponent<Button>();
-                NoButton.GetComponentInChildren<Text>().text = "Defense";
-                StartCoroutine(AttackORDefense(dropZone, box));
-                /*gameObject.GetComponent<ThisCard>().attackmode = true;
-                transform.SetParent(dropZone.transform, false);
-                int index = FindSocketIndex(dropZone);
-                isDraggable = false;
-                PlayerManager.PlayCard(gameObject, index);*/
-            }
-            else
-            {
-                transform.position = startPosition;
-                transform.SetParent(startParent.transform, true);
-            }
-        }
-        else if (isOverDropZone && PlayerManager.IsMyTurn && dropZone.transform.childCount == 1 && dropZone.transform.GetChild(0).GetComponent<ThisCard>().canBeTributed == true && gameObject.GetComponent<ThisCard>().stars >= 5 && gameObject.GetComponent<ThisCard>().stars <= 6 && (PlayerManager.nomoresummons == false || gameObject.GetComponent<ThisMagic>() != null))
-        {
-            GameObject box = Instantiate(ConfirmationBox);
-            //NetworkServer.Spawn(box, connectionToClient);
-            box.GetComponentInChildren<Text>().text = "Do you want to tribute " + dropZone.transform.GetChild(0).GetComponent<ThisCard>().cardName + " to summon " + gameObject.GetComponent<ThisCard>().cardName + "?";
-            box.transform.SetParent(Canvas.transform);
-            YesButton = GameObject.Find("YESButton").GetComponent<Button>();
-            NoButton = GameObject.Find("NOButton").GetComponent<Button>();
-            StartCoroutine(Confirmation(dropZone,box));
-        }
-        else
-        {
-            transform.position = startPosition;
-            transform.SetParent(startParent.transform, true);
-        }
-    }
-
-    private int FindSocketIndex(GameObject dropZone)
+    private int FindSocketIndex(GameObject targetZone)
     {
-        int i = 0;
         if (gameObject.GetComponent<ThisCard>() != null)
-        {
-            for (i = 0; i < PlayerManager.PlayerSockets.Count; i++)
-            {
-                if (PlayerManager.PlayerSockets[i] == dropZone)
-                    return i;
-            }
-        }
-        else if(gameObject.GetComponent<ThisMagic>() != null)
-        {
-            for (i = 0; i < PlayerManager.PlayerActionSockets.Count; i++)
-            {
-                if (PlayerManager.PlayerActionSockets[i] == dropZone)
-                    return i;
-            }
-        }
-        return i;
+            return PlayerManager.PlayerSockets.IndexOf(targetZone);
+        else
+            return PlayerManager.PlayerActionSockets.IndexOf(targetZone);
     }
 }

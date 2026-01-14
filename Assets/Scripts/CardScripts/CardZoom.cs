@@ -1,104 +1,126 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
 
 public class CardZoom : NetworkBehaviour
 {
-    public GameObject Canvas;
-    public PlayerManager PlayerManager;
-    public GameObject Card;
-    public Text NameText;
-    public Image Image;
-    public Text DescriptionText;
-    public Text ATKtext;
-    public Text DEFtext;
-    public Text StarsText;
-    public Image Background;
-    public Image CardCanvas;
+    [Header("3D Animation Settings")]
+    public float zoomAmount = 0.8f;   // How far toward the camera the card moves
+    public float liftAmount = 0.4f;   // How far "up" the card moves
 
-    public Text zoomCardNameText;
-    public Text zoomText;
-    public Image zoomImage;
-    public Text zoomDescriptionText;
-    public Text zoomATKtext;
-    public Text zoomDEFtext;
-    public Text zoomStarstext;
-    public GameObject zoomStars;
-    public GameObject zoomATK;
-    public GameObject zoomDEF;
-    public Image zoomBackground;
-    public Image zoomCanvas;
-    public Image zoomCardBack;
+    private Vector3 originalPosition;
+    private Quaternion originalRotation;
+    private bool isZoomed = false;
+
+    [Header("UI References")]
+    private GameObject zoomPanel;
+    private Text zName, zDesc, zATK, zDEF;
+    private Image zImage;
+    private GameObject zStatsContainer;
 
     public void Awake()
     {
-        Canvas = GameObject.Find("Main Canvas");
-        zoomCardNameText = GameObject.Find("ZoomNameText").GetComponent<Text>();
-        zoomImage = GameObject.Find("ZoomImage").GetComponent<Image>();
-        zoomDescriptionText = GameObject.Find("ZoomDescriptionText").GetComponent<Text>();
-        zoomText = GameObject.Find("ExplainZoomText").GetComponent<Text>();
-        zoomATKtext = GameObject.Find("ZoomATKtext").GetComponent<Text>();
-        zoomDEFtext = GameObject.Find("ZoomDEFtext").GetComponent<Text>();
-        zoomStarstext = GameObject.Find("ZoomStarsText").GetComponent<Text>();
-        zoomStars = GameObject.Find("ZoomStars");
-        zoomATK = GameObject.Find("ZoomATK");
-        zoomDEF = GameObject.Find("ZoomDEF");
-        zoomBackground = GameObject.Find("ZoomBackground").GetComponent<Image>();
-        zoomCanvas = GameObject.Find("ZoomCardCanvas").GetComponent<Image>();
-        zoomCardBack = GameObject.Find("ZoomCardBack").GetComponent<Image>();
+        // 1. Find the Main Zoom Panel (The parent object we created in the Canvas)
+        zoomPanel = GameObject.Find("ZoomPanel");
 
-        NameText = gameObject.transform.Find("CardCanvas").Find("Background").Find("CardName").Find("NameText").GetComponent<Text>();
-        Image = gameObject.transform.Find("CardCanvas").Find("Background").Find("Image").GetComponent<Image>();
-        DescriptionText = gameObject.transform.Find("CardCanvas").Find("Background").Find("CardDescription").Find("DescriptionText").GetComponent<Text>();
-        ATKtext = gameObject.transform.Find("CardCanvas").Find("Background").Find("ATK").Find("ATKtext").GetComponent<Text>();
-        DEFtext = gameObject.transform.Find("CardCanvas").Find("Background").Find("DEF").Find("DEFtext").GetComponent<Text>();
-        StarsText = gameObject.transform.Find("CardCanvas").Find("Background").Find("Stars").Find("StarsText").GetComponent<Text>();
-        Background = gameObject.transform.Find("CardCanvas").Find("Background").GetComponent<Image>();
-        CardCanvas = gameObject.transform.Find("CardCanvas").GetComponent<Image>();
+        if (zoomPanel != null)
+        {
+            // 2. Cache the UI components inside the panel for speed
+            // Assumes these names match your ZoomPanel hierarchy
+            zName = zoomPanel.transform.Find("ZoomNameText")?.GetComponent<Text>();
+            zDesc = zoomPanel.transform.Find("ZoomDescriptionText")?.GetComponent<Text>();
+            zImage = zoomPanel.transform.Find("ZoomCardImage")?.GetComponent<Image>();
+            zStatsContainer = zoomPanel.transform.Find("ZoomStats")?.gameObject;
 
-        NetworkIdentity networkIdentity = NetworkClient.connection.identity;
-        PlayerManager = networkIdentity.GetComponent<PlayerManager>();
-        
+            if (zStatsContainer != null)
+            {
+                zATK = zStatsContainer.transform.Find("ZoomATKText")?.GetComponent<Text>();
+                zDEF = zStatsContainer.transform.Find("ZoomDEFText")?.GetComponent<Text>();
+            }
+
+            // Start with the panel hidden
+            zoomPanel.SetActive(false);
+        }
     }
 
     public void OnHoverEnter()
     {
-        if (hasAuthority || Card.GetComponent<ThisCard>().faceup == true)
-        {
-            zoomCardBack.transform.localScale = new Vector3(0, 0, 0);
-            zoomATK.transform.localScale = new Vector3(1, 1, 1);
-            zoomDEF.transform.localScale = new Vector3(1, 1, 1);
-            zoomStars.transform.localScale = new Vector3(1, 1, 1);
-            zoomCardNameText.text = NameText.text;
-            zoomImage.sprite = Image.sprite;
-            zoomDescriptionText.text = DescriptionText.text;
-            zoomATKtext.text = ATKtext.text;
-            zoomDEFtext.text = DEFtext.text;
-            zoomStarstext.text = StarsText.text;
-            zoomBackground.color = Background.color;
-            zoomText.text = Card.GetComponent<ThisCard>().descriptionText.text;
-            zoomCanvas.color = CardCanvas.color;
-            //PlayerManager.CmdZoomCard(name);
-            /*zoomCard = Instantiate(gameObject, new Vector2(Input.mousePosition.x, Input.mousePosition.y + 250), Quaternion.identity);
-            zoomCard.transform.SetParent(Canvas.transform, true);
-            zoomCard.layer = LayerMask.NameToLayer("Zoom");
+        // Only zoom if we have authority or the card is face up on the table
+        bool isFaceUp = false;
+        if (GetComponent<ThisCard>() != null) isFaceUp = GetComponent<ThisCard>().faceup;
+        if (GetComponent<ThisMagic>() != null) isFaceUp = GetComponent<ThisMagic>().faceup;
 
-            RectTransform rect = zoomCard.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(240, 344);*/
-        }
-        else if (!hasAuthority)
+        if (hasAuthority || isFaceUp)
         {
-            zoomCardBack.transform.localScale = new Vector3(1, 1, 1);
-            zoomText.text = "Opponent's Card.";
-            Debug.Log("NO AUTHORITY!");
+            // --- 3D POP-UP LOGIC ---
+            if (!isZoomed)
+            {
+                originalPosition = transform.localPosition;
+                originalRotation = transform.localRotation;
+
+                // Move closer to camera and slightly up
+                transform.localPosition += new Vector3(0, liftAmount, -zoomAmount);
+                transform.localRotation = Quaternion.Euler(0, 0, 0); // Straighten card
+                isZoomed = true;
+            }
+
+            // --- 2D UI PANEL LOGIC ---
+            if (zoomPanel != null)
+            {
+                zoomPanel.SetActive(true);
+                UpdateZoomUI();
+            }
         }
     }
 
     public void OnHoverExit()
     {
-        //PlayerManager.CmdDestroyZoomCard();
-        //Destroy(zoomCard);
+        // Reset 3D position
+        if (isZoomed)
+        {
+            transform.localPosition = originalPosition;
+            transform.localRotation = originalRotation;
+            isZoomed = false;
+        }
+
+        // Hide 2D Panel
+        if (zoomPanel != null)
+        {
+            zoomPanel.SetActive(false);
+        }
+    }
+
+    private void UpdateZoomUI()
+    {
+        // Handle Monster Card Data
+        ThisCard monster = GetComponent<ThisCard>();
+        if (monster != null)
+        {
+            if (zName) zName.text = monster.cardName;
+            if (zDesc) zDesc.text = monster.descriptionText.text;
+            if (zImage) zImage.sprite = monster.thisSprite;
+
+            if (zStatsContainer)
+            {
+                zStatsContainer.SetActive(true); // Show ATK/DEF for monsters
+                if (zATK) zATK.text = "ATK: " + monster.atk;
+                if (zDEF) zDEF.text = "DEF: " + monster.def;
+            }
+            return;
+        }
+
+        // Handle Magic Card Data
+        ThisMagic magic = GetComponent<ThisMagic>();
+        if (magic != null)
+        {
+            if (zName) zName.text = magic.magicName;
+            if (zDesc) zDesc.text = magic.magicdescriptionText.text;
+            if (zImage) zImage.sprite = magic.thisSprite;
+
+            if (zStatsContainer)
+            {
+                zStatsContainer.SetActive(false); // Hide ATK/DEF for magic
+            }
+        }
     }
 }
