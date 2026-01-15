@@ -138,7 +138,7 @@ MonoBehaviour:
     canBeTributed: 0
   LabyrinthObject: {fileID: 7951009996680074172, guid: 7170bd098f1d54c4e9eb2598bc51ed9d,
     type: 3}
-  thisId: 6
+  thisId: 20
   id: 0
   cardName: 
   stars: 0
@@ -499,8 +499,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  zoomAmount: 0.8
-  liftAmount: 0.4
+  Canvas: {fileID: 0}
+  PlayerManager: {fileID: 0}
+  Card: {fileID: 6605747384558647205}
+  NameText: {fileID: 0}
+  Image: {fileID: 0}
+  DescriptionText: {fileID: 0}
+  ATKtext: {fileID: 0}
+  DEFtext: {fileID: 0}
+  StarsText: {fileID: 0}
+  Background: {fileID: 0}
+  CardCanvas: {fileID: 0}
+  zoomCardNameText: {fileID: 0}
+  zoomText: {fileID: 0}
+  zoomImage: {fileID: 0}
+  zoomDescriptionText: {fileID: 0}
+  zoomATKtext: {fileID: 0}
+  zoomDEFtext: {fileID: 0}
+  zoomStarstext: {fileID: 0}
+  zoomStars: {fileID: 0}
+  zoomATK: {fileID: 0}
+  zoomDEF: {fileID: 0}
+  zoomBackground: {fileID: 0}
+  zoomCanvas: {fileID: 0}
+  zoomCardBack: {fileID: 0}
 --- !u!65 &3132118303870359828
 BoxCollider:
   m_ObjectHideFlags: 0

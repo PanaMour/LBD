@@ -13,12 +13,12 @@ GameObject:
   - component: {fileID: 8262497931863256714}
   - component: {fileID: 6072342874978157714}
   - component: {fileID: 8754883198169277385}
+  - component: {fileID: -7098578232568471390}
   - component: {fileID: 2371189222905091773}
   - component: {fileID: 8776892952669659681}
   - component: {fileID: -4074743529719131515}
   - component: {fileID: 2622352400398172894}
   - component: {fileID: 8982046285179066192}
-  - component: {fileID: -341577518117090205}
   m_Layer: 12
   m_Name: Magic 3D
   m_TagString: Untagged
@@ -74,7 +74,7 @@ MonoBehaviour:
     changeDefense: 0
     equip: 0
     equipBoost: 0
-  thisId: 3
+  thisId: 8
   id: 0
   magicName: 
   magicDescription: 
@@ -169,6 +169,44 @@ MonoBehaviour:
   ConfirmationBox: {fileID: 0}
   YesButton: {fileID: 0}
   NoButton: {fileID: 0}
+--- !u!114 &-7098578232568471390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626048065440055933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b90b5c90ef2041c4da2c3a7219411bad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  Canvas: {fileID: 0}
+  PlayerManager: {fileID: 0}
+  Magic: {fileID: 626048065440055933}
+  NameText: {fileID: 0}
+  Image: {fileID: 0}
+  DescriptionText: {fileID: 0}
+  ATKtext: {fileID: 0}
+  DEFtext: {fileID: 0}
+  StarsText: {fileID: 0}
+  Background: {fileID: 0}
+  MagicCanvas: {fileID: 0}
+  zoomCardNameText: {fileID: 0}
+  zoomText: {fileID: 0}
+  zoomImage: {fileID: 0}
+  zoomDescriptionText: {fileID: 0}
+  zoomATKtext: {fileID: 0}
+  zoomDEFtext: {fileID: 0}
+  zoomStarstext: {fileID: 0}
+  zoomStars: {fileID: 0}
+  zoomATK: {fileID: 0}
+  zoomDEF: {fileID: 0}
+  zoomBackground: {fileID: 0}
+  zoomCanvas: {fileID: 0}
+  zoomCardBack: {fileID: 0}
 --- !u!114 &2371189222905091773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,7 +313,7 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 0}
+        - m_Target: {fileID: -7098578232568471390}
           m_MethodName: OnHoverEnter
           m_Mode: 1
           m_Arguments:
@@ -287,6 +325,32 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
   - eventID: 1
+    callback:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 7906287169701147136}
+          m_MethodName: NotBeingTarget
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: -7098578232568471390}
+          m_MethodName: OnHoverExit
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - eventID: 5
     callback:
       m_PersistentCalls:
         m_Calls:
@@ -404,22 +468,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &-341577518117090205
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 626048065440055933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48957976148fb2e4bb4fbc9deea415f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  zoomAmount: 0.8
-  liftAmount: 0.4
 --- !u!223 &2249666712005733853
 Canvas:
   m_ObjectHideFlags: 0
