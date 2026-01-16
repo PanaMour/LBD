@@ -147,13 +147,19 @@ public class ThisCard : NetworkBehaviour
 
     void Update()
     {
-        PlayerArea = GameObject.Find("Hand_Anchor");
-        if (this.transform.parent == PlayerArea.transform.parent)
+        if (PlayerArea == null) PlayerArea = GameObject.Find("Hand_Anchor");
+        if (battleZone == null) battleZone = GameObject.Find("PlayerSlots");
+        if (PlayerSlots == null) PlayerSlots = GameObject.Find("PlayerSlots");
+
+        if (this.transform.parent != null && PlayerArea != null)
         {
-            cardBack = false;
+            if (this.transform.parent == PlayerArea.transform)
+            {
+                cardBack = false;
+            }
         }
 
-        if (!initialized)
+        if (!initialized && thisCard.Count > 0)
         {
             id = thisCard[0].id;
             cardName = thisCard[0].cardName;
@@ -162,41 +168,28 @@ public class ThisCard : NetworkBehaviour
             def = thisCard[0].def;
             cardDescription = thisCard[0].cardDescription;
             thisSprite = thisCard[0].thisImage;
-
             drawXcards = thisCard[0].drawXcards;
             returnXcards = thisCard[0].returnXcards;
-
             spell = thisCard[0].spell;
             damageDealtBySpell = thisCard[0].damageDealtBySpell;
-
             canBeTributed = thisCard[0].canBeTributed;
             initialized = true;
         }
 
-        nameText.text = "" + cardName;
-        starsText.text = "" + stars;
-        actualATK = atk - decreased;
-        ATKText.text = "" + atk;
-        DEFText.text = "" + def;
-        descriptionText.text = "" + cardDescription;
+        if (initialized)
+        {
+            nameText.text = "" + cardName;
+            starsText.text = "" + stars;
+            actualATK = atk - decreased;
+            ATKText.text = "" + atk;
+            DEFText.text = "" + def;
+            descriptionText.text = "" + cardDescription;
+            if (thisSprite != null) thatImage.sprite = thisSprite;
 
-        thatImage.sprite = thisSprite;
-
-        if (thisCard[0].color == "None")
-        {
-            frame.GetComponent<Image>().color = new Color32(255, 255, 255, 255);
-        }
-        if (thisCard[0].color == "Brown")
-        {
-            frame.GetComponent<Image>().color = new Color32(156, 73, 0, 255);
-        }
-        if (thisCard[0].color == "Red")
-        {
-            frame.GetComponent<Image>().color = new Color32(255, 0, 0, 255);
-        }
-        if (thisCard[0].color == "Magic")
-        {
-            frame.GetComponent<Image>().color = new Color32(19, 138, 102, 255);
+            if (thisCard[0].color == "None") frame.color = new Color32(255, 255, 255, 255);
+            else if (thisCard[0].color == "Brown") frame.color = new Color32(156, 73, 0, 255);
+            else if (thisCard[0].color == "Red") frame.color = new Color32(255, 0, 0, 255);
+            else if (thisCard[0].color == "Magic") frame.color = new Color32(19, 138, 102, 255);
         }
 
         staticCardBack = cardBack;
@@ -212,38 +205,39 @@ public class ThisCard : NetworkBehaviour
 
         if (tag != "Unusable")
         {
-
-            if (stars <= 4 && summoned == false && beInGraveyard == false)
+            bool tributeAvailable = false;
+            if (stars >= 5 && stars <= 6 && summoned == false && beInGraveyard == false && PlayerSlots != null)
             {
-                canBeSummoned = true;
-            }
-            else canBeSummoned = false;
-
-            if (stars >= 5 && stars <= 6 && summoned == false && beInGraveyard == false)
-            {
-                foreach (Transform child in PlayerSlots.transform)//child.child
+                foreach (Transform child in PlayerSlots.transform)
                 {
                     foreach (Transform grandChild in child)
                     {
-                        if (grandChild.GetComponent<ThisCard>() != null)
-                        {
-                            if (grandChild.GetComponent<ThisCard>().canBeTributed)
-                            {
-                                canBeSummoned = true;
-                            }
-                        }
+                        ThisCard tc = grandChild.GetComponent<ThisCard>();
+                        if (tc != null && tc.canBeTributed) tributeAvailable = true;
                     }
                 }
             }
-            if (canBeSummoned)
+
+            if (summoned == false && beInGraveyard == false)
             {
-                gameObject.GetComponent<DragDrop>().enabled = true;
+                if (stars <= 4) canBeSummoned = true;
+                else if ((stars == 5 || stars == 6) && tributeAvailable) canBeSummoned = true;
+                else canBeSummoned = false;
             }
-            else gameObject.GetComponent<DragDrop>().enabled = false;
 
-            battleZone = GameObject.Find("PlayerSlots");
+            DragDrop dd = gameObject.GetComponent<DragDrop>();
+            if (dd != null) dd.enabled = canBeSummoned;
 
-            if ((summoned == false && this.transform.parent.transform.parent == battleZone.transform) || confirmationfinished == true)
+            bool isInBattleZone = false;
+            if (this.transform.parent != null && this.transform.parent.parent != null && battleZone != null)
+            {
+                if (this.transform.parent.parent == battleZone.transform)
+                {
+                    isInBattleZone = true;
+                }
+            }
+
+            if ((summoned == false && isInBattleZone) || confirmationfinished == true)
             {
                 Summon();
                 Debug.Log(cardName + " was summoned successfully!");
@@ -253,149 +247,92 @@ public class ThisCard : NetworkBehaviour
                 confirmationfinished = false;
             }
 
-            if (canAttack == true && attackmode == true && beInGraveyard == false && summoned == true)
-            {
-                attackBorder.SetActive(true);
-                canBeTributed = true;
-            }
-            else if (attackmode == false && beInGraveyard == false && summoned == true)
-            {
-                attackBorder.SetActive(false);
-                canBeTributed = true;
-            }
-            else
-            {
-                attackBorder.SetActive(false);
-                canBeTributed = false;
-            }
-            if (beInGraveyard)
-            {
-                if(!attackmode)
-                transform.Rotate(0, 0, -90);
-                attackmode = true;
-            }
-            if (PlayerManager.IsMyTurn == false && summoned == true)
-            {
-                cantAttack = false;
-                hasMoved = false;
-            }
-
-            if (PlayerManager.IsMyTurn == true && cantAttack == false && attackmode == true && this.transform.parent.transform.parent == battleZone.transform && GameManager.turn != 0)
-            {
-                canAttack = true;
-            }
-            else
-            {
-                canAttack = false;
-            }
-
-            if (PlayerManager.IsMyTurn == true && attackmode == true && this.transform.parent.transform.parent == battleZone.transform && hasMoved == false)
-            {
-                canMove = true;
-            }
-            else
-            {
-                canMove = false;
-            }
-
-            targeting = staticTargeting;
-            targetingEnemy = staticTargetingEnemy;
-
-            if (targetingEnemy)
-            {
-                Target = Enemy;
-            }
-            else
-            {
-                Target = null;
-            }
-
-            if (targeting == true /*&& targetingEnemy == true*/ && onlyThisCardAttack == true)
-            {
-                Attack();
-            }
-
-            if (actualATK <= 0)
-            {
-                Destroy();
-            }
-
-            if (returnXcards > 0 && summoned == true && useReturn == false)
-            {
-                Return(returnXcards);
-                useReturn = true;
-            }
-            if (drawX > 0 && summoned == true && beInGraveyard == false)
-            {
-                PlayerManager.CmdDrawCard();
-                drawX--;
-            }
-            if(PlayerManager.IsMyTurn == false)
-            {
-                UcanReturn = false;
-            }
-            if(damageDealtBySpell > 0)
-            {
-                dealDamage = true;
-            }
-            if (dealDamage == true && this.transform.parent == battleZone.transform)
-            {
-                attackBorder.SetActive(true);
-            }
-            else
-            {
-                //attackBorder.SetActive(false);
-            }
-            if (dealDamage == true && this.transform.parent == battleZone.transform)
-            {
-                dealxDamage(damageDealtBySpell);
-            }
-
-            if(stopDealDamage == true)
-            {
-                attackBorder.SetActive(false);
-                dealDamage = false;
-            }
-
-            if(this.transform.parent == battleZone.transform && spell == true && dealDamage == false)
-            {
-                Destroy();
-            }
-
-            if (attackmode == true && changemode == true)
-            {
-                transform.Rotate(0, 0, 90);
-                changemode = false;
-            }
-            else if (attackmode != true && changemode == true)
-            {
-                transform.Rotate(0, 0, -90);
-                changemode = false;
-            }
-            if (!PlayerManager.IsMyTurn)
-            {
-                alreadychanged = false;
-            }
-            if (boost > 0 && boosted == false)
-            {
-                atk = atk + boost;
-                actualATK = atk;
-                boosted = true;
-            }
-            if (equippedTo != null)
-            {
-                if (equippedTo.GetComponent<ThisMagic>().beInGraveyard)
-                {
-                    atk = atk - boost;
-                    actualATK = atk;
-                    boost = 0;
-                    equippedTo = null;
-                    boosted = false;
-                }
-            }
+            HandleStatusBorders(isInBattleZone);
+            HandleTurnLogic(isInBattleZone);
+            HandleDamageAndDestroy();
+            HandleBoosts();
         }
     }
 
+    void HandleStatusBorders(bool isInBattleZone)
+    {
+        if (summoned && !beInGraveyard)
+        {
+            attackBorder.SetActive(canAttack && attackmode);
+            canBeTributed = true;
+        }
+        else
+        {
+            attackBorder.SetActive(false);
+            if (!summoned) canBeTributed = false;
+        }
+
+        if (beInGraveyard && !attackmode)
+        {
+            transform.Rotate(0, 0, -90);
+            attackmode = true;
+        }
+    }
+
+    void HandleTurnLogic(bool isInBattleZone)
+    {
+        if (PlayerManager.IsMyTurn == false)
+        {
+            if (summoned) { cantAttack = false; hasMoved = false; }
+            UcanReturn = false;
+            alreadychanged = false;
+        }
+
+        canAttack = (PlayerManager.IsMyTurn && !cantAttack && attackmode && isInBattleZone && GameManager.turn != 0);
+        canMove = (PlayerManager.IsMyTurn && attackmode && isInBattleZone && !hasMoved);
+
+        targeting = staticTargeting;
+        targetingEnemy = staticTargetingEnemy;
+        Target = targetingEnemy ? Enemy : null;
+
+        if (targeting && onlyThisCardAttack) Attack();
+    }
+
+    void HandleDamageAndDestroy()
+    {
+        if (actualATK <= 0 && initialized) Destroy();
+
+        if (returnXcards > 0 && summoned && !useReturn)
+        {
+            Return(returnXcards);
+            useReturn = true;
+        }
+
+        if (drawX > 0 && summoned && !beInGraveyard)
+        {
+            PlayerManager.CmdDrawCard();
+            drawX--;
+        }
+
+        if (damageDealtBySpell > 0) dealDamage = true;
+    }
+
+    void HandleBoosts()
+    {
+        if (boost > 0 && !boosted)
+        {
+            atk += boost;
+            actualATK = atk;
+            boosted = true;
+        }
+        if (equippedTo != null)
+        {
+            ThisMagic tm = equippedTo.GetComponent<ThisMagic>();
+            if (tm != null && tm.beInGraveyard)
+            {
+                atk -= boost;
+                actualATK = atk;
+                boost = 0;
+                equippedTo = null;
+                boosted = false;
+            }
+        }
+    }
     public void Summon()
     {
         summoned = true;

@@ -202,14 +202,27 @@ public class PlayerManager : NetworkBehaviour
         RpcShowCard(card, "Dealt", 0);
     }
 
-    public void PlayCard(GameObject card,int index)
+    public void PlayCard(GameObject card, int index)
     {
-        card.GetComponent<CardAbilities>().OnCompile();
-        CmdPlayCard(card,index);
+        if (card.GetComponent<CardAbilities>() != null)
+        {
+            card.GetComponent<CardAbilities>().OnCompile();
+        }
+
+        CmdPlayCard(card, index);
     }
 
+    public void PlayMagicCard(GameObject card, int index)
+    {
+        if (card.GetComponent<ThisMagic>() != null)
+        {
+            card.GetComponent<ThisMagic>().Activate();
+        }
+
+        CmdPlayCard(card, index);
+    }
     [Command]
-    void CmdPlayCard(GameObject card, int index)
+    public void CmdPlayCard(GameObject card, int index)
     {
         RpcShowCard(card, "Played",index);
     }
@@ -290,9 +303,9 @@ public class PlayerManager : NetworkBehaviour
             if (targetSocket != null)
             {
                 card.transform.SetParent(targetSocket, true);
-                card.transform.localPosition = new Vector3(0, 0.1f, 0);
+                card.transform.localPosition = new Vector3(0, 1f, 0);
                 card.transform.localRotation = Quaternion.Euler(90, 0, 0);
-                card.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+                card.transform.localScale = new Vector3(0.01f, 0.007f, 0.01f);
 
                 if (card.GetComponent<ThisMagic>() != null)
                 {
