@@ -266,9 +266,7 @@ public class PlayerManager : NetworkBehaviour
             {
                 GameObject handAnchor = GameObject.Find("Hand_Anchor");
                 card.transform.SetParent(handAnchor.transform);
-
                 card.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
-
                 card.transform.localPosition = new Vector3(index * 0.1f, 0, 0);
                 card.transform.localRotation = Quaternion.identity;
 
@@ -279,6 +277,7 @@ public class PlayerManager : NetworkBehaviour
             {
                 card.transform.SetParent(EnemyArea.transform);
                 card.transform.localPosition = Vector3.zero;
+                card.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
                 if (card.GetComponent<ThisCard>() != null)
                     card.GetComponent<ThisCard>().cardBack = true;
             }
@@ -303,9 +302,17 @@ public class PlayerManager : NetworkBehaviour
             if (targetSocket != null)
             {
                 card.transform.SetParent(targetSocket, true);
-                card.transform.localPosition = new Vector3(0, 1f, 0);
-                card.transform.localRotation = Quaternion.Euler(90, 0, 0);
+                card.transform.localPosition = new Vector3(0, 1.0f, 0);
                 card.transform.localScale = new Vector3(0.01f, 0.007f, 0.01f);
+
+                if (hasAuthority)
+                {
+                    card.transform.localRotation = Quaternion.identity;
+                }
+                else
+                {
+                    card.transform.localRotation = Quaternion.Euler(0, 0, 180);
+                }
 
                 if (card.GetComponent<ThisMagic>() != null)
                 {
