@@ -260,26 +260,35 @@ public class PlayerManager : NetworkBehaviour
     [ClientRpc]
     void RpcShowCard(GameObject card, string type, int index)
     {
+        if (card == null) return;
+
         if (type == "Dealt")
         {
             if (hasAuthority)
             {
                 GameObject handAnchor = GameObject.Find("Hand_Anchor");
-                card.transform.SetParent(handAnchor.transform);
-                card.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
-                card.transform.localPosition = new Vector3(index * 0.1f, 0, 0);
-                card.transform.localRotation = Quaternion.identity;
+                if (handAnchor != null)
+                {
+                    card.transform.SetParent(handAnchor.transform);
+                    card.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+                    card.transform.localPosition = new Vector3(index * 0.1f, 0, 0);
+                    card.transform.localRotation = Quaternion.identity;
 
-                if (card.GetComponent<ThisCard>() != null)
-                    card.GetComponent<ThisCard>().cardBack = false;
+                    if (card.GetComponent<ThisCard>() != null)
+                        card.GetComponent<ThisCard>().cardBack = false;
+                }
             }
             else
             {
-                card.transform.SetParent(EnemyArea.transform);
-                card.transform.localPosition = Vector3.zero;
-                card.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
-                if (card.GetComponent<ThisCard>() != null)
-                    card.GetComponent<ThisCard>().cardBack = true;
+                if (EnemyArea != null)
+                {
+                    card.transform.SetParent(EnemyArea.transform);
+                    card.transform.localPosition = new Vector3(index * 0.1f, 0, 0);
+                    card.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+
+                    if (card.GetComponent<ThisCard>() != null)
+                        card.GetComponent<ThisCard>().cardBack = true;
+                }
             }
         }
         else if (type == "Played")
@@ -302,8 +311,9 @@ public class PlayerManager : NetworkBehaviour
             if (targetSocket != null)
             {
                 card.transform.SetParent(targetSocket, true);
+
                 card.transform.localPosition = new Vector3(0, 1.0f, 0);
-                card.transform.localScale = new Vector3(0.01f, 0.007f, 0.01f);
+                card.transform.localScale = new Vector3(0.008f, 0.008f, 0.008f);
 
                 if (hasAuthority)
                 {
@@ -332,14 +342,13 @@ public class PlayerManager : NetworkBehaviour
         {
             if (card.GetComponent<ThisCard>() != null)
                 card.GetComponent<ThisCard>().beInGraveyard = true;
-            if (hasAuthority)
+
+            GameObject targetYard = hasAuthority ? EnemyYard : PlayerYard;
+            if (targetYard != null)
             {
-                card.transform.SetParent(EnemyYard.transform, false);
+                card.transform.SetParent(targetYard.transform, false);
             }
-            else
-            {
-                card.transform.SetParent(PlayerYard.transform, false);
-            }
+
             if (card.GetComponent<ThisCard>() != null)
             {
                 MonstersPlayed--;
@@ -347,43 +356,35 @@ public class PlayerManager : NetworkBehaviour
         }
         else if (type == "PlayerDestroyed")
         {
-            if(card.GetComponent<ThisCard>() != null)
+            if (card.GetComponent<ThisCard>() != null)
                 card.GetComponent<ThisCard>().beInGraveyard = true;
-            if (hasAuthority)
+
+            GameObject targetYard = hasAuthority ? PlayerYard : EnemyYard;
+            if (targetYard != null)
             {
-                card.transform.SetParent(PlayerYard.transform, false);
-            }
-            else
-            {
-                card.transform.SetParent(EnemyYard.transform, false);
+                card.transform.SetParent(targetYard.transform, false);
             }
         }
         else if (type == "ChangeAttack")
         {
-            if (hasAuthority && card.GetComponent<ThisCard>().attackmode == false)
-                card.transform.Rotate(0, 0, 90);
-            else if (!hasAuthority && card.GetComponent<ThisCard>().attackmode == false)
-                card.transform.Rotate(0, 0, -90);
+            float zRot = hasAuthority ? 90 : -90;
+            if (!hasAuthority) zRot = -zRot;
+
+            card.transform.Rotate(0, 0, zRot);
             card.GetComponent<ThisCard>().attackmode = true;
         }
         else if (type == "ChangeDefense")
         {
-            if (hasAuthority && card.GetComponent<ThisCard>().attackmode == true)
-                card.transform.Rotate(0, 0, -90);
-            else if (!hasAuthority && card.GetComponent<ThisCard>().attackmode == true)
-                card.transform.Rotate(0, 0, 90);
+            float zRot = hasAuthority ? -90 : 90;
+            if (!hasAuthority) zRot = -zRot;
+
+            card.transform.Rotate(0, 0, zRot);
             card.GetComponent<ThisCard>().attackmode = false;
         }
         else if (type == "EquipBoost")
         {
-            if (hasAuthority)
-            {
+            if (card.GetComponent<ThisCard>() != null)
                 card.GetComponent<ThisCard>().boost = index;
-            }
-            else if (!hasAuthority)
-            {
-                card.GetComponent<ThisCard>().boost = index;
-            }
         }
     }
     [Command]
