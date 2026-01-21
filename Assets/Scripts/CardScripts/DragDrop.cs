@@ -13,7 +13,7 @@ public class DragDrop : NetworkBehaviour
     private GameObject startParent;
 
     private Vector3 slotPosition = new Vector3(0, 1.0f, 0);
-    private Vector3 slotScale = new Vector3(0.008f, 0.008f, 0.008f);
+    private Vector3 slotScale = new Vector3(0.01f, 0.0075f, 0.01f);
 
     private void Start()
     {
@@ -114,7 +114,7 @@ public class DragDrop : NetworkBehaviour
     {
         transform.SetParent(slot.transform);
         transform.localPosition = slotPosition;
-        transform.localRotation = Quaternion.identity;
+        transform.localRotation = Quaternion.Euler(90, 0, 0);
         transform.localScale = slotScale;
 
         isDraggable = false;

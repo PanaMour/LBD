@@ -147,6 +147,9 @@ MonoBehaviour:
     stars: 0
     atk: 0
     def: 0
+    type: 0
+    attribute: 0
+    property: 0
     cardDescription: 
     drawXcards: 0
     thisImage: {fileID: 0}
@@ -173,6 +176,7 @@ MonoBehaviour:
   thatImage: {fileID: 0}
   frame: {fileID: 0}
   cardBack: 1
+  CardBackSprite: {fileID: 0}
   PlayerArea: {fileID: 0}
   numberOfCardsInDeck: 0
   canBeSummoned: 0
@@ -211,6 +215,8 @@ MonoBehaviour:
   boosted: 0
   equippedTo: {fileID: 0}
   initialized: 0
+  canMove: 1
+  hasMoved: 0
 --- !u!114 &8251012917168059878
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -226,12 +232,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   GameManager: {fileID: 0}
-  Canvas: {fileID: 0}
   PlayerManager: {fileID: 0}
-  ConfirmationBox: {fileID: 6613209675388961194, guid: 9f2a5f7986b39304d9afcada64a94781,
-    type: 3}
-  YesButton: {fileID: 0}
-  NoButton: {fileID: 0}
 --- !u!114 &689521192030228246
 MonoBehaviour:
   m_ObjectHideFlags: 0

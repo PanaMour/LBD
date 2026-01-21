@@ -64,7 +64,6 @@ Transform:
   m_Children:
   - {fileID: 4466046031467566118}
   - {fileID: 5235865902101865761}
-  - {fileID: 4699968057211779640}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -154,6 +153,7 @@ MonoBehaviour:
   thatImage: {fileID: 0}
   frame: {fileID: 0}
   cardBack: 1
+  CardBackSprite: {fileID: 21300000, guid: dbbe51d685342c148908adf31faab752, type: 3}
   PlayerArea: {fileID: 0}
   numberOfCardsInDeck: 0
   canBeSummoned: 0
@@ -209,12 +209,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   GameManager: {fileID: 0}
-  Canvas: {fileID: 0}
   PlayerManager: {fileID: 0}
-  ConfirmationBox: {fileID: 6613209675388961194, guid: 9f2a5f7986b39304d9afcada64a94781,
-    type: 3}
-  YesButton: {fileID: 0}
-  NoButton: {fileID: 0}
 --- !u!114 &268005390305288747
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1186,7 +1181,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 1902590228653434986}
+    m_TransformParent: {fileID: 5235865902101865761}
     m_Modifications:
     - target: {fileID: 7611383516296512721, guid: 70150d4532c64bd4bac501c763d7fcbd,
         type: 3}
@@ -1226,7 +1221,7 @@ PrefabInstance:
     - target: {fileID: 7611383516296512721, guid: 70150d4532c64bd4bac501c763d7fcbd,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7611383516296512721, guid: 70150d4532c64bd4bac501c763d7fcbd,
         type: 3}
@@ -1298,22 +1293,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardBack
       objectReference: {fileID: 0}
-    - target: {fileID: 8796359032978449884, guid: 70150d4532c64bd4bac501c763d7fcbd,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 70150d4532c64bd4bac501c763d7fcbd, type: 3}
 --- !u!1 &5947642260273158965 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8796359032978449884, guid: 70150d4532c64bd4bac501c763d7fcbd,
-    type: 3}
-  m_PrefabInstance: {fileID: 2925286904550424297}
-  m_PrefabAsset: {fileID: 0}
---- !u!224 &4699968057211779640 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7611383516296512721, guid: 70150d4532c64bd4bac501c763d7fcbd,
     type: 3}
   m_PrefabInstance: {fileID: 2925286904550424297}
   m_PrefabAsset: {fileID: 0}

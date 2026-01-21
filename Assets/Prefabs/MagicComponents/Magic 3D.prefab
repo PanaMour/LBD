@@ -38,7 +38,6 @@ Transform:
   m_LocalScale: {x: 0.001, y: 0.001, z: 0.001}
   m_Children:
   - {fileID: 5286410240051485639}
-  - {fileID: 6304496414613937230}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -84,6 +83,7 @@ MonoBehaviour:
   thatImage: {fileID: 0}
   frame: {fileID: 0}
   cardBack: 1
+  CardBackSprite: {fileID: 0}
   PlayerArea: {fileID: 0}
   numberOfCardsInDeck: 0
   canBeActivated: 0
@@ -95,7 +95,6 @@ MonoBehaviour:
   targeting: 0
   targetingEnemy: 0
   canBeDestroyed: 0
-  Graveyard: {fileID: 0}
   beInGraveyard: 0
   returnXcards: 0
   useReturn: 0
@@ -164,11 +163,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   GameManager: {fileID: 0}
-  Canvas: {fileID: 0}
   PlayerManager: {fileID: 0}
-  ConfirmationBox: {fileID: 0}
-  YesButton: {fileID: 0}
-  NoButton: {fileID: 0}
 --- !u!114 &-7098578232568471390
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -494,7 +489,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 2912657231453395749}
+    m_TransformParent: {fileID: 7990467067600618698}
     m_Modifications:
     - target: {fileID: 4910285948514952758, guid: 38aa6fb3979291443969e6997b90c7a4,
         type: 3}
@@ -534,7 +529,7 @@ PrefabInstance:
     - target: {fileID: 4910285948514952758, guid: 38aa6fb3979291443969e6997b90c7a4,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4910285948514952758, guid: 38aa6fb3979291443969e6997b90c7a4,
         type: 3}
@@ -606,24 +601,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: MagicCardBack
       objectReference: {fileID: 0}
-    - target: {fileID: 6311572886699624251, guid: 38aa6fb3979291443969e6997b90c7a4,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 6311572886699624251, guid: 38aa6fb3979291443969e6997b90c7a4,
-        type: 3}
-      propertyPath: m_Layer
-      value: 12
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38aa6fb3979291443969e6997b90c7a4, type: 3}
---- !u!224 &6304496414613937230 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 4910285948514952758, guid: 38aa6fb3979291443969e6997b90c7a4,
-    type: 3}
-  m_PrefabInstance: {fileID: 1394643757770144376}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5598218290804230918
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -907,6 +886,12 @@ GameObject:
 --- !u!224 &5286410240051485639 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 355159595514761409, guid: 25f68e98c976fcc4d8b9da43d2b00dd8,
+    type: 3}
+  m_PrefabInstance: {fileID: 5598218290804230918}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &7990467067600618698 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2545389937636790220, guid: 25f68e98c976fcc4d8b9da43d2b00dd8,
     type: 3}
   m_PrefabInstance: {fileID: 5598218290804230918}
   m_PrefabAsset: {fileID: 0}

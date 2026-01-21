@@ -28,7 +28,7 @@ public class GridBehavior : MonoBehaviour
         if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
         {
             transform.localRotation = Quaternion.Euler(0, 180, 0);
-            transform.position = new Vector3(columns * 1.1f, 0, rows * 1.1f);
+            transform.position = new Vector3(10f, 0, 15f);
         }
     }
 

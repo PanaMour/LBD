@@ -313,15 +313,15 @@ public class PlayerManager : NetworkBehaviour
                 card.transform.SetParent(targetSocket, true);
 
                 card.transform.localPosition = new Vector3(0, 1.0f, 0);
-                card.transform.localScale = new Vector3(0.008f, 0.008f, 0.008f);
+                card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
 
                 if (hasAuthority)
                 {
-                    card.transform.localRotation = Quaternion.identity;
+                    card.transform.localRotation = Quaternion.Euler(90, 0, 0);
                 }
                 else
                 {
-                    card.transform.localRotation = Quaternion.Euler(0, 0, 180);
+                    card.transform.localRotation = Quaternion.Euler(90, 0, 180);
                 }
 
                 if (card.GetComponent<ThisMagic>() != null)
