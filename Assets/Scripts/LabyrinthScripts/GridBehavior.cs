@@ -205,17 +205,14 @@ public class GridBehavior : MonoBehaviour
     public void ShowSummonZone(GameObject card)
     {
         cardWaitingToSpawn = card;
-        HighlightRange(false); // Clear any old highlights
+        HighlightRange(false);
 
-        // Determine the row based on who is playing
         int row = Mirror.NetworkServer.active ? 0 : 15;
 
-        // Loop through your specific allowed columns (2 to 8)
         for (int col = 2; col <= 8; col++)
         {
             if (gridArray[col, row] != null)
             {
-                // Use your existing tile glow logic
                 gridArray[col, row].GetComponent<LabyrinthTile>().GlowBlock();
             }
         }

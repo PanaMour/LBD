@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using Mirror;
-using System.Collections; // Required for Coroutines
-
+using System.Collections;
 public class LabyrinthObject : NetworkBehaviour
 {
     public GameObject gridGenerator;
@@ -10,7 +9,6 @@ public class LabyrinthObject : NetworkBehaviour
     [SyncVar(hook = nameof(OnMonsterIDChanged))]
     public int monsterID;
 
-    // Trigger the coroutine when the name changes
     [SyncVar(hook = nameof(OnTileNameChanged))]
     public string currentTileName;
 
@@ -29,7 +27,6 @@ public class LabyrinthObject : NetworkBehaviour
         if (monsterID != 0)
             OnMonsterIDChanged(0, monsterID);
 
-        // Start checking for the tile immediately
         if (!string.IsNullOrEmpty(currentTileName))
         {
             StartCoroutine(WaitForTileAndSnap(currentTileName));
@@ -46,7 +43,6 @@ public class LabyrinthObject : NetworkBehaviour
         }
     }
 
-    // Hook just starts the waiter
     void OnTileNameChanged(string oldName, string newName)
     {
         if (!string.IsNullOrEmpty(newName))
@@ -55,19 +51,16 @@ public class LabyrinthObject : NetworkBehaviour
         }
     }
 
-    // THE FIX: Keep trying to find the tile until it exists
     IEnumerator WaitForTileAndSnap(string tileName)
     {
         GameObject targetTile = null;
 
-        // Try for up to 2 seconds (avoid infinite loop)
         float timeout = 2.0f;
         while (targetTile == null && timeout > 0)
         {
             targetTile = GameObject.Find(tileName);
             if (targetTile == null)
             {
-                // Wait one frame and try again
                 yield return null;
                 timeout -= Time.deltaTime;
             }
@@ -75,7 +68,6 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (targetTile != null)
         {
-            // Found it! Snap securely.
             transform.SetParent(targetTile.transform, false);
             transform.localPosition = new Vector3(0, 0.5f, 0);
             transform.localRotation = Quaternion.identity;
@@ -85,9 +77,7 @@ public class LabyrinthObject : NetworkBehaviour
             Debug.LogError($"[Client] LabyrinthObject timed out finding '{tileName}'. Is the Grid generated?");
         }
     }
-
-    // ... (Keep your ObjectToMove and CmdMoveToTile logic same as before) ...
-    public void ObjectToMove()
+        public void ObjectToMove()
     {
         if (!hasAuthority) return;
         if (NetworkClient.connection.identity == null) return;
