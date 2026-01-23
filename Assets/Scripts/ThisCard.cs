@@ -210,9 +210,9 @@ public class ThisCard : NetworkBehaviour
             {
                 foreach (Transform child in PlayerSlots.transform)
                 {
-                    foreach (Transform grandChild in child)
+                    if (child.childCount > 0)
                     {
-                        ThisCard tc = grandChild.GetComponent<ThisCard>();
+                        ThisCard tc = child.GetChild(0).GetComponent<ThisCard>();
                         if (tc != null && tc.canBeTributed) tributeAvailable = true;
                     }
                 }
@@ -220,13 +220,36 @@ public class ThisCard : NetworkBehaviour
 
             if (summoned == false && beInGraveyard == false)
             {
-                if (stars <= 4) canBeSummoned = true;
-                else if ((stars == 5 || stars == 6) && tributeAvailable) canBeSummoned = true;
-                else canBeSummoned = false;
+                if (PlayerManager.nomoresummons)
+                {
+                    canBeSummoned = false;
+                }
+                else
+                {
+                    if (stars <= 4)
+                    {
+                        canBeSummoned = true;
+                    }
+                    else if ((stars >= 5 && stars <= 6) && tributeAvailable)
+                    {
+                        canBeSummoned = true;
+                    }
+                    else if (stars >= 7)
+                    {
+                        canBeSummoned = false;
+                    }
+                    else
+                    {
+                        canBeSummoned = false;
+                    }
+                }
             }
 
             DragDrop dd = gameObject.GetComponent<DragDrop>();
-            if (dd != null) dd.enabled = canBeSummoned;
+            if (dd != null)
+            {
+                dd.enabled = canBeSummoned;
+            }
 
             bool isInBattleZone = false;
             if (this.transform.parent != null && this.transform.parent.parent != null && battleZone != null)

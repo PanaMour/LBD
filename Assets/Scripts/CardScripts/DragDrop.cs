@@ -43,20 +43,33 @@ public class DragDrop : NetworkBehaviour
         if (!hasAuthority) return;
         if (!isDraggable) return;
 
-        if (PlayerManager != null && !PlayerManager.IsMyTurn)
+        if (PlayerManager != null && !PlayerManager.IsMyTurn) return;
+
+        // 1. MONSTER CHECK: Can't pick up if already summoned
+        if (GetComponent<ThisCard>() != null && PlayerManager.nomoresummons)
         {
-            Debug.Log("Cannot play card: It is not your turn.");
+            Debug.Log("Already summoned this turn.");
             return;
+        }
+
+        // 2. MAGIC CHECK: Can't pick up if there are no targets (e.g., Exhaust with no enemies)
+        if (GetComponent<ThisMagic>() != null)
+        {
+            if (!GetComponent<ThisMagic>().canBeActivated)
+            {
+                Debug.Log("Cannot activate spell: No valid targets or conditions not met.");
+                return;
+            }
         }
 
         isDragging = true;
 
+        // Hide from Raycast so we can see the slot behind it
         gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 
         startParent = transform.parent.gameObject;
         transform.SetParent(null);
     }
-
     public void EndDrag()
     {
         if (!isDragging) return;
@@ -99,31 +112,90 @@ public class DragDrop : NetworkBehaviour
 
     void AttemptDrop(GameObject slot)
     {
-        bool isMonster = GetComponent<ThisCard>() != null;
-        bool isMagic = GetComponent<ThisMagic>() != null;
+        ThisCard cardScript = GetComponent<ThisCard>();
+        ThisMagic magicScript = GetComponent<ThisMagic>();
 
+        bool isMonster = cardScript != null;
+        bool isMagic = magicScript != null;
+
+        // --- 1. MAGIC "GATEKEEPER" CHECK ---
+        // If the Magic card logic says "False" (e.g. no enemies to destroy), reject the drop immediately.
+        if (isMagic && !magicScript.canBeActivated)
+        {
+            Debug.Log("Conditions not met for this Magic card!");
+            ReturnToHand();
+            return;
+        }
+
+        // --- 2. EQUIP SPELL LOGIC ---
+        if (isMagic && magicScript.equip)
+        {
+            if (slot.name.Contains("PlayerSlot"))
+            {
+                bool hasMonster = slot.transform.childCount > 0;
+                if (hasMonster)
+                {
+                    PlaceCard(slot, false);
+                    return;
+                }
+                else
+                {
+                    Debug.Log("Equip Spell must be placed on a Monster!");
+                    ReturnToHand();
+                    return;
+                }
+            }
+            else
+            {
+                Debug.Log("Equip Spells must target a Monster Slot!");
+                ReturnToHand();
+                return;
+            }
+        }
+
+        // --- 3. STANDARD DROP LOGIC (Monsters & Normal Spells) ---
         bool validMonsterDrop = isMonster && slot.name.Contains("PlayerSlot");
         bool validMagicDrop = isMagic && slot.name.Contains("ActionSlot");
 
         if (validMonsterDrop || validMagicDrop)
         {
+            // Check if Slot is Full
             bool slotOccupied = slot.GetComponentInChildren<ThisCard>() != null ||
                                 slot.GetComponentInChildren<ThisMagic>() != null;
 
-            if (!slotOccupied)
-            {
-                PlaceCard(slot, isMonster);
-                return;
-            }
-            else
+            if (slotOccupied)
             {
                 Debug.Log("Slot is already full!");
+                ReturnToHand();
+                return;
             }
+
+            // Monster Specific Rules
+            if (isMonster)
+            {
+                if (PlayerManager.nomoresummons)
+                {
+                    Debug.Log("You have already summoned a monster this turn!");
+                    ReturnToHand();
+                    return;
+                }
+
+                if (!cardScript.canBeSummoned)
+                {
+                    Debug.Log("Cannot summon: Needs Tribute or invalid level.");
+                    ReturnToHand();
+                    return;
+                }
+            }
+
+            // Success!
+            PlaceCard(slot, isMonster);
+            return;
         }
 
+        // If nothing matched, return to hand
         ReturnToHand();
     }
-
     void PlaceCard(GameObject slot, bool isMonster)
     {
         transform.SetParent(slot.transform);
@@ -137,6 +209,8 @@ public class DragDrop : NetworkBehaviour
         {
             if (GetComponent<ThisCard>() != null)
                 GetComponent<ThisCard>().summoned = true;
+
+            PlayerManager.nomoresummons = true;
         }
         else
         {

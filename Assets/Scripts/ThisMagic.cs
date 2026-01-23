@@ -147,8 +147,8 @@ public class ThisMagic : NetworkBehaviour
         {
             HandleActivationLogic();
 
-            DragDrop dd = gameObject.GetComponent<DragDrop>();
-            if (dd != null) dd.enabled = canBeActivated;
+            /*DragDrop dd = gameObject.GetComponent<DragDrop>();
+            if (dd != null) dd.enabled = canBeActivated;*/
 
             bool inActionSlot = false;
             if (this.transform.parent != null)
