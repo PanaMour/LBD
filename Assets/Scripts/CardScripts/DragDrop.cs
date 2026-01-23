@@ -40,16 +40,31 @@ public class DragDrop : NetworkBehaviour
 
     public void StartDrag()
     {
+        if (!hasAuthority) return;
         if (!isDraggable) return;
+
+        if (PlayerManager != null && !PlayerManager.IsMyTurn)
+        {
+            Debug.Log("Cannot play card: It is not your turn.");
+            return;
+        }
+
         isDragging = true;
+
+        gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
+
         startParent = transform.parent.gameObject;
         transform.SetParent(null);
     }
 
     public void EndDrag()
     {
+        if (!isDragging) return;
+
         if (!isDraggable) return;
         isDragging = false;
+
+        gameObject.layer = LayerMask.NameToLayer("Default");
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit[] hits = Physics.RaycastAll(ray, 100f);
@@ -78,7 +93,6 @@ public class DragDrop : NetworkBehaviour
         }
         else
         {
-            Debug.Log("No slot found under mouse. Returning.");
             ReturnToHand();
         }
     }
