@@ -46,6 +46,8 @@ MonoImporter:
   - Magic: {fileID: 7540810118024730414, guid: c5a767c04e1f39e45bc4f5a655592fe4, type: 3}
   - CardToHand: {fileID: 1260750737870900169, guid: ddfaf1d468e354446bf7bf1c1c530a34,
       type: 3}
+  - ConfirmationBoxPrefab: {fileID: 6613209675388961194, guid: 9f2a5f7986b39304d9afcada64a94781,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

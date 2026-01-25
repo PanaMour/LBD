@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using UnityEngine.UI;
 
 public class PlayerManager : NetworkBehaviour
 {
@@ -47,6 +48,11 @@ public class PlayerManager : NetworkBehaviour
     public int MonstersPlayed = 0;
 
     private List<GameObject> cards = new List<GameObject>();
+
+    public GameObject ConfirmationBoxPrefab; 
+    private GameObject tempCard;
+    private GameObject tempSlot;
+    private GameObject activeUIBox;
 
     public override void OnStartClient()
     {
@@ -562,5 +568,161 @@ public class PlayerManager : NetworkBehaviour
         {
             monster.GetComponent<LabyrinthObject>().card = cardObj;
         }
+    }
+
+    public void StartSummonProcess(GameObject card, GameObject slot, bool needsTribute)
+    {
+        tempCard = card;
+        tempSlot = slot;
+
+        if (Canvas == null) Canvas = GameObject.Find("Canvas");
+
+        if (needsTribute)
+        {
+            GameObject tributeCandidate = FindFirstTribute();
+
+            if (tributeCandidate != null)
+            {
+                string tributeName = tributeCandidate.GetComponent<ThisCard>().cardName;
+                string summonName = card.GetComponent<ThisCard>().cardName;
+
+                string message = $"Do you want to tribute {tributeName} to summon {summonName}?";
+
+                SpawnTributeBox(message, tributeCandidate);
+            }
+            else
+            {
+                SpawnTributeBox("Do you want to tribute a monster?", null);
+            }
+        }
+        else
+        {
+            SpawnModeBox();
+        }
+    }
+
+    GameObject FindFirstTribute()
+    {
+        GameObject slots = GameObject.Find("PlayerSlots");
+        if (slots == null) return null;
+
+        foreach (Transform slot in slots.transform)
+        {
+            if (slot.childCount > 0)
+            {
+                return slot.GetChild(0).gameObject;
+            }
+        }
+        return null;
+    }
+
+    void SpawnTributeBox(string msg, GameObject specificTribute)
+    {
+        SpawnBox(msg, "Yes", "No", () =>
+        {
+            Destroy(activeUIBox);
+
+            if (specificTribute != null) CmdPlayerDestroyCard(specificTribute, 0);
+            else PerformGenericTribute();
+
+            SpawnModeBox();
+        },
+        () =>
+        {
+            Destroy(activeUIBox);
+            CancelSummon();
+        });
+    }
+    void SpawnModeBox()
+    {
+        SpawnBox("Select Battle Mode", "Attack", "Defense", () =>
+        {
+            Destroy(activeUIBox);
+            FinalizeSummon(true);
+        },
+        () =>
+        {
+            Destroy(activeUIBox);
+            FinalizeSummon(false);
+        });
+    }
+
+    void SpawnBox(string message, string yesLabel, string noLabel, UnityEngine.Events.UnityAction yesAction, UnityEngine.Events.UnityAction noAction)
+    {
+        if (activeUIBox != null) Destroy(activeUIBox);
+
+        activeUIBox = Instantiate(ConfirmationBoxPrefab, Canvas.transform);
+
+        activeUIBox.transform.localPosition = Vector3.zero;
+        activeUIBox.transform.localScale = Vector3.one;
+
+        Text txt = activeUIBox.transform.Find("MessageText")?.GetComponent<Text>();
+        if (txt == null) txt = activeUIBox.GetComponentInChildren<Text>();
+        if (txt != null) txt.text = message;
+
+        Button btn1 = activeUIBox.transform.Find("YesButton")?.GetComponent<Button>();
+        if (btn1 == null) btn1 = activeUIBox.transform.Find("Button1")?.GetComponent<Button>();
+
+        Button btn2 = activeUIBox.transform.Find("NoButton")?.GetComponent<Button>();
+        if (btn2 == null) btn2 = activeUIBox.transform.Find("Button2")?.GetComponent<Button>();
+
+        if (btn1 != null)
+        {
+            btn1.onClick.RemoveAllListeners();
+            btn1.onClick.AddListener(yesAction);
+            Text btnTxt = btn1.GetComponentInChildren<Text>();
+            if (btnTxt) btnTxt.text = yesLabel;
+        }
+
+        if (btn2 != null)
+        {
+            btn2.onClick.RemoveAllListeners();
+            btn2.onClick.AddListener(noAction);
+            Text btnTxt = btn2.GetComponentInChildren<Text>();
+            if (btnTxt) btnTxt.text = noLabel;
+        }
+    }
+
+    void PerformGenericTribute()
+    {
+        GameObject t = FindFirstTribute();
+        if (t != null) CmdPlayerDestroyCard(t, 0);
+    }
+
+    void FinalizeSummon(bool attackMode)
+    {
+        if (tempCard != null && tempSlot != null)
+        {
+            ThisCard cardScript = tempCard.GetComponent<ThisCard>();
+            if (cardScript != null)
+            {
+                cardScript.attackmode = attackMode;
+
+                if (!attackMode) tempCard.transform.localRotation = Quaternion.Euler(90, 0, -90);
+                else tempCard.transform.localRotation = Quaternion.Euler(90, 0, 0);
+            }
+
+            string numberOnly = System.Text.RegularExpressions.Regex.Match(tempSlot.name, @"\d+").Value;
+            int index = 0;
+            if (int.TryParse(numberOnly, out int result)) index = result - 1;
+
+            if (tempCard.GetComponent<CardAbilities>() != null)
+                PlayCard(tempCard, index);
+            else
+                CmdPlayCard(tempCard, index);
+
+            nomoresummons = true;
+        }
+    }
+
+    public void CancelSummon()
+    {
+        if (tempCard != null)
+        {
+            DragDrop dd = tempCard.GetComponent<DragDrop>();
+            if (dd != null) dd.ReturnToHand();
+        }
+        tempCard = null;
+        tempSlot = null;
     }
 }

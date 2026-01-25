@@ -118,8 +118,6 @@ public class DragDrop : NetworkBehaviour
         bool isMonster = cardScript != null;
         bool isMagic = magicScript != null;
 
-        // --- 1. MAGIC "GATEKEEPER" CHECK ---
-        // If the Magic card logic says "False" (e.g. no enemies to destroy), reject the drop immediately.
         if (isMagic && !magicScript.canBeActivated)
         {
             Debug.Log("Conditions not met for this Magic card!");
@@ -127,7 +125,6 @@ public class DragDrop : NetworkBehaviour
             return;
         }
 
-        // --- 2. EQUIP SPELL LOGIC ---
         if (isMagic && magicScript.equip)
         {
             if (slot.name.Contains("PlayerSlot"))
@@ -153,13 +150,11 @@ public class DragDrop : NetworkBehaviour
             }
         }
 
-        // --- 3. STANDARD DROP LOGIC (Monsters & Normal Spells) ---
         bool validMonsterDrop = isMonster && slot.name.Contains("PlayerSlot");
         bool validMagicDrop = isMagic && slot.name.Contains("ActionSlot");
 
         if (validMonsterDrop || validMagicDrop)
         {
-            // Check if Slot is Full
             bool slotOccupied = slot.GetComponentInChildren<ThisCard>() != null ||
                                 slot.GetComponentInChildren<ThisMagic>() != null;
 
@@ -170,7 +165,6 @@ public class DragDrop : NetworkBehaviour
                 return;
             }
 
-            // Monster Specific Rules
             if (isMonster)
             {
                 if (PlayerManager.nomoresummons)
@@ -188,12 +182,10 @@ public class DragDrop : NetworkBehaviour
                 }
             }
 
-            // Success!
             PlaceCard(slot, isMonster);
             return;
         }
 
-        // If nothing matched, return to hand
         ReturnToHand();
     }
     void PlaceCard(GameObject slot, bool isMonster)
@@ -202,42 +194,34 @@ public class DragDrop : NetworkBehaviour
         transform.localPosition = slotPosition;
         transform.localRotation = Quaternion.Euler(90, 0, 0);
         transform.localScale = slotScale;
-
         isDraggable = false;
 
         if (isMonster)
         {
-            if (GetComponent<ThisCard>() != null)
-                GetComponent<ThisCard>().summoned = true;
+            ThisCard cardScript = GetComponent<ThisCard>();
 
-            PlayerManager.nomoresummons = true;
+            bool needsTribute = (cardScript.stars >= 5);
+
+            if (PlayerManager != null)
+            {
+                PlayerManager.StartSummonProcess(gameObject, slot, needsTribute);
+            }
         }
         else
         {
             if (GetComponent<ThisMagic>() != null)
                 GetComponent<ThisMagic>().activated = true;
-        }
 
-        string numberOnly = System.Text.RegularExpressions.Regex.Match(slot.name, @"\d+").Value;
-        int index = 0;
-        if (int.TryParse(numberOnly, out int result)) index = result - 1;
+            string numberOnly = System.Text.RegularExpressions.Regex.Match(slot.name, @"\d+").Value;
+            int index = 0;
+            if (int.TryParse(numberOnly, out int result)) index = result - 1;
 
-        if (isMonster)
-        {
-            if (GetComponent<CardAbilities>() != null)
-                PlayerManager.PlayCard(gameObject, index);
-            else
-                PlayerManager.CmdPlayCard(gameObject, index);
-        }
-        else
-        {
             PlayerManager.PlayMagicCard(gameObject, index);
+            this.enabled = false;
         }
-
-        this.enabled = false;
     }
 
-    void ReturnToHand()
+    public void ReturnToHand()
     {
         transform.SetParent(startParent.transform);
         transform.localPosition = Vector3.zero;

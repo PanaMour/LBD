@@ -118,3 +118,5 @@ MonoBehaviour:
   IsMyTurn: 0
   nomoresummons: 0
   MonstersPlayed: 0
+  ConfirmationBoxPrefab: {fileID: 6613209675388961194, guid: 9f2a5f7986b39304d9afcada64a94781,
+    type: 3}
