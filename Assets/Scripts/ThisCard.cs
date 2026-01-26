@@ -89,6 +89,7 @@ public class ThisCard : NetworkBehaviour
     public bool canBeTributed;
     public bool confirmationfinished = false;
 
+    [SyncVar]
     public bool attackmode = true;
     public bool changemode = false;
     public bool alreadychanged = false;
@@ -192,6 +193,20 @@ public class ThisCard : NetworkBehaviour
             else if (thisCard[0].color == "Magic") frame.color = new Color32(19, 138, 102, 255);
         }
 
+        if (summoned && transform.parent != null)
+        {
+            if (attackmode)
+            {
+                transform.localRotation = Quaternion.Euler(90, 0, 0);
+                transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
+            }
+            else
+            {
+                transform.localRotation = Quaternion.Euler(90, 0, 90);
+                transform.localScale = new Vector3(0.0075f, 0.01f, 0.01f);
+            }
+        }
+
         staticCardBack = cardBack;
 
         if (this.tag == "Clone")
@@ -205,15 +220,24 @@ public class ThisCard : NetworkBehaviour
 
         if (tag != "Unusable")
         {
-            bool tributeAvailable = false;
-            if (stars >= 5 && stars <= 6 && summoned == false && beInGraveyard == false && PlayerSlots != null)
+            if (summoned)
             {
-                foreach (Transform child in PlayerSlots.transform)
+                canBeTributed = true;
+            }
+            bool tributeAvailable = false;
+            if (stars >= 5 && !summoned && !beInGraveyard && PlayerSlots != null)
+            {
+                foreach (Transform slot in PlayerSlots.transform)
                 {
-                    if (child.childCount > 0)
+                    if (slot.childCount > 0)
                     {
-                        ThisCard tc = child.GetChild(0).GetComponent<ThisCard>();
-                        if (tc != null && tc.canBeTributed) tributeAvailable = true;
+                        ThisCard monsterOnField = slot.GetComponentInChildren<ThisCard>();
+
+                        if (monsterOnField != null && monsterOnField.canBeTributed)
+                        {
+                            tributeAvailable = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -230,15 +254,11 @@ public class ThisCard : NetworkBehaviour
                     {
                         canBeSummoned = true;
                     }
-                    else if ((stars >= 5 && stars <= 6) && tributeAvailable)
+                    else if (stars >= 5 && stars <= 6)
                     {
-                        canBeSummoned = true;
+                        canBeSummoned = tributeAvailable;
                     }
                     else if (stars >= 7)
-                    {
-                        canBeSummoned = false;
-                    }
-                    else
                     {
                         canBeSummoned = false;
                     }
@@ -254,20 +274,7 @@ public class ThisCard : NetworkBehaviour
             bool isInBattleZone = false;
             if (this.transform.parent != null && this.transform.parent.parent != null && battleZone != null)
             {
-                if (this.transform.parent.parent == battleZone.transform)
-                {
-                    isInBattleZone = true;
-                }
-            }
-
-            if ((summoned == false && isInBattleZone) || confirmationfinished == true)
-            {
-                Summon();
-                Debug.Log(cardName + " was summoned successfully!");
-                alreadychanged = true;
-                PlayerManager.nomoresummons = true;
-                drawX = drawXcards;
-                confirmationfinished = false;
+                if (this.transform.parent.parent == battleZone.transform) isInBattleZone = true;
             }
 
             HandleStatusBorders(isInBattleZone);
@@ -524,5 +531,11 @@ public class ThisCard : NetworkBehaviour
         {
 
         }
+    }
+
+    [Command]
+    public void CmdSetBattleMode(bool isAttack)
+    {
+        attackmode = isAttack;
     }
 }

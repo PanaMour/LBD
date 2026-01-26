@@ -49,9 +49,10 @@ public class PlayerManager : NetworkBehaviour
 
     private List<GameObject> cards = new List<GameObject>();
 
-    public GameObject ConfirmationBoxPrefab; 
+    public GameObject ConfirmationBoxPrefab;
     private GameObject tempCard;
     private GameObject tempSlot;
+    private GameObject tempTributeVictim;
     private GameObject activeUIBox;
 
     public override void OnStartClient()
@@ -570,30 +571,30 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    public void StartTributeProcess(GameObject card, GameObject slot, GameObject victim)
+    {
+        tempCard = card;
+        tempSlot = slot;
+        tempTributeVictim = victim;
+
+        if (Canvas == null) Canvas = GameObject.Find("Canvas");
+
+        string victimName = victim.GetComponent<ThisCard>().cardName;
+        string newName = card.GetComponent<ThisCard>().cardName;
+
+        SpawnTributeBox($"Tribute {victimName} to summon {newName}?", true);
+    }
+
     public void StartSummonProcess(GameObject card, GameObject slot, bool needsTribute)
     {
         tempCard = card;
         tempSlot = slot;
-
-        if (Canvas == null) Canvas = GameObject.Find("Canvas");
+        tempTributeVictim = null;
 
         if (needsTribute)
         {
-            GameObject tributeCandidate = FindFirstTribute();
-
-            if (tributeCandidate != null)
-            {
-                string tributeName = tributeCandidate.GetComponent<ThisCard>().cardName;
-                string summonName = card.GetComponent<ThisCard>().cardName;
-
-                string message = $"Do you want to tribute {tributeName} to summon {summonName}?";
-
-                SpawnTributeBox(message, tributeCandidate);
-            }
-            else
-            {
-                SpawnTributeBox("Do you want to tribute a monster?", null);
-            }
+            Debug.Log("Error: Tributes must be targeted!");
+            CancelSummon();
         }
         else
         {
@@ -601,31 +602,18 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    GameObject FindFirstTribute()
-    {
-        GameObject slots = GameObject.Find("PlayerSlots");
-        if (slots == null) return null;
-
-        foreach (Transform slot in slots.transform)
-        {
-            if (slot.childCount > 0)
-            {
-                return slot.GetChild(0).gameObject;
-            }
-        }
-        return null;
-    }
-
-    void SpawnTributeBox(string msg, GameObject specificTribute)
+    void SpawnTributeBox(string msg, bool isTribute)
     {
         SpawnBox(msg, "Yes", "No", () =>
         {
             Destroy(activeUIBox);
 
-            if (specificTribute != null) CmdPlayerDestroyCard(specificTribute, 0);
-            else PerformGenericTribute();
+            if (isTribute && tempTributeVictim != null)
+            {
+                CmdPlayerDestroyCard(tempTributeVictim, 0);
 
-            SpawnModeBox();
+                SpawnModeBox();
+            }
         },
         () =>
         {
@@ -633,18 +621,51 @@ public class PlayerManager : NetworkBehaviour
             CancelSummon();
         });
     }
+    void FinalizeSummon(bool attackMode)
+    {
+        if (tempCard != null && tempSlot != null)
+        {
+            tempCard.transform.SetParent(tempSlot.transform);
+            tempCard.transform.localPosition = new Vector3(0, 1.0f, 0);
+
+            if (attackMode)
+            {
+                tempCard.transform.localRotation = Quaternion.Euler(90, 0, 0);
+
+                tempCard.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
+            }
+            else
+            {
+                tempCard.transform.localRotation = Quaternion.Euler(90, 0, 90);
+
+                tempCard.transform.localScale = new Vector3(0.0075f, 0.01f, 0.01f);
+            }
+
+            ThisCard cardScript = tempCard.GetComponent<ThisCard>();
+            if (cardScript != null)
+            {
+                cardScript.CmdSetBattleMode(attackMode);
+                cardScript.summoned = true;
+            }
+
+            string numberOnly = System.Text.RegularExpressions.Regex.Match(tempSlot.name, @"\d+").Value;
+            int index = 0;
+            if (int.TryParse(numberOnly, out int result)) index = result - 1;
+
+            if (tempCard.GetComponent<CardAbilities>() != null)
+                PlayCard(tempCard, index);
+            else
+                CmdPlayCard(tempCard, index);
+
+            nomoresummons = true;
+        }
+    }
     void SpawnModeBox()
     {
-        SpawnBox("Select Battle Mode", "Attack", "Defense", () =>
-        {
-            Destroy(activeUIBox);
-            FinalizeSummon(true);
-        },
-        () =>
-        {
-            Destroy(activeUIBox);
-            FinalizeSummon(false);
-        });
+        SpawnBox("Select Battle Mode", "Attack", "Defense",
+            () => { Destroy(activeUIBox); FinalizeSummon(true); },
+            () => { Destroy(activeUIBox); FinalizeSummon(false); }
+        );
     }
 
     void SpawnBox(string message, string yesLabel, string noLabel, UnityEngine.Events.UnityAction yesAction, UnityEngine.Events.UnityAction noAction)
@@ -680,38 +701,6 @@ public class PlayerManager : NetworkBehaviour
             btn2.onClick.AddListener(noAction);
             Text btnTxt = btn2.GetComponentInChildren<Text>();
             if (btnTxt) btnTxt.text = noLabel;
-        }
-    }
-
-    void PerformGenericTribute()
-    {
-        GameObject t = FindFirstTribute();
-        if (t != null) CmdPlayerDestroyCard(t, 0);
-    }
-
-    void FinalizeSummon(bool attackMode)
-    {
-        if (tempCard != null && tempSlot != null)
-        {
-            ThisCard cardScript = tempCard.GetComponent<ThisCard>();
-            if (cardScript != null)
-            {
-                cardScript.attackmode = attackMode;
-
-                if (!attackMode) tempCard.transform.localRotation = Quaternion.Euler(90, 0, -90);
-                else tempCard.transform.localRotation = Quaternion.Euler(90, 0, 0);
-            }
-
-            string numberOnly = System.Text.RegularExpressions.Regex.Match(tempSlot.name, @"\d+").Value;
-            int index = 0;
-            if (int.TryParse(numberOnly, out int result)) index = result - 1;
-
-            if (tempCard.GetComponent<CardAbilities>() != null)
-                PlayCard(tempCard, index);
-            else
-                CmdPlayCard(tempCard, index);
-
-            nomoresummons = true;
         }
     }
 

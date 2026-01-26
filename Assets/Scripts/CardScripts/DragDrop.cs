@@ -118,97 +118,120 @@ public class DragDrop : NetworkBehaviour
         bool isMonster = cardScript != null;
         bool isMagic = magicScript != null;
 
-        if (isMagic && !magicScript.canBeActivated)
-        {
-            Debug.Log("Conditions not met for this Magic card!");
-            ReturnToHand();
-            return;
-        }
+        GameObject existingCard = GetCardInSlot(slot);
 
         if (isMagic && magicScript.equip)
         {
-            if (slot.name.Contains("PlayerSlot"))
+            if (slot.name.Contains("PlayerSlot") && existingCard != null)
             {
-                bool hasMonster = slot.transform.childCount > 0;
-                if (hasMonster)
+                if (existingCard.GetComponent<ThisCard>() != null)
                 {
                     PlaceCard(slot, false);
                     return;
                 }
+            }
+
+            Debug.Log("Equip needs a monster!");
+            ReturnToHand();
+            return;
+        }
+
+        if (isMonster && slot.name.Contains("PlayerSlot"))
+        {
+            if (PlayerManager.nomoresummons)
+            {
+                Debug.Log("Already summoned this turn.");
+                ReturnToHand();
+                return;
+            }
+
+            if (cardScript.stars >= 5)
+            {
+                if (existingCard != null)
+                {
+                    ThisCard targetScript = existingCard.GetComponent<ThisCard>();
+                    if (targetScript != null && targetScript.canBeTributed)
+                    {
+                        if (PlayerManager != null)
+                        {
+                            PlayerManager.StartTributeProcess(gameObject, slot, existingCard);
+                        }
+                        return;
+                    }
+                    else
+                    {
+                        Debug.Log("This monster cannot be tributed.");
+                        ReturnToHand();
+                        return;
+                    }
+                }
                 else
                 {
-                    Debug.Log("Equip Spell must be placed on a Monster!");
+                    Debug.Log("Level 5+ monsters must be dropped ON TOP of a tribute!");
                     ReturnToHand();
                     return;
                 }
             }
             else
             {
-                Debug.Log("Equip Spells must target a Monster Slot!");
-                ReturnToHand();
-                return;
+                if (existingCard == null)
+                {
+                    PlaceCard(slot, true);
+                    return;
+                }
+                else
+                {
+                    Debug.Log("Slot is full!");
+                    ReturnToHand();
+                    return;
+                }
             }
         }
 
-        bool validMonsterDrop = isMonster && slot.name.Contains("PlayerSlot");
-        bool validMagicDrop = isMagic && slot.name.Contains("ActionSlot");
-
-        if (validMonsterDrop || validMagicDrop)
+        if (isMagic && slot.name.Contains("ActionSlot"))
         {
-            bool slotOccupied = slot.GetComponentInChildren<ThisCard>() != null ||
-                                slot.GetComponentInChildren<ThisMagic>() != null;
-
-            if (slotOccupied)
+            if (existingCard == null)
             {
-                Debug.Log("Slot is already full!");
-                ReturnToHand();
+                PlaceCard(slot, false);
                 return;
             }
-
-            if (isMonster)
-            {
-                if (PlayerManager.nomoresummons)
-                {
-                    Debug.Log("You have already summoned a monster this turn!");
-                    ReturnToHand();
-                    return;
-                }
-
-                if (!cardScript.canBeSummoned)
-                {
-                    Debug.Log("Cannot summon: Needs Tribute or invalid level.");
-                    ReturnToHand();
-                    return;
-                }
-            }
-
-            PlaceCard(slot, isMonster);
-            return;
         }
 
         ReturnToHand();
     }
+
+    GameObject GetCardInSlot(GameObject slot)
+    {
+        foreach (Transform child in slot.transform)
+        {
+            if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null)
+            {
+                return child.gameObject;
+            }
+        }
+        return null;
+    }
     void PlaceCard(GameObject slot, bool isMonster)
     {
-        transform.SetParent(slot.transform);
-        transform.localPosition = slotPosition;
-        transform.localRotation = Quaternion.Euler(90, 0, 0);
-        transform.localScale = slotScale;
         isDraggable = false;
 
         if (isMonster)
         {
-            ThisCard cardScript = GetComponent<ThisCard>();
 
-            bool needsTribute = (cardScript.stars >= 5);
+            ThisCard cardScript = GetComponent<ThisCard>();
 
             if (PlayerManager != null)
             {
-                PlayerManager.StartSummonProcess(gameObject, slot, needsTribute);
+                PlayerManager.StartSummonProcess(gameObject, slot, false);
             }
         }
         else
         {
+            transform.SetParent(slot.transform);
+            transform.localPosition = slotPosition;
+            transform.localRotation = Quaternion.Euler(90, 0, 0);
+            transform.localScale = slotScale;
+
             if (GetComponent<ThisMagic>() != null)
                 GetComponent<ThisMagic>().activated = true;
 
