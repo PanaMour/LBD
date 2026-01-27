@@ -128,10 +128,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
-  labyrinthObject: {fileID: 6391627019251348834}
   gridGenerator: {fileID: 0}
   card: {fileID: 0}
   monsterID: 0
   currentTileName: 
   moveRange: 0
   hasMovedThisTurn: 0
+  targetWorldSize: 0.5

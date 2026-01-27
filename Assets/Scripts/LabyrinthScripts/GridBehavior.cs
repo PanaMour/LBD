@@ -223,18 +223,21 @@ public class GridBehavior : MonoBehaviour
         if (cardWaitingToSpawn != null)
         {
             int validRow = Mirror.NetworkServer.active ? 0 : 15;
-
             if (y == validRow && x >= 2 && x <= 8)
             {
                 int cardId = cardWaitingToSpawn.GetComponent<ThisCard>().thisId;
                 NetworkIdentity ni = cardWaitingToSpawn.GetComponent<NetworkIdentity>();
                 string tileName = gridArray[x, y].name;
-
                 PlayerManager pm = Mirror.NetworkClient.connection.identity.GetComponent<PlayerManager>();
                 pm.CmdSpawnMonster(cardId, tileName, ni);
+                pm.CompleteSummonSequence();
 
                 HighlightRange(false);
                 cardWaitingToSpawn = null;
+            }
+            else
+            {
+                Debug.Log("Invalid Spawn Tile! Pick a green tile.");
             }
         }
         else if (objectToMove != null)
@@ -373,7 +376,6 @@ public class GridBehavior : MonoBehaviour
 
             if (shouldShow)
             {
-                // If tile is reachable within monster's 'stars'
                 if (stat.visited > 0 && stat.visited <= spaces)
                 {
                     tile.GlowBlock();

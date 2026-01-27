@@ -10,7 +10,7 @@ public class CameraController : MonoBehaviour
     public Vector3 summonZoneRot = new Vector3(30, 0, 0);
 
     public float speed = 5f;
-    private bool lookingAtLabyrinth = true;
+    private bool lookingAtLabyrinth = false;
 
     void Update()
     {

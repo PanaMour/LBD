@@ -631,13 +631,11 @@ public class PlayerManager : NetworkBehaviour
             if (attackMode)
             {
                 tempCard.transform.localRotation = Quaternion.Euler(90, 0, 0);
-
                 tempCard.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
             }
             else
             {
                 tempCard.transform.localRotation = Quaternion.Euler(90, 0, 90);
-
                 tempCard.transform.localScale = new Vector3(0.0075f, 0.01f, 0.01f);
             }
 
@@ -648,6 +646,18 @@ public class PlayerManager : NetworkBehaviour
                 cardScript.summoned = true;
             }
 
+            GameObject gridGen = GameObject.Find("GridGenerator");
+            if (gridGen != null)
+            {
+                GridBehavior gb = gridGen.GetComponent<GridBehavior>();
+                gb.ShowSummonZone(tempCard);
+            }
+        }
+    }
+    public void CompleteSummonSequence()
+    {
+        if (tempCard != null && tempSlot != null)
+        {
             string numberOnly = System.Text.RegularExpressions.Regex.Match(tempSlot.name, @"\d+").Value;
             int index = 0;
             if (int.TryParse(numberOnly, out int result)) index = result - 1;
@@ -658,6 +668,9 @@ public class PlayerManager : NetworkBehaviour
                 CmdPlayCard(tempCard, index);
 
             nomoresummons = true;
+
+            tempCard = null;
+            tempSlot = null;
         }
     }
     void SpawnModeBox()

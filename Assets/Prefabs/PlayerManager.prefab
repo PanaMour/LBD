@@ -104,7 +104,7 @@ MonoBehaviour:
   EnemyActionSlot4: {fileID: 0}
   PlayerYard: {fileID: 0}
   EnemyYard: {fileID: 0}
-  LabyrinthObjectPrefab: {fileID: 7951009996680074172, guid: 7170bd098f1d54c4e9eb2598bc51ed9d,
+  LabyrinthObjectPrefab: {fileID: 6391627019251348834, guid: c3459144f5fcd094b937463d06e3b900,
     type: 3}
   PlayerSockets: []
   EnemySockets: []

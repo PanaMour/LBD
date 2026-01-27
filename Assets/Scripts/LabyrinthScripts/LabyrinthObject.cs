@@ -17,20 +17,14 @@ public class LabyrinthObject : NetworkBehaviour
 
     [SyncVar]
     public bool hasMovedThisTurn = false;
-
+    public float targetWorldSize = 0.5f;
     public override void OnStartClient()
     {
         base.OnStartClient();
-
         gridGenerator = GameObject.Find("GridGenerator");
 
-        if (monsterID != 0)
-            OnMonsterIDChanged(0, monsterID);
-
-        if (!string.IsNullOrEmpty(currentTileName))
-        {
-            StartCoroutine(WaitForTileAndSnap(currentTileName));
-        }
+        if (monsterID != 0) OnMonsterIDChanged(0, monsterID);
+        if (!string.IsNullOrEmpty(currentTileName)) StartCoroutine(WaitForTileAndSnap(currentTileName));
     }
 
     void OnMonsterIDChanged(int oldID, int newID)
@@ -39,7 +33,12 @@ public class LabyrinthObject : NetworkBehaviour
         {
             Card cardData = CardDataBase.cardList[newID];
             SpriteRenderer sr = GetComponent<SpriteRenderer>();
-            if (sr != null) sr.sprite = cardData.thisImage;
+            if (sr != null)
+            {
+                sr.sprite = cardData.thisImage;
+
+                AdjustSize();
+            }
         }
     }
 
@@ -53,31 +52,58 @@ public class LabyrinthObject : NetworkBehaviour
 
     IEnumerator WaitForTileAndSnap(string tileName)
     {
-        GameObject targetTile = null;
+        if (gridGenerator == null) gridGenerator = GameObject.Find("GridGenerator");
 
+        Transform targetTileTransform = null;
         float timeout = 2.0f;
-        while (targetTile == null && timeout > 0)
+
+        while (targetTileTransform == null && timeout > 0)
         {
-            targetTile = GameObject.Find(tileName);
-            if (targetTile == null)
+            if (gridGenerator != null)
+                targetTileTransform = gridGenerator.transform.Find(tileName);
+
+            if (targetTileTransform == null)
             {
                 yield return null;
                 timeout -= Time.deltaTime;
+                if (gridGenerator == null) gridGenerator = GameObject.Find("GridGenerator");
             }
         }
 
-        if (targetTile != null)
+        if (targetTileTransform != null)
         {
-            transform.SetParent(targetTile.transform, false);
-            transform.localPosition = new Vector3(0, 0.5f, 0);
-            transform.localRotation = Quaternion.identity;
+            transform.SetParent(targetTileTransform, true);
+
+            transform.localPosition = new Vector3(0, 0.55f, 0);
+            transform.localRotation = Quaternion.Euler(90, 0, 0);
+            AdjustSize();
         }
         else
         {
-            Debug.LogError($"[Client] LabyrinthObject timed out finding '{tileName}'. Is the Grid generated?");
+            Debug.LogError($"[Client] LabyrinthObject could not find child '{tileName}' inside GridGenerator!");
         }
     }
-        public void ObjectToMove()
+
+    void AdjustSize()
+    {
+        SpriteRenderer sr = GetComponent<SpriteRenderer>();
+        if (sr == null || sr.sprite == null) return;
+        if (transform.parent == null) return;
+
+        Vector3 spriteSize = sr.sprite.bounds.size;
+
+        float maxSpriteDimension = Mathf.Max(spriteSize.x, spriteSize.y);
+
+        float parentScale = transform.parent.lossyScale.x;
+
+        if (parentScale == 0 || maxSpriteDimension == 0) return;
+
+        float finalScale = targetWorldSize / (parentScale * maxSpriteDimension);
+
+        transform.localScale = new Vector3(finalScale, finalScale, 1f);
+    }
+
+    public void ObjectToMove()
     {
         if (!hasAuthority) return;
         if (NetworkClient.connection.identity == null) return;
@@ -87,6 +113,7 @@ public class LabyrinthObject : NetworkBehaviour
         if (hasMovedThisTurn) return;
 
         if (gridGenerator == null) gridGenerator = GameObject.Find("GridGenerator");
+
         if (gridGenerator != null)
             gridGenerator.GetComponent<GridBehavior>().ShowPossiblePaths(gameObject);
     }
