@@ -178,6 +178,41 @@ public class PlayerManager : NetworkBehaviour
 
     public void Update()
     {
+        if (!IsMyTurn || !hasAuthority) return;
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                GameObject clickedObj = hit.collider.gameObject;
+                LabyrinthObject labObj = clickedObj.GetComponent<LabyrinthObject>();
+
+                if (labObj == null)
+                    labObj = clickedObj.GetComponentInParent<LabyrinthObject>();
+
+                if (labObj != null)
+                {
+                    labObj.ObjectToMove();
+                    return;
+                }
+                GridStat tileStat = clickedObj.GetComponent<GridStat>();
+
+                if (tileStat == null)
+                    tileStat = clickedObj.GetComponentInParent<GridStat>();
+
+                if (tileStat != null)
+                {
+                    GameObject gridGen = GameObject.Find("GridGenerator");
+                    if (gridGen != null)
+                    {W
+                        gridGen.GetComponent<GridBehavior>().OnTileClicked(tileStat.x, tileStat.y);
+                    }
+                }
+            }
+        }
     }
 
     [Server]
