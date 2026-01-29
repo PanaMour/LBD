@@ -207,7 +207,7 @@ public class PlayerManager : NetworkBehaviour
                 {
                     GameObject gridGen = GameObject.Find("GridGenerator");
                     if (gridGen != null)
-                    {W
+                    {
                         gridGen.GetComponent<GridBehavior>().OnTileClicked(tileStat.x, tileStat.y);
                     }
                 }
