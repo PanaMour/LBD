@@ -9,15 +9,11 @@ using Mirror;
 public class ItemController : MonoBehaviour
 {
     public PlayerManager PlayerManager;
-    public Button sampleButton;                         // sample button prefab
-    private List<ContextMenuItem> contextMenuItems;     // list of items in menu
+    public Button sampleButton;
+    private List<ContextMenuItem> contextMenuItems;
 
     void Awake()
     {
-        // Here we are creating and populating our future Context Menu.
-        // I do it in Awake once, but as you can see, 
-        // it can be edited at runtime anywhere and anytime.
-
         contextMenuItems = new List<ContextMenuItem>();
         Action<Image> atk = new Action<Image>(ChangeAttack);
         Action<Image> def = new Action<Image>(ChangeDefense);

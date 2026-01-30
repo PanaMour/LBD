@@ -538,4 +538,10 @@ public class ThisCard : NetworkBehaviour
     {
         attackmode = isAttack;
     }
+
+    public void ActivateSummonEffects()
+    {
+        drawX = drawXcards;
+        useReturn = false;
+    }
 }

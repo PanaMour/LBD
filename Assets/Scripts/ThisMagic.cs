@@ -264,6 +264,42 @@ public class ThisMagic : NetworkBehaviour
                 equippedTo = null;
             }
         }
+
+        else if (equip == true && activated == true && beInGraveyard == false && equippedTo == null)
+        {
+            if (Target != null)
+            {
+                if (Target == Enemy)
+                {
+
+                }
+            }
+            else
+            {
+                if (PlayerSlots != null)
+                {
+                    foreach (Transform child in PlayerSlots.transform)
+                    {
+                        foreach (Transform grandChild in child)
+                        {
+                            ThisCard monster = grandChild.GetComponent<ThisCard>();
+
+                            if (monster != null && monster.isTarget == true)
+                            {
+                                equippedTo = grandChild.gameObject;
+                                monster.equippedTo = Magic;
+
+                                PlayerManager.CmdEquipBoost(grandChild.gameObject, equipBoost);
+
+                                monster.isTarget = false;
+
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     IEnumerator SmoothDestruction(int sec)
@@ -275,6 +311,7 @@ public class ThisMagic : NetworkBehaviour
     public void Activate()
     {
         activated = true;
+        drawX = drawXcards;
     }
     public void UntargetEnemy()
     {

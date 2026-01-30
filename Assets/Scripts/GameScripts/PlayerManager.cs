@@ -697,13 +697,30 @@ public class PlayerManager : NetworkBehaviour
             int index = 0;
             if (int.TryParse(numberOnly, out int result)) index = result - 1;
 
-            if (tempCard.GetComponent<CardAbilities>() != null)
+            CardAbilities specialEffect = tempCard.GetComponent<CardAbilities>();
+            if (specialEffect != null)
+            {
+                specialEffect.OnCompile();
+            }
+
+            ThisCard genericEffect = tempCard.GetComponent<ThisCard>();
+            if (genericEffect != null)
+            {
+                genericEffect.ActivateSummonEffects();
+            }
+
+            if (specialEffect != null)
                 PlayCard(tempCard, index);
             else
                 CmdPlayCard(tempCard, index);
 
-            nomoresummons = true;
+            if (genericEffect != null)
+            {
+                genericEffect.CmdSetBattleMode(genericEffect.attackmode);
+                genericEffect.summoned = true;
+            }
 
+            nomoresummons = true;
             tempCard = null;
             tempSlot = null;
         }

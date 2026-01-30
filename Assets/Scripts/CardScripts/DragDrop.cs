@@ -115,28 +115,40 @@ public class DragDrop : NetworkBehaviour
         ThisCard cardScript = GetComponent<ThisCard>();
         ThisMagic magicScript = GetComponent<ThisMagic>();
 
-        bool isMonster = cardScript != null;
-        bool isMagic = magicScript != null;
-
         GameObject existingCard = GetCardInSlot(slot);
 
-        if (isMagic && magicScript.equip)
+        if (magicScript != null && magicScript.equip)
         {
             if (slot.name.Contains("PlayerSlot") && existingCard != null)
             {
-                if (existingCard.GetComponent<ThisCard>() != null)
+                ThisCard monsterScript = existingCard.GetComponent<ThisCard>();
+                if (monsterScript != null)
                 {
-                    PlaceCard(slot, false);
-                    return;
+                    monsterScript.isTarget = true;
+
+                    GameObject openSpellSlot = FindEmptyActionSlot();
+
+                    if (openSpellSlot != null)
+                    {
+                        PlaceCard(openSpellSlot, false);
+                        return;
+                    }
+                    else
+                    {
+                        Debug.Log("No empty Spell/Trap zones available!");
+                        monsterScript.isTarget = false;
+                        ReturnToHand();
+                        return;
+                    }
                 }
             }
 
-            Debug.Log("Equip needs a monster!");
+            Debug.Log("Equip Spell must be dropped ON TOP of a Monster!");
             ReturnToHand();
             return;
         }
 
-        if (isMonster && slot.name.Contains("PlayerSlot"))
+        if (cardScript != null && slot.name.Contains("PlayerSlot"))
         {
             if (PlayerManager.nomoresummons)
             {
@@ -153,42 +165,25 @@ public class DragDrop : NetworkBehaviour
                     if (targetScript != null && targetScript.canBeTributed)
                     {
                         if (PlayerManager != null)
-                        {
                             PlayerManager.StartTributeProcess(gameObject, slot, existingCard);
-                        }
-                        return;
-                    }
-                    else
-                    {
-                        Debug.Log("This monster cannot be tributed.");
-                        ReturnToHand();
                         return;
                     }
                 }
-                else
-                {
-                    Debug.Log("Level 5+ monsters must be dropped ON TOP of a tribute!");
-                    ReturnToHand();
-                    return;
-                }
+                Debug.Log("Level 5+ must tribute a monster!");
+                ReturnToHand();
+                return;
             }
-            else
+            else 
             {
                 if (existingCard == null)
                 {
                     PlaceCard(slot, true);
                     return;
                 }
-                else
-                {
-                    Debug.Log("Slot is full!");
-                    ReturnToHand();
-                    return;
-                }
             }
         }
 
-        if (isMagic && slot.name.Contains("ActionSlot"))
+        if (magicScript != null && slot.name.Contains("ActionSlot"))
         {
             if (existingCard == null)
             {
@@ -200,14 +195,25 @@ public class DragDrop : NetworkBehaviour
         ReturnToHand();
     }
 
+    GameObject FindEmptyActionSlot()
+    {
+        for (int i = 1; i <= 4; i++)
+        {
+            GameObject s = GameObject.Find("ActionSlot" + i);
+            if (s != null && GetCardInSlot(s) == null)
+            {
+                return s;
+            }
+        }
+        return null;
+    }
+
     GameObject GetCardInSlot(GameObject slot)
     {
         foreach (Transform child in slot.transform)
         {
             if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null)
-            {
                 return child.gameObject;
-            }
         }
         return null;
     }
