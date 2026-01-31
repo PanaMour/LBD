@@ -383,18 +383,14 @@ public class PlayerManager : NetworkBehaviour
         else if (type == "OpponentDestroyed")
         {
             if (card.GetComponent<ThisCard>() != null)
+            {
                 card.GetComponent<ThisCard>().beInGraveyard = true;
-
-            GameObject targetYard = hasAuthority ? EnemyYard : PlayerYard;
-            if (targetYard != null)
-            {
-                card.transform.SetParent(targetYard.transform, false);
-            }
-
-            if (card.GetComponent<ThisCard>() != null)
-            {
                 MonstersPlayed--;
             }
+
+            GameObject targetYard = hasAuthority ? EnemyYard : PlayerYard;
+
+            SendCardToGraveyardPile(card, targetYard);
         }
         else if (type == "PlayerDestroyed")
         {
@@ -402,10 +398,8 @@ public class PlayerManager : NetworkBehaviour
                 card.GetComponent<ThisCard>().beInGraveyard = true;
 
             GameObject targetYard = hasAuthority ? PlayerYard : EnemyYard;
-            if (targetYard != null)
-            {
-                card.transform.SetParent(targetYard.transform, false);
-            }
+
+            SendCardToGraveyardPile(card, targetYard);
         }
         else if (type == "ChangeAttack")
         {
@@ -778,5 +772,20 @@ public class PlayerManager : NetworkBehaviour
         }
         tempCard = null;
         tempSlot = null;
+    }
+
+    void SendCardToGraveyardPile(GameObject card, GameObject yard)
+    {
+        if (yard != null)
+        {
+            card.transform.SetParent(yard.transform);
+            int stackIndex = yard.transform.childCount - 1;
+            float baseLift = 1f;
+            float heightOffset = baseLift + (stackIndex * 0.01f);
+
+            card.transform.localPosition = new Vector3(0, heightOffset, 0);
+            card.transform.localRotation = Quaternion.Euler(90, 0, 0);
+            card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
+        }
     }
 }
