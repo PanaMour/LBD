@@ -14,6 +14,10 @@ public class LabyrinthObject : NetworkBehaviour
 
     [SyncVar]
     public int moveRange;
+    [SyncVar]
+    public bool attackMode = true;
+    [SyncVar]
+    public int turnSummoned = 0;
 
     [SyncVar]
     public bool hasMovedThisTurn = false;

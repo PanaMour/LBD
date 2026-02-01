@@ -583,12 +583,15 @@ public class PlayerManager : NetworkBehaviour
         GameObject monster = Instantiate(LabyrinthObjectPrefab);
         LabyrinthObject script = monster.GetComponent<LabyrinthObject>();
 
-        // Get the stars from the card on the Server side
         script.moveRange = cardNetId.gameObject.GetComponent<ThisCard>().stars;
         script.monsterID = id;
         script.currentTileName = tileName;
 
+        script.attackMode = cardNetId.gameObject.GetComponent<ThisCard>().attackmode;
+        script.turnSummoned = GameManager.turn;
+
         NetworkServer.Spawn(monster, connectionToClient);
+        RpcLinkMonsterToCard(monster, cardNetId.gameObject);
     }
 
     [ClientRpc]
@@ -779,13 +782,37 @@ public class PlayerManager : NetworkBehaviour
         if (yard != null)
         {
             card.transform.SetParent(yard.transform);
-            int stackIndex = yard.transform.childCount - 1;
-            float baseLift = 1f;
+
+            int stackIndex = yard.transform.childCount - 1; 
+            float baseLift = 1f; 
             float heightOffset = baseLift + (stackIndex * 0.01f);
 
             card.transform.localPosition = new Vector3(0, heightOffset, 0);
             card.transform.localRotation = Quaternion.Euler(90, 0, 0);
-            card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
+            
+            card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f); 
+            LabyrinthObject[] allTokens = FindObjectsOfType<LabyrinthObject>();
+            
+            foreach (LabyrinthObject token in allTokens)
+            {
+                if (token.card == card)
+                {
+                    if (token.hasAuthority || isServer)
+                    {
+                        
+                        if (hasAuthority)
+                        {
+                            CmdDestroyToken(token.gameObject);
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    [Command]
+    public void CmdDestroyToken(GameObject token)
+    {
+        NetworkServer.Destroy(token);
     }
 }
