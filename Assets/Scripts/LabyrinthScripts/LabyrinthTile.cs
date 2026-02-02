@@ -92,4 +92,8 @@ public class LabyrinthTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         return Color.Lerp(white, red, Mathf.Sin(Time.time*7));
     }
+    public void RedGlowBlock()
+    {
+        GetComponent<Renderer>().material.color = Color.red;
+    }
 }

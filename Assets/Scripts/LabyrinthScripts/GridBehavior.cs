@@ -242,12 +242,37 @@ public class GridBehavior : MonoBehaviour
         }
         else if (objectToMove != null)
         {
-            FindDistanceTrue(x, y);
+            GridStat clickedStat = gridArray[x, y].GetComponent<GridStat>();
+
+            if (clickedStat.visited > 0 && clickedStat.visited <= spaces)
+            {
+                FindDistanceTrue(x, y);
+            }
+            else if (clickedStat.visited == 999)
+            {
+                LabyrinthObject attacker = objectToMove.GetComponent<LabyrinthObject>();
+                LabyrinthObject defender = gridArray[x, y].GetComponentInChildren<LabyrinthObject>();
+
+                if (attacker != null && defender != null)
+                {
+                    attacker.CmdAttackMonster(defender.gameObject);
+
+                    HighlightRange(false);
+                    objectToMove = null;
+                }
+            }
+            else if (clickedStat.visited == 888)
+            {
+                LabyrinthObject attacker = objectToMove.GetComponent<LabyrinthObject>();
+                attacker.CmdDirectAttack();
+
+                HighlightRange(false);
+                objectToMove = null;
+            }
         }
     }
     bool TestDirection(int x, int y, int step, int direction)
     {
-        // direction: 1 is up, 2 is right, 3 is down, 4 is left
         switch (direction)
         {
             case 4: // Attempting to move LEFT
@@ -397,13 +422,43 @@ public class GridBehavior : MonoBehaviour
         HighlightRange(false);
         objectToMove = labyrinthObject;
 
-        startX = objectToMove.transform.parent.GetComponent<GridStat>().x;
-        startY = objectToMove.transform.parent.GetComponent<GridStat>().y;
+        GridStat currentStat = objectToMove.transform.parent.GetComponent<GridStat>();
+        startX = currentStat.x;
+        startY = currentStat.y;
 
         LabyrinthObject labScript = labyrinthObject.GetComponent<LabyrinthObject>();
-
         spaces = labScript.moveRange;
 
         HighlightRange(true);
+
+        CheckAttackableNeighbors(startX, startY);
+    }
+
+    void CheckAttackableNeighbors(int x, int y)
+    {
+        // Check 4 directions: (x+1, y), (x-1, y), (x, y+1), (x, y-1)
+        CheckForEnemy(x + 1, y);
+        CheckForEnemy(x - 1, y);
+        CheckForEnemy(x, y + 1);
+        CheckForEnemy(x, y - 1);
+    }
+
+    void CheckForEnemy(int checkX, int checkY)
+    {
+        if (checkX < 0 || checkX >= columns || checkY < 0 || checkY >= rows) return;
+
+        GameObject tile = gridArray[checkX, checkY];
+        if (tile == null) return;
+
+        LabyrinthObject enemyMonster = tile.GetComponentInChildren<LabyrinthObject>();
+
+        if (enemyMonster != null)
+        {
+            if (enemyMonster.hasAuthority != objectToMove.GetComponent<LabyrinthObject>().hasAuthority)
+            {
+                tile.GetComponent<LabyrinthTile>().RedGlowBlock();
+                tile.GetComponent<GridStat>().visited = 999;
+            }
+        }
     }
 }

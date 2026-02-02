@@ -116,6 +116,12 @@ public class LabyrinthObject : NetworkBehaviour
         if (pm == null || !pm.IsMyTurn) return;
         if (hasMovedThisTurn) return;
 
+        if (!attackMode)
+        {
+            Debug.Log("Cannot move or attack in Defense Mode!");
+            return;
+        }
+
         if (gridGenerator == null) gridGenerator = GameObject.Find("GridGenerator");
 
         if (gridGenerator != null)
@@ -131,5 +137,86 @@ public class LabyrinthObject : NetworkBehaviour
             currentTileName = tileName;
             hasMovedThisTurn = true;
         }
+    }
+
+    [Command]
+    public void CmdAttackMonster(GameObject targetObj)
+    {
+        LabyrinthObject targetScript = targetObj.GetComponent<LabyrinthObject>();
+        if (targetScript == null) return;
+
+        ThisCard myCard = card.GetComponent<ThisCard>();
+        ThisCard enemyCard = targetScript.card.GetComponent<ThisCard>();
+
+        if (myCard == null || enemyCard == null) return;
+
+        int myAtk = myCard.actualATK; // Use actualATK for buffs
+        int enemyAtk = enemyCard.actualATK;
+        int enemyDef = enemyCard.def;
+        bool enemyIsAttackMode = targetScript.attackMode;
+
+        hasMovedThisTurn = true;
+
+        if (enemyIsAttackMode)
+        {
+            // --- ATK vs ATK ---
+            if (myAtk > enemyAtk)
+            {
+                // Destroy Enemy
+                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+                pm.CmdOpponentDestroyCard(targetScript.card, 0);
+                // Damage
+                int damage = myAtk - enemyAtk;
+                pm.CmdGMChangeLP(0, damage);
+            }
+            else if (myAtk < enemyAtk)
+            {
+                // Destroy Me
+                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+                pm.CmdPlayerDestroyCard(this.card, 0);
+                // Damage Me
+                int damage = enemyAtk - myAtk;
+                pm.CmdGMChangeLP(damage, 0);
+            }
+            else // Tie
+            {
+                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+                pm.CmdPlayerDestroyCard(this.card, 0);
+                pm.CmdOpponentDestroyCard(targetScript.card, 0);
+            }
+        }
+        else
+        {
+            // --- ATK vs DEF ---
+            if (myAtk > enemyDef)
+            {
+                // Destroy Enemy (No Damage to LP)
+                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+                pm.CmdOpponentDestroyCard(targetScript.card, 0);
+            }
+            else if (myAtk < enemyDef)
+            {
+                // I lose Life Points (No destroy)
+                int damage = enemyDef - myAtk;
+                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+                pm.CmdGMChangeLP(damage, 0);
+            }
+            // Tie = Nothing happens
+        }
+    }
+
+    [Command]
+    public void CmdDirectAttack()
+    {
+        ThisCard myCard = card.GetComponent<ThisCard>();
+        if (myCard == null) return;
+
+        hasMovedThisTurn = true;
+
+        int damage = myCard.actualATK;
+
+        // Deal damage to Opponent
+        PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+        pm.CmdGMChangeLP(0, damage);
     }
 }
