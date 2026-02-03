@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6391627019251348862}
-  - component: {fileID: 6391627019251348833}
+  - component: {fileID: 1021730744231417020}
   - component: {fileID: 1116098396741134615}
   - component: {fileID: -3828813890004396349}
   - component: {fileID: -5473772500369022743}
@@ -34,8 +34,8 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &6391627019251348833
-CapsuleCollider:
+--- !u!65 &1021730744231417020
+BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -44,9 +44,8 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.5
-  m_Height: 2
-  m_Direction: 1
+  serializedVersion: 2
+  m_Size: {x: 25, y: 25, z: 0.7}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!212 &1116098396741134615
 SpriteRenderer:
@@ -133,5 +132,7 @@ MonoBehaviour:
   monsterID: 0
   currentTileName: 
   moveRange: 0
+  attackMode: 1
+  turnSummoned: 0
   hasMovedThisTurn: 0
   targetWorldSize: 0.5
