@@ -132,11 +132,8 @@ public class LabyrinthObject : NetworkBehaviour
     public void CmdMoveToTile(string tileName)
     {
         PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
-        if (pm.IsMyTurn)
-        {
-            currentTileName = tileName;
-            hasMovedThisTurn = true;
-        }
+        currentTileName = tileName;
+        hasMovedThisTurn = true;
     }
 
     [Command]

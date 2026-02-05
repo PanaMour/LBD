@@ -25,11 +25,7 @@ public class GridBehavior : MonoBehaviour
 
     void Start()
     {
-        if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
-        {
-            transform.localRotation = Quaternion.Euler(0, 180, 0);
-            transform.position = new Vector3(10f, 0, 15f);
-        }
+
     }
 
     private void Awake()
@@ -458,6 +454,16 @@ public class GridBehavior : MonoBehaviour
             {
                 tile.GetComponent<LabyrinthTile>().RedGlowBlock();
                 tile.GetComponent<GridStat>().visited = 999;
+            }
+        }
+        else
+        {
+            int targetRow = Mirror.NetworkServer.active ? 15 : 0;
+
+            if (checkY == targetRow)
+            {
+                tile.GetComponent<LabyrinthTile>().RedGlowBlock();
+                tile.GetComponent<GridStat>().visited = 888;
             }
         }
     }
