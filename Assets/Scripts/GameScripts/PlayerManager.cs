@@ -122,17 +122,7 @@ public class PlayerManager : NetworkBehaviour
 
         StartCoroutine(StartGame());*/
     }
-    /*
-    IEnumerator StartGame()
-    {
-        for (int i = 0; i <= 4; i++)
-        {
-            yield return new WaitForSeconds(1);
-            GameObject card = Instantiate(CardToHand, transform.position, transform.rotation);
-            NetworkServer.Spawn(card, connectionToClient);
-            CmdFiveCardHand(card);
-        }
-    }*/
+
     IEnumerator DealFiveCards()
     {
         for (int i = 0; i < 5; i++)

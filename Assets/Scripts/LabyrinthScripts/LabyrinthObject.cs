@@ -56,7 +56,8 @@ public class LabyrinthObject : NetworkBehaviour
 
     IEnumerator WaitForTileAndSnap(string tileName)
     {
-        if (gridGenerator == null) gridGenerator = GameObject.Find("GridGenerator");
+        if (gridGenerator == null)
+            gridGenerator = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
 
         Transform targetTileTransform = null;
         float timeout = 2.0f;
@@ -64,27 +65,32 @@ public class LabyrinthObject : NetworkBehaviour
         while (targetTileTransform == null && timeout > 0)
         {
             if (gridGenerator != null)
-                targetTileTransform = gridGenerator.transform.Find(tileName);
+            {
+                foreach (Transform child in gridGenerator.transform)
+                {
+                    if (child.name == tileName && child.GetComponent<GridStat>() != null)
+                    {
+                        targetTileTransform = child;
+                        break;
+                    }
+                }
+            }
 
             if (targetTileTransform == null)
             {
                 yield return null;
                 timeout -= Time.deltaTime;
-                if (gridGenerator == null) gridGenerator = GameObject.Find("GridGenerator");
+                if (gridGenerator == null)
+                    gridGenerator = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
             }
         }
 
         if (targetTileTransform != null)
         {
             transform.SetParent(targetTileTransform, true);
-
             transform.localPosition = new Vector3(0, 0.55f, 0);
             transform.localRotation = Quaternion.Euler(90, 0, 0);
             AdjustSize();
-        }
-        else
-        {
-            Debug.LogError($"[Client] LabyrinthObject could not find child '{tileName}' inside GridGenerator!");
         }
     }
 

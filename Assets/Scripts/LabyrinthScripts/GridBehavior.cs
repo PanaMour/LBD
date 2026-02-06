@@ -56,44 +56,89 @@ public class GridBehavior : MonoBehaviour
     void GenerateGrid()
     {
         Transform refContainer = transform.Find("GridContainer");
-
         if (refContainer == null)
         {
-            Debug.LogError("Could not find GridContainer in the scene! Make sure the 2D map exists.");
+            foreach (Transform child in transform)
+            {
+                if (child.name.Contains("GridContainer"))
+                {
+                    refContainer = child;
+                    break;
+                }
+            }
+        }
+
+        if (refContainer != null) refContainer.gameObject.SetActive(false);
+
+        if (gridPrefab == null)
+        {
+            Debug.LogError("Missing gridPrefab!");
             return;
         }
 
         gridArray = new GameObject[columns, rows];
         float spacing = 1f;
+
+        bool isClient = Mirror.NetworkClient.active && !Mirror.NetworkServer.active;
+
         for (int i = 0; i < columns; i++)
         {
             for (int j = 0; j < rows; j++)
             {
-                Vector3 pos = new Vector3(leftBottomLocation.x + (i * spacing), 0, leftBottomLocation.z + (j * spacing));
-                GameObject obj = Instantiate(gridPrefab, pos, Quaternion.identity);
+                Vector3 pos;
+                Quaternion rot;
+
+                if (isClient)
+                {
+                    float physX = (columns - 1 - i) * spacing;
+                    float physZ = (rows - 1 - j) * spacing;
+
+                    pos = new Vector3(leftBottomLocation.x + physX, 0, leftBottomLocation.z + physZ);
+                    rot = Quaternion.Euler(0, 180, 0);
+                }
+                else
+                {
+                    pos = new Vector3(leftBottomLocation.x + (i * spacing), 0, leftBottomLocation.z + (j * spacing));
+                    rot = Quaternion.identity;
+                }
+
+                GameObject obj = Instantiate(gridPrefab, pos, rot);
                 obj.transform.SetParent(this.transform);
 
-                GridStat stat = obj.GetComponent<GridStat>();
-                stat.x = i;
-                stat.y = j;
                 obj.name = "GridObject(" + i + "," + j + ")";
 
-                Transform refTile = refContainer.transform.Find(obj.name);
-                if (refTile != null)
+                GridStat stat = obj.GetComponent<GridStat>();
+                if (stat != null)
                 {
-                    Sprite refSprite = refTile.GetComponent<Image>().sprite;
-
-                    Transform quad = obj.transform.Find("Quad");
-                    if (quad != null && refSprite != null)
+                    stat.x = i;
+                    stat.y = j;
+                }
+                if (refContainer != null)
+                {
+                    Transform refTile = refContainer.transform.Find(obj.name);
+                    if (refTile != null)
                     {
-                        Renderer quadRenderer = quad.GetComponent<Renderer>();
+                        Texture texToCopy = null;
+                        if (refTile.GetComponentInChildren<Renderer>() != null)
+                            texToCopy = refTile.GetComponentInChildren<Renderer>().material.mainTexture;
+                        else if (refTile.GetComponent<UnityEngine.UI.Image>() != null)
+                            texToCopy = refTile.GetComponent<UnityEngine.UI.Image>().sprite.texture;
 
-                        quadRenderer.material.mainTexture = refSprite.texture;
+                        if (texToCopy != null)
+                        {
+                            Transform realQuad = obj.transform.Find("Quad");
+                            if (realQuad != null)
+                                realQuad.GetComponent<Renderer>().material.mainTexture = texToCopy;
+                        }
                     }
                 }
 
                 gridArray[i, j] = obj;
             }
+        }
+        if (refContainer != null)
+        {
+            Destroy(refContainer.gameObject);
         }
     }
     void SetDistance()
