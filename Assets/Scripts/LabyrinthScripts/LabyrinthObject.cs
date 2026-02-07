@@ -89,7 +89,15 @@ public class LabyrinthObject : NetworkBehaviour
         {
             transform.SetParent(targetTileTransform, true);
             transform.localPosition = new Vector3(0, 0.55f, 0);
-            transform.localRotation = Quaternion.Euler(90, 0, 0);
+            if (isClientOnly)
+            {
+                transform.localRotation = Quaternion.Euler(90, 180, 0);
+            }
+            else
+            {
+                transform.localRotation = Quaternion.Euler(90, 0, 0);
+            }
+
             AdjustSize();
         }
     }
@@ -153,39 +161,46 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (myCard == null || enemyCard == null) return;
 
-        int myAtk = myCard.actualATK; // Use actualATK for buffs
+        int myAtk = myCard.actualATK;
         int enemyAtk = enemyCard.actualATK;
         int enemyDef = enemyCard.def;
         bool enemyIsAttackMode = targetScript.attackMode;
 
         hasMovedThisTurn = true;
 
+        PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+
         if (enemyIsAttackMode)
         {
             // --- ATK vs ATK ---
             if (myAtk > enemyAtk)
             {
-                // Destroy Enemy
-                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
-                pm.CmdOpponentDestroyCard(targetScript.card, 0);
-                // Damage
+                // 1. Destroy Enemy
+                NetworkServer.Destroy(targetScript.gameObject);
+                pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
+
+                // 2. Damage Opponent (Subtract LP)
                 int damage = myAtk - enemyAtk;
-                pm.CmdGMChangeLP(0, damage);
+                pm.RpcGMChangeLP(0, -damage);
             }
             else if (myAtk < enemyAtk)
             {
-                // Destroy Me
-                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
-                pm.CmdPlayerDestroyCard(this.card, 0);
-                // Damage Me
+                // 1. Destroy Me
+                NetworkServer.Destroy(this.gameObject);
+                pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
+
+                // 2. Damage Me (Subtract LP)
                 int damage = enemyAtk - myAtk;
-                pm.CmdGMChangeLP(damage, 0);
+                pm.RpcGMChangeLP(-damage, 0);
             }
             else // Tie
             {
-                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
-                pm.CmdPlayerDestroyCard(this.card, 0);
-                pm.CmdOpponentDestroyCard(targetScript.card, 0);
+                NetworkServer.Destroy(this.gameObject);
+                NetworkServer.Destroy(targetScript.gameObject);
+
+                pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
+                pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
+                // No damage on ties
             }
         }
         else
@@ -193,18 +208,16 @@ public class LabyrinthObject : NetworkBehaviour
             // --- ATK vs DEF ---
             if (myAtk > enemyDef)
             {
-                // Destroy Enemy (No Damage to LP)
-                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
-                pm.CmdOpponentDestroyCard(targetScript.card, 0);
+                // Destroy Defender (No Damage)
+                NetworkServer.Destroy(targetScript.gameObject);
+                pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
             }
             else if (myAtk < enemyDef)
             {
-                // I lose Life Points (No destroy)
+                // No Destroy. Attacker takes damage.
                 int damage = enemyDef - myAtk;
-                PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
-                pm.CmdGMChangeLP(damage, 0);
+                pm.RpcGMChangeLP(-damage, 0);
             }
-            // Tie = Nothing happens
         }
     }
 

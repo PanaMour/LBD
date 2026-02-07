@@ -290,7 +290,7 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcShowCard(GameObject card, string type, int index)
+    public void RpcShowCard(GameObject card, string type, int index)
     {
         if (card == null) return;
 
