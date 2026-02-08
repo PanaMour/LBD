@@ -316,39 +316,51 @@ public class GridBehavior : MonoBehaviour
     {
         switch (direction)
         {
-            case 4: // Attempting to move LEFT
+            case 4: // Attempting to move LEFT (Check x-1)
                 if (x - 1 > -1 && gridArray[x - 1, y] && gridArray[x - 1, y].GetComponent<GridStat>().visited == step)
                 {
-                    // Current tile cannot block Left AND Next tile cannot block Right
-                    if (!BlocksDirection(x, y, "Left") && !BlocksDirection(x - 1, y, "Right"))
-                        return true;
+                    // 1. Check Walls
+                    if (BlocksDirection(x, y, "Left") || BlocksDirection(x - 1, y, "Right")) return false;
+
+                    // 2. Check Occupancy (THE FIX)
+                    // Only check occupancy if we are calculating distances (step == -1) 
+                    // or finding the path (step > -1). 
+                    if (IsOccupied(x - 1, y)) return false;
+
+                    return true;
                 }
                 return false;
 
-            case 3: // Attempting to move DOWN
+            case 3: // Attempting to move DOWN (Check y-1)
                 if (y - 1 > -1 && gridArray[x, y - 1] && gridArray[x, y - 1].GetComponent<GridStat>().visited == step)
                 {
-                    // Current tile cannot block Bottom AND Next tile cannot block Top
-                    if (!BlocksDirection(x, y, "Bottom") && !BlocksDirection(x, y - 1, "Top"))
-                        return true;
+                    if (BlocksDirection(x, y, "Bottom") || BlocksDirection(x, y - 1, "Top")) return false;
+
+                    if (IsOccupied(x, y - 1)) return false;
+
+                    return true;
                 }
                 return false;
 
-            case 2: // Attempting to move RIGHT
+            case 2: // Attempting to move RIGHT (Check x+1)
                 if (x + 1 < columns && gridArray[x + 1, y] && gridArray[x + 1, y].GetComponent<GridStat>().visited == step)
                 {
-                    // Current tile cannot block Right AND Next tile cannot block Left
-                    if (!BlocksDirection(x, y, "Right") && !BlocksDirection(x + 1, y, "Left"))
-                        return true;
+                    if (BlocksDirection(x, y, "Right") || BlocksDirection(x + 1, y, "Left")) return false;
+
+                    if (IsOccupied(x + 1, y)) return false;
+
+                    return true;
                 }
                 return false;
 
-            case 1: // Attempting to move UP
+            case 1: // Attempting to move UP (Check y+1)
                 if (y + 1 < rows && gridArray[x, y + 1] && gridArray[x, y + 1].GetComponent<GridStat>().visited == step)
                 {
-                    // Current tile cannot block Top AND Next tile cannot block Bottom
-                    if (!BlocksDirection(x, y, "Up") && !BlocksDirection(x, y + 1, "Bottom"))
-                        return true;
+                    if (BlocksDirection(x, y, "Up") || BlocksDirection(x, y + 1, "Bottom")) return false;
+
+                    if (IsOccupied(x, y + 1)) return false;
+
+                    return true;
                 }
                 return false;
         }
@@ -511,5 +523,20 @@ public class GridBehavior : MonoBehaviour
                 tile.GetComponent<GridStat>().visited = 888;
             }
         }
+    }
+
+    bool IsOccupied(int x, int y)
+    {
+        if (gridArray[x, y] == null) return true;
+        LabyrinthObject monster = gridArray[x, y].GetComponentInChildren<LabyrinthObject>();
+
+        if (monster != null)
+        {
+            if (monster.gameObject != objectToMove)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

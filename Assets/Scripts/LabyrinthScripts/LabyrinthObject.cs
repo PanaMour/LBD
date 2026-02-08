@@ -181,7 +181,7 @@ public class LabyrinthObject : NetworkBehaviour
 
                 // 2. Damage Opponent (Subtract LP)
                 int damage = myAtk - enemyAtk;
-                pm.RpcGMChangeLP(0, -damage);
+                pm.RpcGMChangeLP(0, damage);
             }
             else if (myAtk < enemyAtk)
             {
