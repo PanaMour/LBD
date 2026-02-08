@@ -539,4 +539,61 @@ public class GridBehavior : MonoBehaviour
         }
         return false;
     }
+
+    public bool HighlightAttackOptions(LabyrinthObject attacker)
+    {
+        bool foundTarget = false;
+
+        GridStat currentStat = attacker.GetComponentInParent<GridStat>();
+        if (currentStat == null) return false;
+
+        int x = currentStat.x;
+        int y = currentStat.y;
+
+        CheckAndHighlight(x + 1, y, attacker, ref foundTarget);
+        CheckAndHighlight(x - 1, y, attacker, ref foundTarget);
+        CheckAndHighlight(x, y + 1, attacker, ref foundTarget);
+        CheckAndHighlight(x, y - 1, attacker, ref foundTarget);
+
+        return foundTarget;
+    }
+
+    void CheckAndHighlight(int checkX, int checkY, LabyrinthObject attacker, ref bool foundTarget)
+    {
+        if (checkX >= 0 && checkX < columns && checkY >= 0 && checkY < rows)
+        {
+            GameObject tile = gridArray[checkX, checkY];
+            if (tile == null) return;
+
+            LabyrinthObject targetMonster = tile.GetComponentInChildren<LabyrinthObject>();
+
+            if (targetMonster != null)
+            {
+                if (targetMonster.hasAuthority != attacker.hasAuthority)
+                {
+                    Transform quad = tile.transform.Find("Quad");
+                    if (quad != null)
+                    {
+                        quad.GetComponent<Renderer>().material.color = Color.red;
+                    }
+                    foundTarget = true;
+                }
+            }
+        }
+    }
+
+    public void ResetTileColors()
+    {
+        foreach (GameObject tile in gridArray)
+        {
+            if (tile != null)
+            {
+                Transform quad = tile.transform.Find("Quad");
+                if (quad != null)
+                {
+                    quad.GetComponent<Renderer>().material.color = Color.white;
+                }
+            }
+        }
+    }
 }

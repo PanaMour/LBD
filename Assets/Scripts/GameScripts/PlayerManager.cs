@@ -172,30 +172,60 @@ public class PlayerManager : NetworkBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
+            LabyrinthObject attackingUnit = null;
+            LabyrinthObject[] allUnits = FindObjectsOfType<LabyrinthObject>();
+
+            foreach (var unit in allUnits)
+            {
+                if (unit.hasAuthority && unit.waitingToAttack)
+                {
+                    attackingUnit = unit;
+                    break;
+                }
+            }
+
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
             {
                 GameObject clickedObj = hit.collider.gameObject;
-                LabyrinthObject labObj = clickedObj.GetComponent<LabyrinthObject>();
 
-                if (labObj == null)
-                    labObj = clickedObj.GetComponentInParent<LabyrinthObject>();
+                if (attackingUnit != null)
+                {
+                    LabyrinthObject target = clickedObj.GetComponent<LabyrinthObject>();
+                    if (target == null) target = clickedObj.GetComponentInParent<LabyrinthObject>();
+
+                    if (target != null && !target.hasAuthority)
+                    {
+                        attackingUnit.CmdAttackMonster(target.gameObject);
+                    }
+                    else
+                    {
+                        Debug.Log("Attack skipped. Ending turn.");
+                        attackingUnit.waitingToAttack = false;
+                    }
+
+                    GameObject grid = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+                    if (grid != null) grid.GetComponent<GridBehavior>().ResetTileColors();
+                    return;
+                }
+
+                LabyrinthObject labObj = clickedObj.GetComponent<LabyrinthObject>();
+                if (labObj == null) labObj = clickedObj.GetComponentInParent<LabyrinthObject>();
 
                 if (labObj != null)
                 {
                     labObj.ObjectToMove();
                     return;
                 }
-                GridStat tileStat = clickedObj.GetComponent<GridStat>();
 
-                if (tileStat == null)
-                    tileStat = clickedObj.GetComponentInParent<GridStat>();
+                GridStat tileStat = clickedObj.GetComponent<GridStat>();
+                if (tileStat == null) tileStat = clickedObj.GetComponentInParent<GridStat>();
 
                 if (tileStat != null)
                 {
-                    GameObject gridGen = GameObject.Find("GridGenerator");
+                    GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
                     if (gridGen != null)
                     {
                         gridGen.GetComponent<GridBehavior>().OnTileClicked(tileStat.x, tileStat.y);

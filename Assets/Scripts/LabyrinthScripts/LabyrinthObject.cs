@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Mirror;
 using System.Collections;
+
 public class LabyrinthObject : NetworkBehaviour
 {
     public GameObject gridGenerator;
@@ -19,13 +20,17 @@ public class LabyrinthObject : NetworkBehaviour
     [SyncVar]
     public int turnSummoned = 0;
 
+    // FLAG FOR "MOVE THEN ATTACK"
+    public bool waitingToAttack = false;
+
     [SyncVar]
     public bool hasMovedThisTurn = false;
     public float targetWorldSize = 0.5f;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
-        gridGenerator = GameObject.Find("GridGenerator");
+        gridGenerator = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
 
         if (monsterID != 0) OnMonsterIDChanged(0, monsterID);
         if (!string.IsNullOrEmpty(currentTileName)) StartCoroutine(WaitForTileAndSnap(currentTileName));
@@ -40,7 +45,6 @@ public class LabyrinthObject : NetworkBehaviour
             if (sr != null)
             {
                 sr.sprite = cardData.thisImage;
-
                 AdjustSize();
             }
         }
@@ -89,16 +93,43 @@ public class LabyrinthObject : NetworkBehaviour
         {
             transform.SetParent(targetTileTransform, true);
             transform.localPosition = new Vector3(0, 0.55f, 0);
+
             if (isClientOnly)
-            {
                 transform.localRotation = Quaternion.Euler(90, 180, 0);
-            }
             else
-            {
                 transform.localRotation = Quaternion.Euler(90, 0, 0);
-            }
 
             AdjustSize();
+            yield return new WaitForEndOfFrame();
+
+            // 4. CHECK FOR ATTACK OPPORTUNITIES
+            if (hasAuthority && hasMovedThisTurn)
+            {
+                CheckSurroundingsForEnemies();
+            }
+        }
+    }
+
+    void CheckSurroundingsForEnemies()
+    {
+        if (gridGenerator != null)
+        {
+            GridBehavior gb = gridGenerator.GetComponent<GridBehavior>();
+            if (gb != null)
+            {
+                bool enemiesFound = gb.HighlightAttackOptions(this);
+
+                if (enemiesFound)
+                {
+                    waitingToAttack = true;
+                    Debug.Log("Enemies found! Waiting for attack...");
+                }
+                else
+                {
+                    waitingToAttack = false;
+                    RpcResetGridColors();
+                }
+            }
         }
     }
 
@@ -109,15 +140,12 @@ public class LabyrinthObject : NetworkBehaviour
         if (transform.parent == null) return;
 
         Vector3 spriteSize = sr.sprite.bounds.size;
-
         float maxSpriteDimension = Mathf.Max(spriteSize.x, spriteSize.y);
-
         float parentScale = transform.parent.lossyScale.x;
 
         if (parentScale == 0 || maxSpriteDimension == 0) return;
 
         float finalScale = targetWorldSize / (parentScale * maxSpriteDimension);
-
         transform.localScale = new Vector3(finalScale, finalScale, 1f);
     }
 
@@ -128,6 +156,7 @@ public class LabyrinthObject : NetworkBehaviour
 
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
         if (pm == null || !pm.IsMyTurn) return;
+
         if (hasMovedThisTurn) return;
 
         if (!attackMode)
@@ -136,7 +165,7 @@ public class LabyrinthObject : NetworkBehaviour
             return;
         }
 
-        if (gridGenerator == null) gridGenerator = GameObject.Find("GridGenerator");
+        if (gridGenerator == null) gridGenerator = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
 
         if (gridGenerator != null)
             gridGenerator.GetComponent<GridBehavior>().ShowPossiblePaths(gameObject);
@@ -145,7 +174,6 @@ public class LabyrinthObject : NetworkBehaviour
     [Command]
     public void CmdMoveToTile(string tileName)
     {
-        PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
         currentTileName = tileName;
         hasMovedThisTurn = true;
     }
@@ -167,56 +195,48 @@ public class LabyrinthObject : NetworkBehaviour
         bool enemyIsAttackMode = targetScript.attackMode;
 
         hasMovedThisTurn = true;
+        waitingToAttack = false;
+        RpcResetGridColors();
 
         PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
 
         if (enemyIsAttackMode)
         {
-            // --- ATK vs ATK ---
             if (myAtk > enemyAtk)
             {
-                // 1. Destroy Enemy
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
 
-                // 2. Damage Opponent (Subtract LP)
                 int damage = myAtk - enemyAtk;
                 pm.RpcGMChangeLP(0, damage);
             }
             else if (myAtk < enemyAtk)
             {
-                // 1. Destroy Me
                 NetworkServer.Destroy(this.gameObject);
                 pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
 
-                // 2. Damage Me (Subtract LP)
                 int damage = enemyAtk - myAtk;
-                pm.RpcGMChangeLP(-damage, 0);
+                pm.RpcGMChangeLP(damage, 0);
             }
-            else // Tie
+            else
             {
                 NetworkServer.Destroy(this.gameObject);
                 NetworkServer.Destroy(targetScript.gameObject);
-
                 pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
-                // No damage on ties
             }
         }
         else
         {
-            // --- ATK vs DEF ---
             if (myAtk > enemyDef)
             {
-                // Destroy Defender (No Damage)
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
             }
             else if (myAtk < enemyDef)
             {
-                // No Destroy. Attacker takes damage.
                 int damage = enemyDef - myAtk;
-                pm.RpcGMChangeLP(-damage, 0);
+                pm.RpcGMChangeLP(damage, 0);
             }
         }
     }
@@ -228,11 +248,22 @@ public class LabyrinthObject : NetworkBehaviour
         if (myCard == null) return;
 
         hasMovedThisTurn = true;
-
         int damage = myCard.actualATK;
 
-        // Deal damage to Opponent
         PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
         pm.CmdGMChangeLP(0, damage);
+    }
+
+    [ClientRpc]
+    void RpcResetGridColors()
+    {
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+        if (gridGen) gridGen.GetComponent<GridBehavior>().ResetTileColors();
+    }
+
+    public void EndTurn()
+    {
+        PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+        if (pm) pm.CmdChangeTurn();
     }
 }
