@@ -247,11 +247,26 @@ public class LabyrinthObject : NetworkBehaviour
         ThisCard myCard = card.GetComponent<ThisCard>();
         if (myCard == null) return;
 
-        hasMovedThisTurn = true;
-        int damage = myCard.actualATK;
+        GridStat currentGrid = GetComponentInParent<GridStat>();
+        if (currentGrid == null) return;
 
-        PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
-        pm.CmdGMChangeLP(0, damage);
+        int y = currentGrid.y;
+        bool validHostPos = (y == 14);
+        bool validClientPos = (y == 1);
+
+        bool validRow = (y == 14 || y == 15 || y == 1 || y == 0);
+
+        if (validRow)
+        {
+            hasMovedThisTurn = true;
+            int damage = myCard.actualATK;
+
+            PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+            pm.CmdGMChangeLP(0, damage);
+
+            waitingToAttack = false;
+            RpcResetGridColors();
+        }
     }
 
     [ClientRpc]

@@ -499,6 +499,7 @@ public class GridBehavior : MonoBehaviour
     {
         if (targetX < 0 || targetX >= columns || targetY < 0 || targetY >= rows) return;
 
+        string opposite = "";
         if (direction == "Right") opposite = "Left";
         if (direction == "Left") opposite = "Right";
         if (direction == "Top") opposite = "Bottom";

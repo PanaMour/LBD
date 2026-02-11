@@ -193,21 +193,42 @@ public class PlayerManager : NetworkBehaviour
 
                 if (attackingUnit != null)
                 {
-                    LabyrinthObject target = clickedObj.GetComponent<LabyrinthObject>();
-                    if (target == null) target = clickedObj.GetComponentInParent<LabyrinthObject>();
+                    LabyrinthObject targetMonster = clickedObj.GetComponent<LabyrinthObject>();
+                    if (targetMonster == null) targetMonster = clickedObj.GetComponentInParent<LabyrinthObject>();
 
-                    if (target != null && !target.hasAuthority)
+                    if (targetMonster != null && !targetMonster.hasAuthority)
                     {
-                        attackingUnit.CmdAttackMonster(target.gameObject);
+                        attackingUnit.CmdAttackMonster(targetMonster.gameObject);
                     }
                     else
                     {
-                        Debug.Log("Attack skipped. Ending turn.");
-                        attackingUnit.waitingToAttack = false;
+                        GridStat clickedTile = clickedObj.GetComponent<GridStat>();
+                        if (clickedTile == null) clickedTile = clickedObj.GetComponentInParent<GridStat>();
+
+                        if (clickedTile != null)
+                        {
+                            int targetRow = isServer ? 15 : 0;
+
+                            if (clickedTile.y == targetRow && clickedTile.x >= 2 && clickedTile.x <= 8)
+                            {
+                                attackingUnit.CmdDirectAttack();
+                            }
+                            else
+                            {
+                                Debug.Log("Attack skipped. Continuing turn.");
+                                attackingUnit.waitingToAttack = false;
+                            }
+                        }
+                        else
+                        {
+                            Debug.Log("Attack skipped. Continuing turn.");
+                            attackingUnit.waitingToAttack = false;
+                        }
                     }
 
                     GameObject grid = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
                     if (grid != null) grid.GetComponent<GridBehavior>().ResetTileColors();
+
                     return;
                 }
 
