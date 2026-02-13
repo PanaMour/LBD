@@ -185,77 +185,81 @@ public class PlayerManager : NetworkBehaviour
             }
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit))
+            RaycastHit[] hits = Physics.RaycastAll(ray);
+
+            LabyrinthObject clickedMonster = null;
+            GridStat clickedTile = null;
+
+            foreach (RaycastHit hit in hits)
             {
-                GameObject clickedObj = hit.collider.gameObject;
+                GameObject obj = hit.collider.gameObject;
 
-                if (attackingUnit != null)
+                if (obj.GetComponent<ThisCard>() != null || obj.GetComponent<ThisMagic>() != null)
                 {
-                    LabyrinthObject targetMonster = clickedObj.GetComponent<LabyrinthObject>();
-                    if (targetMonster == null) targetMonster = clickedObj.GetComponentInParent<LabyrinthObject>();
+                    continue;
+                }
 
-                    if (targetMonster != null && !targetMonster.hasAuthority)
+                if (clickedMonster == null)
+                {
+                    clickedMonster = obj.GetComponent<LabyrinthObject>();
+                    if (clickedMonster == null) clickedMonster = obj.GetComponentInParent<LabyrinthObject>();
+                }
+
+                if (clickedTile == null)
+                {
+                    clickedTile = obj.GetComponent<GridStat>();
+                    if (clickedTile == null) clickedTile = obj.GetComponentInParent<GridStat>();
+                }
+            }
+
+            if (attackingUnit != null)
+            {
+                if (clickedMonster != null && !clickedMonster.hasAuthority)
+                {
+                    attackingUnit.CmdAttackMonster(clickedMonster.gameObject);
+                }
+                else if (clickedTile != null)
+                {
+                    int targetRow = isServer ? 15 : 0;
+                    if (clickedTile.y == targetRow && clickedTile.x >= 2 && clickedTile.x <= 8)
                     {
-                        attackingUnit.CmdAttackMonster(targetMonster.gameObject);
+                        attackingUnit.CmdDirectAttack();
                     }
                     else
                     {
-                        GridStat clickedTile = clickedObj.GetComponent<GridStat>();
-                        if (clickedTile == null) clickedTile = clickedObj.GetComponentInParent<GridStat>();
-
-                        if (clickedTile != null)
-                        {
-                            int targetRow = isServer ? 15 : 0;
-
-                            if (clickedTile.y == targetRow && clickedTile.x >= 2 && clickedTile.x <= 8)
-                            {
-                                attackingUnit.CmdDirectAttack();
-                            }
-                            else
-                            {
-                                Debug.Log("Attack skipped. Continuing turn.");
-                                attackingUnit.waitingToAttack = false;
-                            }
-                        }
-                        else
-                        {
-                            Debug.Log("Attack skipped. Continuing turn.");
-                            attackingUnit.waitingToAttack = false;
-                        }
+                        Debug.Log("Attack skipped. Continuing turn.");
+                        attackingUnit.waitingToAttack = false;
                     }
-
-                    GameObject grid = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
-                    if (grid != null) grid.GetComponent<GridBehavior>().ResetTileColors();
-
-                    return;
+                }
+                else
+                {
+                    Debug.Log("Attack skipped. Continuing turn.");
+                    attackingUnit.waitingToAttack = false;
                 }
 
-                LabyrinthObject labObj = clickedObj.GetComponent<LabyrinthObject>();
-                if (labObj == null) labObj = clickedObj.GetComponentInParent<LabyrinthObject>();
+                GameObject grid = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+                if (grid != null) grid.GetComponent<GridBehavior>().ResetTileColors();
 
-                if (labObj != null)
+                return;
+            }
+
+            if (clickedMonster != null)
+            {
+                clickedMonster.ObjectToMove();
+                return;
+            }
+
+            if (clickedTile != null)
+            {
+                GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+                if (gridGen != null)
                 {
-                    labObj.ObjectToMove();
-                    return;
-                }
-
-                GridStat tileStat = clickedObj.GetComponent<GridStat>();
-                if (tileStat == null) tileStat = clickedObj.GetComponentInParent<GridStat>();
-
-                if (tileStat != null)
-                {
-                    GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
-                    if (gridGen != null)
-                    {
-                        gridGen.GetComponent<GridBehavior>().OnTileClicked(tileStat.x, tileStat.y);
-                    }
+                    gridGen.GetComponent<GridBehavior>().OnTileClicked(clickedTile.x, clickedTile.y);
                 }
             }
         }
     }
-
     [Server]
     public override void OnStartServer()
     {

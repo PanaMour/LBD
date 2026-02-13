@@ -65,6 +65,7 @@ public class Card
     public int drawXcards;
 
     public Sprite thisImage;
+    public GameObject modelPrefab;
 
     public string color;
     public int returnXcards;
@@ -79,7 +80,7 @@ public class Card
 
     }
 
-    public Card(int Id, string CardName, int Stars, int ATK, int DEF, Type Type, Attribute Attribute, Property Property, string CardDescription, Sprite ThisImage, string Color, int DrawXCards, int ReturnXcards, bool Spell, int DamageDealtBySpell, bool CanBeTributed)
+    public Card(int Id, string CardName, int Stars, int ATK, int DEF, Type Type, Attribute Attribute, Property Property, string CardDescription, Sprite ThisImage, GameObject ModelPrefab, string Color, int DrawXCards, int ReturnXcards, bool Spell, int DamageDealtBySpell, bool CanBeTributed)
     {
         id = Id;
         cardName = CardName;
@@ -94,6 +95,7 @@ public class Card
         cardDescription = CardDescription;
 
         thisImage = ThisImage;
+        modelPrefab = ModelPrefab;
 
         color = Color;
 
@@ -107,7 +109,7 @@ public class Card
         canBeTributed = CanBeTributed;
     }
 
-    public Card(int Id,string CardName, int Stars, int ATK, int DEF, string CardDescription, Sprite ThisImage, string Color, int DrawXCards, int ReturnXcards, bool Spell, int DamageDealtBySpell, bool CanBeTributed)
+    public Card(int Id,string CardName, int Stars, int ATK, int DEF, string CardDescription, Sprite ThisImage, GameObject ModelPrefab, string Color, int DrawXCards, int ReturnXcards, bool Spell, int DamageDealtBySpell, bool CanBeTributed)
     {
         id = Id;
         cardName = CardName;
@@ -117,6 +119,7 @@ public class Card
         cardDescription = CardDescription;
 
         thisImage = ThisImage;
+        modelPrefab = ModelPrefab;
 
         color = Color;
 

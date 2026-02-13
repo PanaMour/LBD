@@ -12,7 +12,7 @@ public class LabyrinthObject : NetworkBehaviour
 
     [SyncVar(hook = nameof(OnTileNameChanged))]
     public string currentTileName;
-
+    public GameObject current3DModel;
     [SyncVar]
     public int moveRange;
     [SyncVar]
@@ -20,7 +20,6 @@ public class LabyrinthObject : NetworkBehaviour
     [SyncVar]
     public int turnSummoned = 0;
 
-    // FLAG FOR "MOVE THEN ATTACK"
     public bool waitingToAttack = false;
 
     [SyncVar]
@@ -41,11 +40,33 @@ public class LabyrinthObject : NetworkBehaviour
         if (newID > 0 && newID < CardDataBase.cardList.Count)
         {
             Card cardData = CardDataBase.cardList[newID];
-            SpriteRenderer sr = GetComponent<SpriteRenderer>();
-            if (sr != null)
+
+            if (current3DModel != null) Destroy(current3DModel);
+
+            if (cardData.modelPrefab != null)
             {
-                sr.sprite = cardData.thisImage;
+                SpriteRenderer sr = GetComponent<SpriteRenderer>();
+                if (sr != null) sr.enabled = false;
+
+                current3DModel = Instantiate(cardData.modelPrefab, this.transform);
+
+                current3DModel.transform.localPosition = Vector3.zero;
+                current3DModel.transform.localRotation = Quaternion.Euler(-90, 0, 0);
+                current3DModel.transform.localScale = Vector3.one;
+
+                SetLayerRecursively(current3DModel, 2);
+
                 AdjustSize();
+            }
+            else
+            {
+                SpriteRenderer sr = GetComponent<SpriteRenderer>();
+                if (sr != null)
+                {
+                    sr.enabled = true;
+                    sr.sprite = cardData.thisImage;
+                    AdjustSize();
+                }
             }
         }
     }
@@ -135,6 +156,18 @@ public class LabyrinthObject : NetworkBehaviour
 
     void AdjustSize()
     {
+        BoxCollider myCollider = GetComponent<BoxCollider>();
+
+        if (current3DModel != null)
+        {
+            transform.localScale = Vector3.one;
+            if (myCollider != null)
+            {
+                myCollider.size = new Vector3(1f, 1f, 1f);
+            }
+            return;
+        }
+
         SpriteRenderer sr = GetComponent<SpriteRenderer>();
         if (sr == null || sr.sprite == null) return;
         if (transform.parent == null) return;
@@ -146,7 +179,13 @@ public class LabyrinthObject : NetworkBehaviour
         if (parentScale == 0 || maxSpriteDimension == 0) return;
 
         float finalScale = targetWorldSize / (parentScale * maxSpriteDimension);
+
         transform.localScale = new Vector3(finalScale, finalScale, 1f);
+
+        if (myCollider != null)
+        {
+            myCollider.size = new Vector3(25f, 25f, 1f);
+        }
     }
 
     public void ObjectToMove()
@@ -280,5 +319,17 @@ public class LabyrinthObject : NetworkBehaviour
     {
         PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
         if (pm) pm.CmdChangeTurn();
+    }
+    void SetLayerRecursively(GameObject obj, int newLayer)
+    {
+        if (obj == null) return;
+
+        obj.layer = newLayer;
+
+        foreach (Transform child in obj.transform)
+        {
+            if (child == null) continue;
+            SetLayerRecursively(child.gameObject, newLayer);
+        }
     }
 }
