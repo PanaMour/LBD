@@ -50,7 +50,7 @@ public class LabyrinthObject : NetworkBehaviour
 
                 current3DModel = Instantiate(cardData.modelPrefab, this.transform);
 
-                current3DModel.transform.localPosition = Vector3.zero;
+                current3DModel.transform.localPosition = new Vector3(0f, 0f, -0.375f);
                 current3DModel.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 current3DModel.transform.localScale = Vector3.one;
 
@@ -161,6 +161,18 @@ public class LabyrinthObject : NetworkBehaviour
         if (current3DModel != null)
         {
             transform.localScale = Vector3.one;
+
+            if (transform.parent != null)
+            {
+                Vector3 worldScale = transform.lossyScale;
+
+                transform.localScale = new Vector3(
+                    1f / worldScale.x,
+                    1f / worldScale.y,
+                    1f / worldScale.z
+                );
+            }
+
             if (myCollider != null)
             {
                 myCollider.size = new Vector3(1f, 1f, 1f);
@@ -184,7 +196,7 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (myCollider != null)
         {
-            myCollider.size = new Vector3(25f, 25f, 1f);
+            myCollider.size = new Vector3(spriteSize.x, spriteSize.y, 1f);
         }
     }
 
