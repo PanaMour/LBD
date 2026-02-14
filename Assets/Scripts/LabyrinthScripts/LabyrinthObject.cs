@@ -50,7 +50,7 @@ public class LabyrinthObject : NetworkBehaviour
 
                 current3DModel = Instantiate(cardData.modelPrefab, this.transform);
 
-                current3DModel.transform.localPosition = new Vector3(0f, 0f, -0.375f);
+                current3DModel.transform.localPosition = new Vector3(0f, 0f, -0.45f);
                 current3DModel.transform.localRotation = Quaternion.Euler(-90, 0, 0);
                 current3DModel.transform.localScale = Vector3.one;
 
