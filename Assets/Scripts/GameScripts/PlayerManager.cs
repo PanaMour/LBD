@@ -45,6 +45,8 @@ public class PlayerManager : NetworkBehaviour
     public int CardsPlayed = 0;
     public bool IsMyTurn = false;
     public bool nomoresummons = false;
+    public bool hasDrawnInitialHand = false;
+    public bool hasDrawnThisTurn = false;
     public int MonstersPlayed = 0;
 
     private List<GameObject> cards = new List<GameObject>();
@@ -272,7 +274,19 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDealCards()
     {
-        StartCoroutine(DealFiveCards());
+        if (hasDrawnThisTurn) return;
+
+        if (!hasDrawnInitialHand)
+        {
+            StartCoroutine(DealFiveCards());
+            hasDrawnInitialHand = true;
+        }
+        else
+        {
+            StartCoroutine(DrawCard());
+        }
+
+        hasDrawnThisTurn = true;
         RpcGMChangeState("Compile {}");
     }
 
@@ -540,6 +554,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdChangeTurn()
     {
+        PlayerManager[] allPlayers = FindObjectsOfType<PlayerManager>();
+        foreach (PlayerManager player in allPlayers)
+        {
+            player.hasDrawnThisTurn = false;
+        }
+
         RpcGMChangeTurn();
     }
 
@@ -566,6 +586,15 @@ public class PlayerManager : NetworkBehaviour
         }
 
         nomoresummons = false;
+
+        if (pm.IsMyTurn && hasAuthority)
+        {
+            UIManager.updateButtonText("Draw Cards");
+        }
+        else if (!pm.IsMyTurn && hasAuthority)
+        {
+            UIManager.updateButtonText("Enemy Turn");
+        }
     }
 
     [Command]
