@@ -17,13 +17,49 @@ public class UIManager : NetworkBehaviour
     public Text TurnText;
 
     Color blueColor = new Color32(17, 216, 238, 255);
+    private Text phaseButtonText;
 
     void Start()
     {
         if (GameManager == null)
             GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
 
+        if (Button != null)
+            phaseButtonText = Button.GetComponentInChildren<Text>();
+
         RefreshUI();
+    }
+
+    void Update()
+    {
+        if (phaseButtonText == null || NetworkClient.connection == null || NetworkClient.connection.identity == null)
+            return;
+
+        PlayerManager localPM = NetworkClient.connection.identity.GetComponent<PlayerManager>();
+
+        if (localPM != null)
+        {
+            if (!localPM.IsMyTurn)
+            {
+                phaseButtonText.text = "Enemy Turn";
+                updateEndButtonColourBlue();
+            }
+            else if (localPM.hasDrawnThisTurn)
+            {
+                phaseButtonText.text = "Action Phase";
+                updateEndButtonColourMagenta();
+            }
+            else if (!localPM.hasDrawnInitialHand)
+            {
+                phaseButtonText.text = "Draw Cards";
+                updateEndButtonColourMagenta();
+            }
+            else
+            {
+                phaseButtonText.text = "Draw Card";
+                updateEndButtonColourMagenta();
+            }
+        }
     }
 
     public void RefreshUI()
@@ -43,9 +79,9 @@ public class UIManager : NetworkBehaviour
 
     public void updateButtonText(string gameState)
     {
-        if (Button != null)
+        if (Button != null && phaseButtonText != null)
         {
-            Button.GetComponentInChildren<Text>().text = gameState;
+            phaseButtonText.text = gameState;
         }
     }
 
@@ -59,13 +95,13 @@ public class UIManager : NetworkBehaviour
 
     public void updateEndButtonColourMagenta()
     {
-        if (EndButton != null)
+        if (EndButton != null && EndButton.GetComponent<Outline>() != null)
             EndButton.GetComponent<Outline>().effectColor = Color.magenta;
     }
 
     public void updateEndButtonColourBlue()
     {
-        if (EndButton != null)
+        if (EndButton != null && EndButton.GetComponent<Outline>() != null)
             EndButton.GetComponent<Outline>().effectColor = blueColor;
     }
 }

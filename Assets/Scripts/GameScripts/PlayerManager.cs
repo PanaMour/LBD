@@ -168,6 +168,23 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    public void OnDrawPhaseClicked()
+    {
+        if (!hasAuthority || !IsMyTurn || hasDrawnThisTurn) return;
+
+        if (!hasDrawnInitialHand)
+        {
+            CmdDealCards();
+            hasDrawnInitialHand = true;
+        }
+        else
+        {
+            CmdDrawCard();
+        }
+
+        hasDrawnThisTurn = true;
+    }
+
     public void Update()
     {
         if (!IsMyTurn || !hasAuthority) return;
@@ -274,26 +291,15 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDealCards()
     {
-        if (hasDrawnThisTurn) return;
-
-        if (!hasDrawnInitialHand)
-        {
-            StartCoroutine(DealFiveCards());
-            hasDrawnInitialHand = true;
-        }
-        else
-        {
-            StartCoroutine(DrawCard());
-        }
-
-        hasDrawnThisTurn = true;
-        RpcGMChangeState("Compile {}");
+        StartCoroutine(DealFiveCards());
+        RpcGMChangeState("Draw Card");
     }
 
     [Command]
     public void CmdDrawCard()
     {
         StartCoroutine(DrawCard());
+        RpcGMChangeState("Action Phase");
     }
 
     [Command]
@@ -491,9 +497,9 @@ public class PlayerManager : NetworkBehaviour
     [ClientRpc]
     void RpcGMChangeState(string stateRequest)
     {
-        if (stateRequest == "Compile {}" && hasAuthority == true)
+        if (stateRequest == "Action Phase" && hasAuthority == true)
         {
-            UIManager.updateButtonText("Compile {}");
+            UIManager.updateButtonText("Action Phase");
             UIManager.updateTurnText();
         }
         else if (stateRequest == "Draw Cards")
@@ -568,13 +574,28 @@ public class PlayerManager : NetworkBehaviour
     {
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
         pm.IsMyTurn = !pm.IsMyTurn;
+        pm.hasDrawnThisTurn = false;
         GameManager.turn++;
         UIManager.updateTurnText();
 
         if (!hasAuthority)
+        {
             UIManager.updateEndButtonColourMagenta();
+            UIManager.updateButtonText("Enemy Turn");
+        }
         if (hasAuthority)
+        {
             UIManager.updateEndButtonColourBlue();
+
+            if (!pm.hasDrawnInitialHand)
+            {
+                UIManager.updateButtonText("Draw Cards");
+            }
+            else
+            {
+                UIManager.updateButtonText("Draw Card");
+            }
+        }
 
         LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
         foreach (LabyrinthObject monster in allMonsters)
@@ -586,15 +607,6 @@ public class PlayerManager : NetworkBehaviour
         }
 
         nomoresummons = false;
-
-        if (pm.IsMyTurn && hasAuthority)
-        {
-            UIManager.updateButtonText("Draw Cards");
-        }
-        else if (!pm.IsMyTurn && hasAuthority)
-        {
-            UIManager.updateButtonText("Enemy Turn");
-        }
     }
 
     [Command]
