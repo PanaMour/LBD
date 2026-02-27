@@ -148,7 +148,7 @@ public class LabyrinthObject : NetworkBehaviour
                 else
                 {
                     waitingToAttack = false;
-                    RpcResetGridColors();
+                    ResetGridColors();
                 }
             }
         }
@@ -247,7 +247,7 @@ public class LabyrinthObject : NetworkBehaviour
 
         hasMovedThisTurn = true;
         waitingToAttack = false;
-        RpcResetGridColors();
+        ResetGridColors();
 
         PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
 
@@ -316,12 +316,11 @@ public class LabyrinthObject : NetworkBehaviour
             pm.CmdGMChangeLP(0, damage);
 
             waitingToAttack = false;
-            RpcResetGridColors();
+            ResetGridColors();
         }
     }
 
-    [ClientRpc]
-    void RpcResetGridColors()
+    void ResetGridColors()
     {
         GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
         if (gridGen) gridGen.GetComponent<GridBehavior>().ResetTileColors();
