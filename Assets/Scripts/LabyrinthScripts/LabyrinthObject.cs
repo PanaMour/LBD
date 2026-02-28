@@ -115,15 +115,20 @@ public class LabyrinthObject : NetworkBehaviour
             transform.SetParent(targetTileTransform, true);
             transform.localPosition = new Vector3(0, 0.55f, 0);
 
-            if (isClientOnly)
+            bool isClientMonster = (hasAuthority && !isServer) || (!hasAuthority && isServer);
+
+            if (isClientMonster)
+            {
                 transform.localRotation = Quaternion.Euler(90, 180, 0);
+            }
             else
+            {
                 transform.localRotation = Quaternion.Euler(90, 0, 0);
+            }
 
             AdjustSize();
             yield return new WaitForEndOfFrame();
 
-            // 4. CHECK FOR ATTACK OPPORTUNITIES
             if (hasAuthority && hasMovedThisTurn)
             {
                 CheckSurroundingsForEnemies();
