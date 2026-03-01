@@ -180,7 +180,8 @@ public class LabyrinthObject : NetworkBehaviour
 
             if (myCollider != null)
             {
-                myCollider.size = new Vector3(1f, 1f, 1f);
+                myCollider.size = new Vector3(0.8f, 0.5f, 0.8f);
+                myCollider.center = new Vector3(0, 0.25f, 0);
             }
             return;
         }
@@ -201,7 +202,8 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (myCollider != null)
         {
-            myCollider.size = new Vector3(spriteSize.x, spriteSize.y, 1f);
+            myCollider.size = new Vector3(spriteSize.x, spriteSize.y * 0.5f, 1f);
+            myCollider.center = new Vector3(0, -spriteSize.y * 0.25f, 0);
         }
     }
 
