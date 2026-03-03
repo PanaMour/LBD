@@ -57,6 +57,10 @@ public class PlayerManager : NetworkBehaviour
     private GameObject tempTributeVictim;
     private GameObject activeUIBox;
 
+    [Header("Treasure Settings")]
+    public GameObject TreasureChestPrefab;
+    public Color TreasureTileColor = Color.yellow;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -282,10 +286,10 @@ public class PlayerManager : NetworkBehaviour
     [Server]
     public override void OnStartServer()
     {
-        //cards.Add(Ping);
-        //cards.Add(Card1);
-        //Card.GetComponent<ThisCard>().thisId = 2;
-        //cards.Add(Card);
+        if (connectionToClient == NetworkServer.localConnection)
+        {
+            ServerSpawnTreasure();
+        }
     }
 
     [Command]
@@ -900,5 +904,45 @@ public class PlayerManager : NetworkBehaviour
     public void CmdDestroyToken(GameObject token)
     {
         NetworkServer.Destroy(token);
+    }
+
+    [Server]
+    public void ServerSpawnTreasure()
+    {
+        int rX = Random.Range(0, 11);
+        int rY = Random.Range(6, 10);
+
+        Debug.Log($"[SERVER] Spawning Treasure at Grid Coordinates: {rX}, {rY}");
+
+        Vector3 spawnPos = Vector3.zero;
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+
+        if (gridGen != null)
+        {
+            foreach (Transform child in gridGen.transform)
+            {
+                GridStat stat = child.GetComponent<GridStat>();
+                if (stat != null && stat.x == rX && stat.y == rY)
+                {
+                    spawnPos = child.position;
+                    break;
+                }
+            }
+        }
+
+        if (TreasureChestPrefab != null)
+        {
+            GameObject chest = Instantiate(TreasureChestPrefab, spawnPos, Quaternion.identity);
+
+            TreasureChest chestScript = chest.GetComponent<TreasureChest>();
+            if (chestScript != null)
+            {
+                chestScript.gridX = rX;
+                chestScript.gridY = rY;
+                chestScript.tileColor = TreasureTileColor;
+            }
+
+            NetworkServer.Spawn(chest);
+        }
     }
 }

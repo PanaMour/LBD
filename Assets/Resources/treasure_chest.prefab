@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2485966859792620546}
   - component: {fileID: 5671849471755377397}
+  - component: {fileID: 7848267549451391824}
   m_Layer: 0
   m_Name: treasure_chest
   m_TagString: Untagged
@@ -48,6 +49,23 @@ MonoBehaviour:
   serverOnly: 0
   m_AssetId: 
   hasSpawned: 0
+--- !u!114 &7848267549451391824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4900892709646839478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 707cf26235a68524496b5da8abf677c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  gridX: 0
+  gridY: 0
+  tileColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1001 &7424941957123236881
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -117,6 +117,11 @@ MonoBehaviour:
   CardsPlayed: 0
   IsMyTurn: 0
   nomoresummons: 0
+  hasDrawnInitialHand: 0
+  hasDrawnThisTurn: 0
   MonstersPlayed: 0
   ConfirmationBoxPrefab: {fileID: 6613209675388961194, guid: 9f2a5f7986b39304d9afcada64a94781,
     type: 3}
+  TreasureChestPrefab: {fileID: 4900892709646839478, guid: 9acf395d02c23274eb7fd01b016365da,
+    type: 3}
+  TreasureTileColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
