@@ -134,15 +134,15 @@ public class PlayerManager : NetworkBehaviour
         for (int i = 0; i < 5; i++)
         {
             yield return new WaitForSeconds(1);
-            int r = Random.Range(0, 42);
-            if (r < 29)
+            int r = Random.Range(0, 43);
+            if (r < 30)
             {
-                Card.GetComponent<ThisCard>().thisId = Random.Range(1, 28);
+                Card.GetComponent<ThisCard>().thisId = Random.Range(1, 29);
                 GameObject card = Instantiate(Card, new Vector2(0, 0), Quaternion.identity);
                 NetworkServer.Spawn(card, connectionToClient);
                 RpcShowCard(card, "Dealt", 0);
             }
-            else if (r >= 29)
+            else if (r >= 30)
             {
                 Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 14);
                 GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
@@ -155,15 +155,15 @@ public class PlayerManager : NetworkBehaviour
     IEnumerator DrawCard()
     {
         yield return new WaitForSeconds(1);
-        int r = Random.Range(0, 42);
-        if (r < 29)
+        int r = Random.Range(0, 43);
+        if (r < 30)
         {
-            Card.GetComponent<ThisCard>().thisId = Random.Range(1, 28);
+            Card.GetComponent<ThisCard>().thisId = Random.Range(1, 29);
             GameObject card = Instantiate(Card, new Vector2(0, 0), Quaternion.identity);
             NetworkServer.Spawn(card, connectionToClient);
             RpcShowCard(card, "Dealt", 0);
         }
-        else if (r >= 29)
+        else if (r >= 30)
         {
             Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 14);
             GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
