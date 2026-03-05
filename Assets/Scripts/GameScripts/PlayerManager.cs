@@ -945,4 +945,45 @@ public class PlayerManager : NetworkBehaviour
             NetworkServer.Spawn(chest);
         }
     }
+
+    [Server]
+    public void ServerCollectTreasure(GameObject chest)
+    {
+        NetworkServer.Destroy(chest);
+
+        List<int> labyrinthCardIds = new List<int>();
+
+        for (int i = 1; i < CardDataBase.cardList.Count; i++)
+        {
+            if (CardDataBase.cardList[i].type == Type.Labyrinth)
+            {
+                labyrinthCardIds.Add(i);
+            }
+        }
+
+        if (labyrinthCardIds.Count > 0)
+        {
+            int randomId = labyrinthCardIds[Random.Range(0, labyrinthCardIds.Count)];
+            StartCoroutine(DrawSpecificCard(randomId));
+
+            Debug.Log($"Player collected treasure! Drawing Card ID: {randomId}");
+        }
+        else
+        {
+            Debug.LogWarning("No cards of Type.Labyrinth found in CardDataBase!");
+        }
+    }
+
+    IEnumerator DrawSpecificCard(int cardId)
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        GameObject cardObj = Instantiate(Card, Vector2.zero, Quaternion.identity);
+
+        cardObj.GetComponent<ThisCard>().thisId = cardId;
+
+        NetworkServer.Spawn(cardObj, connectionToClient);
+
+        RpcShowCard(cardObj, "Dealt", 0);
+    }
 }

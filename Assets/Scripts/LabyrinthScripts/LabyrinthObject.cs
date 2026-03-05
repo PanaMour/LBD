@@ -234,6 +234,25 @@ public class LabyrinthObject : NetworkBehaviour
     {
         currentTileName = tileName;
         hasMovedThisTurn = true;
+
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+        if (gridGen != null)
+        {
+            Transform tile = gridGen.transform.Find(tileName);
+            if (tile != null)
+            {
+                TreasureChest chest = tile.GetComponentInChildren<TreasureChest>();
+
+                if (chest != null)
+                {
+                    PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+                    if (pm != null)
+                    {
+                        pm.ServerCollectTreasure(chest.gameObject);
+                    }
+                }
+            }
+        }
     }
 
     [Command]
