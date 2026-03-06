@@ -198,7 +198,6 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!IsMyTurn || !hasAuthority) return;
 
-        // RIGHT CLICK TO CANCEL TARGETING
         if (Input.GetMouseButtonDown(1) && isTargeting)
         {
             CancelTargeting();
@@ -222,12 +221,10 @@ public class PlayerManager : NetworkBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit[] hits = Physics.RaycastAll(ray);
 
-            // --- TARGETING MODE LOGIC ---
             if (isTargeting)
             {
                 foreach (RaycastHit hit in hits)
                 {
-                    // FIX: Renamed 'clickedMonster' to 'targetCandidate' to avoid CS0136 Error
                     LabyrinthObject targetCandidate = hit.collider.GetComponent<LabyrinthObject>();
                     if (targetCandidate == null) targetCandidate = hit.collider.GetComponentInParent<LabyrinthObject>();
 
@@ -235,25 +232,20 @@ public class PlayerManager : NetworkBehaviour
                     {
                         if (CheckTargetValidity(targetCandidate, currentTargetCriteria))
                         {
-                            // Valid Target Found! Execute!
                             CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject);
                             CancelTargeting();
 
-                            // Visuals
                             CmdPlayCard(activeMagicCard, 0);
                         }
                         else
                         {
                             Debug.Log("Invalid Target selected.");
                         }
-                        return; // Stop processing to prevent moving/attacking while targeting
+                        return;
                     }
                 }
                 return;
             }
-            // -----------------------------
-
-            // --- NORMAL MOVEMENT / ATTACK LOGIC ---
             LabyrinthObject clickedMonster = null;
             GridStat clickedTile = null;
 
@@ -261,7 +253,6 @@ public class PlayerManager : NetworkBehaviour
             {
                 GameObject obj = hit.collider.gameObject;
 
-                // Ignore cards in hand/slots
                 if (obj.GetComponent<ThisCard>() != null || obj.GetComponent<ThisMagic>() != null)
                 {
                     continue;
@@ -1090,41 +1081,30 @@ public class PlayerManager : NetworkBehaviour
 
         if (magicScript == null || monsterScript == null) return;
 
-        // Execute Effect based on Type
         switch (magicScript.targetType)
         {
             case MagicTargetType.EnemyAttack:
-                // Card: SUCCUMB 
-                // Target was: Attack Mode -> Change to Defense (false)
                 monsterScript.attackMode = false;
                 RpcShowCard(monsterScript.card, "ChangeDefense", 0);
                 break;
 
             case MagicTargetType.EnemyDefense:
-                // Card: ENRAGE
-                // Target was: Defense Mode -> Change to Attack (true)
                 monsterScript.attackMode = true;
                 RpcShowCard(monsterScript.card, "ChangeAttack", 0);
                 break;
 
             case MagicTargetType.AnyEnemy:
-                // Card: TARGET PRACTICE -> Destroy
                 NetworkServer.Destroy(targetMonster);
                 RpcShowCard(monsterScript.card, "OpponentDestroyed", 0);
                 break;
 
             case MagicTargetType.AnyAlly:
-                // EQUIPS LOGIC
-                // 1. Get the Card Object representing the monster
                 GameObject monsterCardObj = monsterScript.card;
 
                 if (monsterCardObj != null)
                 {
-                    // 2. Apply the Boost using your existing system
-                    // We reuse the 'index' parameter of RpcShowCard to pass the boost amount
                     RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
 
-                    // 3. (Optional) Visual Debug
                     Debug.Log($"Equipped {magicScript.name} to {monsterScript.name}. Boost: {magicScript.equipBoost}");
                 }
                 break;
