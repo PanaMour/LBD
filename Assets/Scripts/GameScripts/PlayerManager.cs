@@ -61,6 +61,11 @@ public class PlayerManager : NetworkBehaviour
     public GameObject TreasureChestPrefab;
     public Color TreasureTileColor = Color.yellow;
 
+    [Header("Targeting System")]
+    public bool isTargeting = false;
+    public GameObject activeMagicCard;
+    public MagicTargetType currentTargetCriteria;
+
     public override void OnStartClient()
     {
         base.OnStartClient();
@@ -193,6 +198,13 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!IsMyTurn || !hasAuthority) return;
 
+        // RIGHT CLICK TO CANCEL TARGETING
+        if (Input.GetMouseButtonDown(1) && isTargeting)
+        {
+            CancelTargeting();
+            return;
+        }
+
         if (Input.GetMouseButtonDown(0))
         {
             LabyrinthObject attackingUnit = null;
@@ -208,9 +220,40 @@ public class PlayerManager : NetworkBehaviour
             }
 
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
             RaycastHit[] hits = Physics.RaycastAll(ray);
 
+            // --- TARGETING MODE LOGIC ---
+            if (isTargeting)
+            {
+                foreach (RaycastHit hit in hits)
+                {
+                    // FIX: Renamed 'clickedMonster' to 'targetCandidate' to avoid CS0136 Error
+                    LabyrinthObject targetCandidate = hit.collider.GetComponent<LabyrinthObject>();
+                    if (targetCandidate == null) targetCandidate = hit.collider.GetComponentInParent<LabyrinthObject>();
+
+                    if (targetCandidate != null)
+                    {
+                        if (CheckTargetValidity(targetCandidate, currentTargetCriteria))
+                        {
+                            // Valid Target Found! Execute!
+                            CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject);
+                            CancelTargeting();
+
+                            // Visuals
+                            CmdPlayCard(activeMagicCard, 0);
+                        }
+                        else
+                        {
+                            Debug.Log("Invalid Target selected.");
+                        }
+                        return; // Stop processing to prevent moving/attacking while targeting
+                    }
+                }
+                return;
+            }
+            // -----------------------------
+
+            // --- NORMAL MOVEMENT / ATTACK LOGIC ---
             LabyrinthObject clickedMonster = null;
             GridStat clickedTile = null;
 
@@ -218,6 +261,7 @@ public class PlayerManager : NetworkBehaviour
             {
                 GameObject obj = hit.collider.gameObject;
 
+                // Ignore cards in hand/slots
                 if (obj.GetComponent<ThisCard>() != null || obj.GetComponent<ThisMagic>() != null)
                 {
                     continue;
@@ -325,13 +369,64 @@ public class PlayerManager : NetworkBehaviour
 
     public void PlayMagicCard(GameObject card, int index)
     {
-        if (card.GetComponent<ThisMagic>() != null)
+        ThisMagic magicScript = card.GetComponent<ThisMagic>();
+
+        if (magicScript != null)
         {
-            card.GetComponent<ThisMagic>().Activate();
+            if (magicScript.targetType != MagicTargetType.None)
+            {
+                StartTargetingMode(card, magicScript.targetType);
+                return;
+            }
+
+            magicScript.Activate();
         }
 
         CmdPlayCard(card, index);
     }
+
+    void StartTargetingMode(GameObject card, MagicTargetType type)
+    {
+        isTargeting = true;
+        activeMagicCard = card;
+        currentTargetCriteria = type;
+        Debug.Log($"Targeting Mode Started: Looking for {type}");
+    }
+
+    bool CheckTargetValidity(LabyrinthObject monster, MagicTargetType type)
+    {
+        bool isEnemy = !monster.hasAuthority;
+        bool isAttack = monster.attackMode;
+
+        switch (type)
+        {
+            case MagicTargetType.EnemyAttack:
+                return isEnemy && isAttack;
+
+            case MagicTargetType.EnemyDefense:
+                return isEnemy && !isAttack;
+
+            case MagicTargetType.AnyEnemy:
+                return isEnemy;
+
+            case MagicTargetType.AnyAlly:
+                return !isEnemy;
+
+            case MagicTargetType.AnyUnit:
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
+    public void CancelTargeting()
+    {
+        isTargeting = false;
+        activeMagicCard = null;
+        Debug.Log("Targeting Cancelled");
+    }
+
     [Command]
     public void CmdPlayCard(GameObject card, int index)
     {
@@ -985,5 +1080,56 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(cardObj, connectionToClient);
 
         RpcShowCard(cardObj, "Dealt", 0);
+    }
+
+    [Command]
+    public void CmdExecuteMagicEffect(GameObject magicCard, GameObject targetMonster)
+    {
+        ThisMagic magicScript = magicCard.GetComponent<ThisMagic>();
+        LabyrinthObject monsterScript = targetMonster.GetComponent<LabyrinthObject>();
+
+        if (magicScript == null || monsterScript == null) return;
+
+        // Execute Effect based on Type
+        switch (magicScript.targetType)
+        {
+            case MagicTargetType.EnemyAttack:
+                // Card: SUCCUMB 
+                // Target was: Attack Mode -> Change to Defense (false)
+                monsterScript.attackMode = false;
+                RpcShowCard(monsterScript.card, "ChangeDefense", 0);
+                break;
+
+            case MagicTargetType.EnemyDefense:
+                // Card: ENRAGE
+                // Target was: Defense Mode -> Change to Attack (true)
+                monsterScript.attackMode = true;
+                RpcShowCard(monsterScript.card, "ChangeAttack", 0);
+                break;
+
+            case MagicTargetType.AnyEnemy:
+                // Card: TARGET PRACTICE -> Destroy
+                NetworkServer.Destroy(targetMonster);
+                RpcShowCard(monsterScript.card, "OpponentDestroyed", 0);
+                break;
+
+            case MagicTargetType.AnyAlly:
+                // EQUIPS LOGIC
+                // 1. Get the Card Object representing the monster
+                GameObject monsterCardObj = monsterScript.card;
+
+                if (monsterCardObj != null)
+                {
+                    // 2. Apply the Boost using your existing system
+                    // We reuse the 'index' parameter of RpcShowCard to pass the boost amount
+                    RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
+
+                    // 3. (Optional) Visual Debug
+                    Debug.Log($"Equipped {magicScript.name} to {monsterScript.name}. Boost: {magicScript.equipBoost}");
+                }
+                break;
+        }
+
+        RpcShowCard(magicCard, "Played", 0);
     }
 }

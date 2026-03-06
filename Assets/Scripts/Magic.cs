@@ -1,7 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
+
+public enum MagicTargetType
+{
+    None,
+    EnemyAttack,
+    EnemyDefense,
+    AnyEnemy,
+    AnyAlly,
+    AnyUnit
+}
 
 public enum MagicType
 {
@@ -10,28 +17,23 @@ public enum MagicType
 }
 
 [System.Serializable]
-
 public class Magic
 {
     public int id;
     public string cardName;
     public string cardDescription;
+    public Sprite thisImage;
+    public string color;
+
+    public MagicTargetType targetType;
 
     public int drawXcards;
-
-    public Sprite thisImage;
-
-    public string color;
     public int returnXcards;
-
     public int damageHealedBySpell;
     public int damageDealtBySpell;
-
     public bool targetDestroy;
-
     public bool changeAttack;
     public bool changeDefense;
-
     public bool equip;
     public int equipBoost;
 
@@ -40,20 +42,18 @@ public class Magic
 
     }
 
-    public Magic(int Id, string CardName, string CardDescription, Sprite ThisImage, string Color, int DrawXCards, int ReturnXcards, int DamageHealedBySpell, int DamageDealtBySpell,bool TargetDestroy,bool ChangeAttack,bool ChangeDefense, bool Equip, int EquipBoost)
+    public Magic(int Id, string CardName, string CardDescription, Sprite ThisImage, string Color, MagicTargetType TargetType, int DrawXCards, int ReturnXcards, int DamageHealedBySpell, int DamageDealtBySpell, bool TargetDestroy, bool ChangeAttack, bool ChangeDefense, bool Equip, int EquipBoost)
     {
         id = Id;
         cardName = CardName;
         cardDescription = CardDescription;
-
         thisImage = ThisImage;
-
         color = Color;
 
+        targetType = TargetType;
+
         drawXcards = DrawXCards;
-
         returnXcards = ReturnXcards;
-
         damageHealedBySpell = DamageHealedBySpell;
         damageDealtBySpell = DamageDealtBySpell;
         targetDestroy = TargetDestroy;

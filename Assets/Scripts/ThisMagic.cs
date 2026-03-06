@@ -22,6 +22,8 @@ public class ThisMagic : NetworkBehaviour
     public Image thatImage;
     public Image frame;
 
+    public MagicTargetType targetType;
+
     public bool cardBack;
     public static bool staticCardBack;
 
@@ -71,22 +73,35 @@ public class ThisMagic : NetworkBehaviour
 
     void Start()
     {
-        GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+        GameManager = GameObject.Find("GameManager")?.GetComponent<GameManager>();
 
-        if (this.tag != "Unusable")
-        {
-            if (NetworkClient.connection != null && NetworkClient.connection.identity != null)
-                PlayerManager = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-        }
-
-        thisMagic[0] = MagicDataBase.magicList[thisId];
+        if (NetworkClient.connection != null && NetworkClient.connection.identity != null)
+            PlayerManager = NetworkClient.connection.identity.GetComponent<PlayerManager>();
 
         if (transform.Find("MagicCanvas"))
         {
-            magicnameText = transform.Find("MagicCanvas/MagicBackground/MagicName/MagicNameText").GetComponent<Text>();
-            magicdescriptionText = transform.Find("MagicCanvas/MagicBackground/MagicDescription/MagicDescriptionText").GetComponent<Text>();
-            thatImage = transform.Find("MagicCanvas/MagicBackground/MagicImage").GetComponent<Image>();
-            frame = transform.Find("MagicCanvas").GetComponent<Image>();
+            Transform canvas = transform.Find("MagicCanvas");
+            Transform bg = canvas.Find("MagicBackground");
+
+            if (bg.Find("MagicName/MagicNameText"))
+                magicnameText = bg.Find("MagicName/MagicNameText").GetComponent<Text>();
+
+            if (bg.Find("MagicDescription/MagicDescriptionText"))
+                magicdescriptionText = bg.Find("MagicDescription/MagicDescriptionText").GetComponent<Text>();
+
+            if (bg.Find("MagicImage"))
+                thatImage = bg.Find("MagicImage").GetComponent<Image>();
+
+            frame = canvas.GetComponent<Image>();
+        }
+
+        if (thisId > 0 && thisId < MagicDataBase.magicList.Count)
+        {
+            thisMagic.Add(MagicDataBase.magicList[thisId]);
+        }
+        else
+        {
+            thisMagic.Add(MagicDataBase.magicList[0]);
         }
 
         numberOfCardsInDeck = PlayerDeck.deckSize;
@@ -101,6 +116,12 @@ public class ThisMagic : NetworkBehaviour
 
     void Update()
     {
+        if (PlayerManager == null)
+        {
+            if (NetworkClient.connection != null && NetworkClient.connection.identity != null)
+                PlayerManager = NetworkClient.connection.identity.GetComponent<PlayerManager>();
+        }
+
         if (PlayerArea == null) PlayerArea = GameObject.Find("Hand_Anchor");
         if (PlayerSlots == null) PlayerSlots = GameObject.Find("PlayerSlots");
         if (EnemySlots == null) EnemySlots = GameObject.Find("EnemySlots");
@@ -113,12 +134,23 @@ public class ThisMagic : NetworkBehaviour
             }
         }
 
-        if (!initialized && thisMagic.Count > 0)
+        if (thisId != 0 && thisId != id)
+        {
+            if (thisId < MagicDataBase.magicList.Count)
+            {
+                thisMagic.Clear();
+                thisMagic.Add(MagicDataBase.magicList[thisId]);
+                initialized = false;
+            }
+        }
+
+        if (!initialized && thisMagic.Count > 0 && thisMagic[0] != null)
         {
             id = thisMagic[0].id;
             magicName = thisMagic[0].cardName;
             magicDescription = thisMagic[0].cardDescription;
             thisSprite = thisMagic[0].thisImage;
+            targetType = thisMagic[0].targetType;
             drawXcards = thisMagic[0].drawXcards;
             returnXcards = thisMagic[0].returnXcards;
             damageHealedBySpell = thisMagic[0].damageHealedBySpell;
@@ -133,22 +165,36 @@ public class ThisMagic : NetworkBehaviour
 
         if (initialized)
         {
-            magicnameText.text = "" + magicName;
-            magicdescriptionText.text = "" + magicDescription;
-            if (thisSprite != null) thatImage.sprite = thisSprite;
+            if (magicnameText) magicnameText.text = "" + magicName;
+            if (magicdescriptionText) magicdescriptionText.text = "" + magicDescription;
 
-            if (thisMagic[0].color == "Magic") frame.color = new Color32(62, 69, 90, 255);
-            else frame.color = new Color32(255, 255, 255, 255);
+            if (thatImage != null && thisSprite != null)
+            {
+                thatImage.sprite = thisSprite;
+            }
+
+            if (frame)
+            {
+                if (thisMagic[0].color == "Magic") frame.color = new Color32(62, 69, 90, 255);
+                else frame.color = new Color32(255, 255, 255, 255);
+            }
         }
 
         staticCardBack = cardBack;
 
         if (tag != "Unusable")
         {
-            HandleActivationLogic();
-
-            /*DragDrop dd = gameObject.GetComponent<DragDrop>();
-            if (dd != null) dd.enabled = canBeActivated;*/
+            if (targetType != MagicTargetType.None)
+            {
+                if (PlayerManager != null && PlayerManager.IsMyTurn && !activated)
+                {
+                    canBeActivated = true;
+                }
+            }
+            else
+            {
+                HandleActivationLogic();
+            }
 
             bool inActionSlot = false;
             if (this.transform.parent != null)
@@ -159,15 +205,18 @@ public class ThisMagic : NetworkBehaviour
                 }
             }
 
-            if (activated == false && inActionSlot)
+            if (activated == false && inActionSlot && targetType == MagicTargetType.None)
             {
                 Activate();
                 drawX = drawXcards;
             }
 
-            HandleSpellEffects();
+            if (initialized)
+            {
+                HandleSpellEffects();
+            }
 
-            if (activated == true && PlayerManager.IsMyTurn == false && beInGraveyard == false && equip == false)
+            if (activated == true && PlayerManager != null && PlayerManager.IsMyTurn == false && beInGraveyard == false && equip == false)
             {
                 activationcomplete = true;
                 StartCoroutine(SmoothDestruction(2));
@@ -179,6 +228,7 @@ public class ThisMagic : NetworkBehaviour
             }
         }
     }
+
     void HandleActivationLogic()
     {
         if (activated == false && beInGraveyard == false && !equip && !targetDestroy && !changeAttack && !changeDefense)
@@ -201,6 +251,8 @@ public class ThisMagic : NetworkBehaviour
 
     bool CheckForMonsters(GameObject slotsContainer)
     {
+        if (slotsContainer == null) return false;
+
         foreach (Transform child in slotsContainer.transform)
         {
             foreach (Transform grandChild in child)
@@ -213,6 +265,8 @@ public class ThisMagic : NetworkBehaviour
 
     void HandleSpellEffects()
     {
+        if (thisMagic == null || thisMagic.Count == 0) return;
+
         targeting = staticTargeting;
         targetingEnemy = staticTargetingEnemy;
         Target = targetingEnemy ? Enemy : null;
@@ -227,7 +281,7 @@ public class ThisMagic : NetworkBehaviour
 
         if (drawX > 0 && activated && hasAuthority)
         {
-            PlayerManager.CmdDrawCard();
+            if (PlayerManager != null) PlayerManager.CmdDrawCard();
             drawX--;
             canBeDestroyed = true;
         }
@@ -238,7 +292,7 @@ public class ThisMagic : NetworkBehaviour
             StartCoroutine(SmoothDestruction(2));
         }
 
-        if (PlayerManager.IsMyTurn && activated && !activationcomplete && hasAuthority)
+        if (PlayerManager != null && PlayerManager.IsMyTurn && activated && !activationcomplete && hasAuthority)
         {
             if (damageHealedBySpell > 0)
             {
@@ -252,51 +306,23 @@ public class ThisMagic : NetworkBehaviour
             }
         }
 
-        if (!PlayerManager.IsMyTurn) UcanReturn = false;
+        if (PlayerManager != null && !PlayerManager.IsMyTurn) UcanReturn = false;
 
         if (equippedTo != null)
         {
-            ThisCard tc = equippedTo.GetComponent<ThisCard>();
-            if (tc != null && tc.beInGraveyard)
+            if (equippedTo == null)
             {
                 canBeDestroyed = true;
                 beInGraveyard = true;
-                equippedTo = null;
-            }
-        }
-
-        else if (equip == true && activated == true && beInGraveyard == false && equippedTo == null)
-        {
-            if (Target != null)
-            {
-                if (Target == Enemy)
-                {
-
-                }
             }
             else
             {
-                if (PlayerSlots != null)
+                ThisCard tc = equippedTo.GetComponent<ThisCard>();
+                if (tc != null && tc.beInGraveyard)
                 {
-                    foreach (Transform child in PlayerSlots.transform)
-                    {
-                        foreach (Transform grandChild in child)
-                        {
-                            ThisCard monster = grandChild.GetComponent<ThisCard>();
-
-                            if (monster != null && monster.isTarget == true)
-                            {
-                                equippedTo = grandChild.gameObject;
-                                monster.equippedTo = Magic;
-
-                                PlayerManager.CmdEquipBoost(grandChild.gameObject, equipBoost);
-
-                                monster.isTarget = false;
-
-                                return;
-                            }
-                        }
-                    }
+                    canBeDestroyed = true;
+                    beInGraveyard = true;
+                    equippedTo = null;
                 }
             }
         }
@@ -305,74 +331,31 @@ public class ThisMagic : NetworkBehaviour
     IEnumerator SmoothDestruction(int sec)
     {
         yield return new WaitForSeconds(sec);
-        if (Magic != null)
+        if (Magic != null && PlayerManager != null)
             PlayerManager.CmdPlayerDestroyCard(Magic, 0);
     }
+
     public void Activate()
     {
         activated = true;
         drawX = drawXcards;
     }
-    public void UntargetEnemy()
-    {
-        staticTargetingEnemy = false;
-    }
 
-    public void TargetEnemy()
-    {
-        staticTargetingEnemy = true;
-    }
-    public void Activating()
-    {
-        //PlayerManager.nomoresummons = false;
-    }
-    public void NotActivating()
-    {
-        //PlayerManager.nomoresummons = true;
-    }
-
-    public void StartAttack()
-    {
-        staticTargeting = true;
-    }
-
-    public void StopAttack()
-    {
-        staticTargeting = false;
-    }
-
-    public void OneCardAttack()
-    {
-        //onlyThisCardAttack = true;
-    }
-
-    public void OneCardAttackStop()
-    {
-        //onlyThisCardAttack = false;
-    }
-
-    public void Destroy()
-    {
-        canBeDestroyed = false;
-        beInGraveyard = true;
-    }
+    public void UntargetEnemy() { staticTargetingEnemy = false; }
+    public void TargetEnemy() { staticTargetingEnemy = true; }
+    public void StartAttack() { staticTargeting = true; }
+    public void StopAttack() { staticTargeting = false; }
+    public void Destroy() { canBeDestroyed = false; beInGraveyard = true; }
 
     public void Return(int x)
     {
-        for (int i = 0; i <= x; i++)
-        {
-            ReturnCard();//not working now
-        }
+        for (int i = 0; i <= x; i++) ReturnCard();
     }
-
-    public void ReturnCard()
-    {
-        UcanReturn = true;
-    }
+    public void ReturnCard() { UcanReturn = true; }
 
     public void ReturnThis()
     {
-        if (beInGraveyard == true && UcanReturn == true)
+        if (beInGraveyard == true && UcanReturn == true && PlayerArea != null)
         {
             this.transform.SetParent(PlayerArea.transform);
             UcanReturn = false;
@@ -380,175 +363,5 @@ public class ThisMagic : NetworkBehaviour
         }
     }
 
-    public void BeingTarget()
-    {
-        isTarget = true;
-    }
-
-    public void NotBeingTarget()
-    {
-        isTarget = false;
-    }
-
-    /*
-    public void dealxDamage(int x)
-    {
-        if (Target != null)
-        {
-            if (Target == Enemy && stopDealDamage == false && Input.GetMouseButton(0))
-            {
-                PlayerManager.CmdGMChangeLP(0, damageDealtBySpell);
-                stopDealDamage = true;
-            }
-        }
-        else
-        {
-
-        }
-    }*/
-
-    public void TargetMonster()
-    {
-        if (targetDestroy == true && activated == true && activationcomplete == false && beInGraveyard == false)
-        {
-            if(Target != null)
-            {
-                if (Target == Enemy)
-                {
-                    monstersExist = false;
-                    foreach (Transform child in EnemySlots.transform)//child.child
-                    {
-                        if (child.transform.childCount != 0)
-                        {
-                            monstersExist = true;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (Transform child in EnemySlots.transform)//child.child
-                {
-                    foreach (Transform grandChild in child)
-                    {
-                        if (grandChild.GetComponent<ThisCard>().isTarget == true)
-                        {
-                            if (grandChild.GetComponent<ThisCard>() != null)
-                            {
-                                grandChild.GetComponent<ThisCard>().decreased = grandChild.GetComponent<ThisCard>().atk;
-                                PlayerManager.CmdOpponentDestroyCard(grandChild.gameObject, 0);
-                                canBeDestroyed = true;
-                                beInGraveyard = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if(changeAttack == true && activated == true && activationcomplete == false && beInGraveyard == false)
-        {
-            if (Target != null)
-            {
-                if (Target == Enemy)
-                {
-                    monstersExist = false;
-                    foreach (Transform child in EnemySlots.transform)//child.child
-                    {
-                        if (child.transform.childCount != 0)
-                        {
-                            monstersExist = true;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (Transform child in EnemySlots.transform)//child.child
-                {
-                    foreach (Transform grandChild in child)
-                    {
-                        if (grandChild.GetComponent<ThisCard>().isTarget == true)
-                        {
-                            if (grandChild.GetComponent<ThisCard>() != null)
-                            {
-                                PlayerManager.CmdChangeAttack(grandChild.gameObject, 0);
-                                canBeDestroyed = true;
-                                beInGraveyard = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if(changeDefense == true && activated == true && activationcomplete == false && beInGraveyard == false)
-        {
-            if (Target != null)
-            {
-                if (Target == Enemy)
-                {
-                    monstersExist = false;
-                    foreach (Transform child in EnemySlots.transform)//child.child
-                    {
-                        if (child.transform.childCount != 0)
-                        {
-                            monstersExist = true;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (Transform child in EnemySlots.transform)//child.child
-                {
-                    foreach (Transform grandChild in child)
-                    {
-                        if (grandChild.GetComponent<ThisCard>().isTarget == true)
-                        {
-                            if (grandChild.GetComponent<ThisCard>() != null)
-                            {
-                                PlayerManager.CmdChangeDefense(grandChild.gameObject, 0);
-                                canBeDestroyed = true;
-                                beInGraveyard = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        else if(equip == true && activated == true && beInGraveyard == false)
-        {
-            if (Target != null)
-            {
-                if (Target == Enemy)
-                {
-                    monstersExist = false;
-                    foreach (Transform child in PlayerSlots.transform)//child.child
-                    {
-                        if (child.transform.childCount != 0)
-                        {
-                            monstersExist = true;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                foreach (Transform child in PlayerSlots.transform)//child.child
-                {
-                    foreach (Transform grandChild in child)
-                    {
-                        if(grandChild.GetComponent<ThisCard>() != null)
-                        {
-                            if (grandChild.GetComponent<ThisCard>().isTarget == true)
-                            {
-                                equippedTo = grandChild.gameObject;
-                                grandChild.gameObject.GetComponent<ThisCard>().equippedTo = Magic;
-                                PlayerManager.CmdEquipBoost(grandChild.gameObject, equipBoost);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    public void TargetMonster() { }
 }
