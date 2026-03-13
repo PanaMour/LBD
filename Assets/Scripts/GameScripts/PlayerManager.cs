@@ -574,8 +574,18 @@ public class PlayerManager : NetworkBehaviour
         }
         else if (type == "EquipBoost")
         {
-            if (card.GetComponent<ThisCard>() != null)
-                card.GetComponent<ThisCard>().boost = index;
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                if (!isServer)
+                {
+                    tc.boost += index;
+                }
+
+                tc.actualATK = tc.atk + tc.boost;
+
+                tc.decreased = tc.actualATK;
+            }
         }
     }
     [Command]
@@ -1103,6 +1113,14 @@ public class PlayerManager : NetworkBehaviour
 
                 if (monsterCardObj != null)
                 {
+                    ThisCard thisCardScript = monsterCardObj.GetComponent<ThisCard>();
+                    if (thisCardScript != null)
+                    {
+                        thisCardScript.boost += magicScript.equipBoost;
+                        thisCardScript.actualATK = thisCardScript.atk + thisCardScript.boost;
+                        thisCardScript.decreased = thisCardScript.actualATK;
+                    }
+
                     RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
 
                     Debug.Log($"Equipped {magicScript.name} to {monsterScript.name}. Boost: {magicScript.equipBoost}");
