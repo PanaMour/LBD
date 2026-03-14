@@ -24,6 +24,7 @@ GameObject:
   - component: {fileID: 1691721096182591090}
   - component: {fileID: -4673307682156799109}
   - component: {fileID: -584530148153014313}
+  - component: {fileID: 1572484398787583449}
   m_Layer: 8
   m_Name: Card
   m_TagString: Untagged
@@ -153,6 +154,7 @@ MonoBehaviour:
     cardDescription: 
     drawXcards: 0
     thisImage: {fileID: 0}
+    modelPrefab: {fileID: 0}
     color: 
     returnXcards: 0
     spell: 0
@@ -176,7 +178,6 @@ MonoBehaviour:
   thatImage: {fileID: 0}
   frame: {fileID: 0}
   cardBack: 1
-  CardBackSprite: {fileID: 0}
   PlayerArea: {fileID: 0}
   numberOfCardsInDeck: 0
   canBeSummoned: 0
@@ -573,6 +574,21 @@ MonoBehaviour:
   zoomBackground: {fileID: 0}
   zoomCanvas: {fileID: 0}
   zoomCardBack: {fileID: 0}
+--- !u!114 &1572484398787583449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5874341644732258968}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f91e1c656b25e1144941ede3261dfe0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleMultiplier: 1.5
+  liftAmount: 0.05
+  smoothSpeed: 15
 --- !u!1001 &930920539954570198
 PrefabInstance:
   m_ObjectHideFlags: 0

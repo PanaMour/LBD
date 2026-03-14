@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 3132118303870359828}
   - component: {fileID: 1277723730298811786}
   - component: {fileID: 8639271636157545478}
+  - component: {fileID: 7860643768887700289}
   m_Layer: 8
   m_Name: Card 3D
   m_TagString: Untagged
@@ -130,6 +131,7 @@ MonoBehaviour:
     cardDescription: 
     drawXcards: 0
     thisImage: {fileID: 0}
+    modelPrefab: {fileID: 0}
     color: 
     returnXcards: 0
     spell: 0
@@ -594,6 +596,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &7860643768887700289
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6605747384558647205}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f91e1c656b25e1144941ede3261dfe0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleMultiplier: 1.5
+  liftAmount: 0.05
+  smoothSpeed: 15
 --- !u!1001 &357890490064734154
 PrefabInstance:
   m_ObjectHideFlags: 0

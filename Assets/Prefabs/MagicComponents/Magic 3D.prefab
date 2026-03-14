@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: -4074743529719131515}
   - component: {fileID: 2622352400398172894}
   - component: {fileID: 8982046285179066192}
+  - component: {fileID: 3778694177182650545}
   m_Layer: 12
   m_Name: Magic 3D
   m_TagString: Untagged
@@ -62,9 +63,10 @@ MonoBehaviour:
   - id: 0
     cardName: 
     cardDescription: 
-    drawXcards: 0
     thisImage: {fileID: 0}
     color: 
+    targetType: 0
+    drawXcards: 0
     returnXcards: 0
     damageHealedBySpell: 0
     damageDealtBySpell: 0
@@ -73,7 +75,7 @@ MonoBehaviour:
     changeDefense: 0
     equip: 0
     equipBoost: 0
-  thisId: 8
+  thisId: 9
   id: 0
   magicName: 
   magicDescription: 
@@ -82,8 +84,8 @@ MonoBehaviour:
   thisSprite: {fileID: 0}
   thatImage: {fileID: 0}
   frame: {fileID: 0}
+  targetType: 0
   cardBack: 1
-  CardBackSprite: {fileID: 0}
   PlayerArea: {fileID: 0}
   numberOfCardsInDeck: 0
   canBeActivated: 0
@@ -463,6 +465,21 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &3778694177182650545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 626048065440055933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f91e1c656b25e1144941ede3261dfe0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleMultiplier: 1.5
+  liftAmount: 0.05
+  smoothSpeed: 15
 --- !u!223 &2249666712005733853
 Canvas:
   m_ObjectHideFlags: 0

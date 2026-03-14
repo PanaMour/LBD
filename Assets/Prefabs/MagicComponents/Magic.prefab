@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 4683274909212148718}
   - component: {fileID: 1863280903349352306}
   - component: {fileID: -622499888680580974}
+  - component: {fileID: -1567727167024783984}
   m_Layer: 12
   m_Name: Magic
   m_TagString: Untagged
@@ -106,13 +107,18 @@ MonoBehaviour:
   - id: 0
     cardName: 
     cardDescription: 
-    drawXcards: 0
     thisImage: {fileID: 0}
     color: 
+    targetType: 0
+    drawXcards: 0
     returnXcards: 0
     damageHealedBySpell: 0
     damageDealtBySpell: 0
     targetDestroy: 0
+    changeAttack: 0
+    changeDefense: 0
+    equip: 0
+    equipBoost: 0
   thisId: 2
   id: 0
   magicName: 
@@ -122,6 +128,7 @@ MonoBehaviour:
   thisSprite: {fileID: 0}
   thatImage: {fileID: 0}
   frame: {fileID: 0}
+  targetType: 0
   cardBack: 1
   PlayerArea: {fileID: 0}
   numberOfCardsInDeck: 0
@@ -134,11 +141,11 @@ MonoBehaviour:
   targeting: 0
   targetingEnemy: 0
   canBeDestroyed: 0
-  Graveyard: {fileID: 0}
   beInGraveyard: 0
   returnXcards: 0
   useReturn: 0
   isTarget: 0
+  PlayerSlots: {fileID: 0}
   EnemySlots: {fileID: 0}
   monstersExist: 0
   damageHealedBySpell: 0
@@ -148,6 +155,11 @@ MonoBehaviour:
   activationcomplete: 0
   targetDestroy: 0
   faceup: 0
+  changeAttack: 0
+  changeDefense: 0
+  equip: 0
+  equipBoost: 0
+  equippedTo: {fileID: 0}
 --- !u!114 &1350015186512313305
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -197,11 +209,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   GameManager: {fileID: 0}
-  Canvas: {fileID: 0}
   PlayerManager: {fileID: 0}
-  ConfirmationBox: {fileID: 0}
-  YesButton: {fileID: 0}
-  NoButton: {fileID: 0}
 --- !u!61 &8236292996802163398
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -419,6 +427,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b90b5c90ef2041c4da2c3a7219411bad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   Canvas: {fileID: 0}
   PlayerManager: {fileID: 0}
   Magic: {fileID: 7540810118024730414}
@@ -428,6 +438,8 @@ MonoBehaviour:
   ATKtext: {fileID: 0}
   DEFtext: {fileID: 0}
   StarsText: {fileID: 0}
+  Background: {fileID: 0}
+  MagicCanvas: {fileID: 0}
   zoomCardNameText: {fileID: 0}
   zoomText: {fileID: 0}
   zoomImage: {fileID: 0}
@@ -438,6 +450,24 @@ MonoBehaviour:
   zoomStars: {fileID: 0}
   zoomATK: {fileID: 0}
   zoomDEF: {fileID: 0}
+  zoomBackground: {fileID: 0}
+  zoomCanvas: {fileID: 0}
+  zoomCardBack: {fileID: 0}
+--- !u!114 &-1567727167024783984
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7540810118024730414}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f91e1c656b25e1144941ede3261dfe0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  scaleMultiplier: 1.5
+  liftAmount: 0.05
+  smoothSpeed: 15
 --- !u!1001 &3289492914384805461
 PrefabInstance:
   m_ObjectHideFlags: 0
