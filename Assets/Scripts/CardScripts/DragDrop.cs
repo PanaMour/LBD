@@ -45,14 +45,12 @@ public class DragDrop : NetworkBehaviour
 
         if (PlayerManager != null && !PlayerManager.IsMyTurn) return;
 
-        // 1. MONSTER CHECK: Can't pick up if already summoned
         if (GetComponent<ThisCard>() != null && PlayerManager.nomoresummons)
         {
             Debug.Log("Already summoned this turn.");
             return;
         }
 
-        // 2. MAGIC CHECK: Can't pick up if there are no targets (e.g., Exhaust with no enemies)
         if (GetComponent<ThisMagic>() != null)
         {
             if (!GetComponent<ThisMagic>().canBeActivated)
@@ -64,7 +62,6 @@ public class DragDrop : NetworkBehaviour
 
         isDragging = true;
 
-        // Hide from Raycast so we can see the slot behind it
         gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 
         startParent = transform.parent.gameObject;

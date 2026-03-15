@@ -57,11 +57,9 @@ public class PlayerManager : NetworkBehaviour
     private GameObject tempTributeVictim;
     private GameObject activeUIBox;
 
-    [Header("Treasure Settings")]
     public GameObject TreasureChestPrefab;
     public Color TreasureTileColor = Color.yellow;
 
-    [Header("Targeting System")]
     public bool isTargeting = false;
     public GameObject activeMagicCard;
     public MagicTargetType currentTargetCriteria;
@@ -120,18 +118,6 @@ public class PlayerManager : NetworkBehaviour
             UIManager.updateEndButtonColourMagenta();
             nomoresummons = false;
         }
-
-/*
-        x = 0;
-        PlayerDeck.deckSize = 40;
-
-        for (int i = 0; i < PlayerDeck.deckSize; i++)
-        {
-            x = Random.Range(1, 3);
-            PlayerDeck.staticDeck[i] = CardDataBase.cardList[x];
-        }
-
-        StartCoroutine(StartGame());*/
     }
 
     IEnumerator DealFiveCards()

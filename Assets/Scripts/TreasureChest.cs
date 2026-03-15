@@ -7,11 +7,8 @@ public class TreasureChest : NetworkBehaviour
     [SyncVar] public int gridX;
     [SyncVar] public int gridY;
 
-    [Header("Visual Settings")]
     public Color tileColor = Color.yellow;
-    [Tooltip("How high above the tile center should the chest sit?")]
     public float verticalOffset = 0.5f;
-    [Tooltip("Scale of the chest model")]
     public float modelScale = 1.0f;
 
     private Renderer tileRenderer;
