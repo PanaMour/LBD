@@ -7,7 +7,8 @@ public enum MagicTargetType
     EnemyDefense,
     AnyEnemy,
     AnyAlly,
-    AnyUnit
+    AnyUnit,
+    UnmovedAlly
 }
 
 public enum MagicType

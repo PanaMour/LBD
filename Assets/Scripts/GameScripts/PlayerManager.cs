@@ -61,6 +61,8 @@ public class PlayerManager : NetworkBehaviour
     public Color TreasureTileColor = Color.yellow;
 
     public bool isTargeting = false;
+    public bool isTargetingTile = false;
+    public LabyrinthObject teleportMonsterCandidate;
     public GameObject activeMagicCard;
     public MagicTargetType currentTargetCriteria;
 
@@ -184,9 +186,10 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!IsMyTurn || !hasAuthority) return;
 
-        if (Input.GetMouseButtonDown(1) && isTargeting)
+        if (Input.GetMouseButtonDown(1))
         {
-            CancelTargeting();
+            if (isTargeting) CancelTargeting();
+            if (isTargetingTile) CancelTileTargeting();
             return;
         }
 
@@ -207,6 +210,42 @@ public class PlayerManager : NetworkBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit[] hits = Physics.RaycastAll(ray);
 
+            if (isTargetingTile)
+            {
+                foreach (RaycastHit hit in hits)
+                {
+                    GridStat targetTileCandidate = hit.collider.GetComponent<GridStat>();
+                    if (targetTileCandidate == null) targetTileCandidate = hit.collider.GetComponentInParent<GridStat>();
+
+                    if (targetTileCandidate != null && teleportMonsterCandidate != null)
+                    {
+                        GridStat monsterTile = teleportMonsterCandidate.GetComponentInParent<GridStat>();
+
+                        if (monsterTile != null)
+                        {
+                            if (targetTileCandidate.x == monsterTile.x && Mathf.Abs(targetTileCandidate.y - monsterTile.y) > 0 && Mathf.Abs(targetTileCandidate.y - monsterTile.y) <= 3)
+                            {
+                                if (targetTileCandidate.GetComponentInChildren<LabyrinthObject>() == null)
+                                {
+                                    CmdTeleportMonster(activeMagicCard, teleportMonsterCandidate.gameObject, targetTileCandidate.gameObject.name);
+                                    CancelTileTargeting();
+                                }
+                                else
+                                {
+                                    Debug.Log("Tile is occupied!");
+                                }
+                            }
+                            else
+                            {
+                                Debug.Log("Invalid Teleport Tile!");
+                            }
+                        }
+                        return;
+                    }
+                }
+                return;
+            }
+
             if (isTargeting)
             {
                 foreach (RaycastHit hit in hits)
@@ -218,10 +257,18 @@ public class PlayerManager : NetworkBehaviour
                     {
                         if (CheckTargetValidity(targetCandidate, currentTargetCriteria))
                         {
+                            if (currentTargetCriteria == MagicTargetType.UnmovedAlly)
+                            {
+                                isTargeting = false;
+                                isTargetingTile = true;
+                                teleportMonsterCandidate = targetCandidate;
+
+                                HighlightTeleportTiles(targetCandidate);
+                                return;
+                            }
+
                             CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject);
                             CancelTargeting();
-
-                            CmdPlayCard(activeMagicCard, 0);
                         }
                         else
                         {
@@ -232,6 +279,7 @@ public class PlayerManager : NetworkBehaviour
                 }
                 return;
             }
+
             LabyrinthObject clickedMonster = null;
             GridStat clickedTile = null;
 
@@ -391,6 +439,9 @@ public class PlayerManager : NetworkBehaviour
 
             case MagicTargetType.AnyUnit:
                 return true;
+
+            case MagicTargetType.UnmovedAlly:
+                return !isEnemy && !monster.hasMovedThisTurn;
 
             default:
                 return false;
@@ -1112,6 +1163,54 @@ public class PlayerManager : NetworkBehaviour
                     Debug.Log($"Equipped {magicScript.name} to {monsterScript.name}. Boost: {magicScript.equipBoost}");
                 }
                 break;
+        }
+
+        RpcShowCard(magicCard, "Played", 0);
+    }
+
+    public void CancelTileTargeting()
+    {
+        isTargetingTile = false;
+        teleportMonsterCandidate = null;
+        activeMagicCard = null;
+
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+        if (gridGen != null) gridGen.GetComponent<GridBehavior>().ResetTileColors();
+    }
+
+    void HighlightTeleportTiles(LabyrinthObject monster)
+    {
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+        if (gridGen == null) return;
+
+        GridStat monsterTile = monster.GetComponentInParent<GridStat>();
+        if (monsterTile == null) return;
+
+        foreach (Transform child in gridGen.transform)
+        {
+            GridStat tile = child.GetComponent<GridStat>();
+            if (tile != null)
+            {
+                if (tile.x == monsterTile.x && Mathf.Abs(tile.y - monsterTile.y) > 0 && Mathf.Abs(tile.y - monsterTile.y) <= 3)
+                {
+                    if (child.GetComponentInChildren<LabyrinthObject>() == null)
+                    {
+                        Renderer r = child.GetComponent<Renderer>();
+                        if (r == null) r = child.GetComponentInChildren<Renderer>();
+                        if (r != null) r.material.color = Color.cyan;
+                    }
+                }
+            }
+        }
+    }
+
+    [Command]
+    public void CmdTeleportMonster(GameObject magicCard, GameObject monster, string targetTileName)
+    {
+        LabyrinthObject monsterScript = monster.GetComponent<LabyrinthObject>();
+        if (monsterScript != null)
+        {
+            monsterScript.CmdMoveToTile(targetTileName);
         }
 
         RpcShowCard(magicCard, "Played", 0);
