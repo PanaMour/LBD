@@ -639,6 +639,18 @@ public class PlayerManager : NetworkBehaviour
                 tc.decreased = tc.actualATK;
             }
         }
+        else if (type == "ChangeStars")
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                if (!isServer)
+                {
+                    tc.stars += index;
+                    if (tc.stars < 0) tc.stars = 0;
+                }
+            }
+        }
     }
     [Command]
     public void CmdGMChangeState(string stateRequest)
@@ -1189,6 +1201,40 @@ public class PlayerManager : NetworkBehaviour
                 {
                     monsterScript.moveRange += 4;
                     RpcActivateSprintBoost(targetMonster);
+                }
+                break;
+
+            case MagicTargetType.AnyUnit:
+                if (magicScript.equip)
+                {
+                    int starChange = 0;
+
+                    if (magicScript.id == 19) // Fleetfoot Blessing
+                    {
+                        monsterScript.moveRange += 2;
+                        starChange = 2;
+                    }
+                    else if (magicScript.id == 20) // Weighted Shackles
+                    {
+                        monsterScript.moveRange -= 2;
+                        if (monsterScript.moveRange < 0) monsterScript.moveRange = 0;
+                        starChange = -2;
+                    }
+
+                    GameObject monsterCardObj = monsterScript.card;
+                    if (monsterCardObj != null)
+                    {
+                        ThisCard thisCardScript = monsterCardObj.GetComponent<ThisCard>();
+                        if (thisCardScript != null)
+                        {
+                            thisCardScript.stars += starChange;
+                            if (thisCardScript.stars < 0) thisCardScript.stars = 0;
+                        }
+
+                        RpcShowCard(monsterCardObj, "ChangeStars", starChange);
+                    }
+
+                    Debug.Log($"Equipped {magicScript.name} to {targetMonster.name}. Move Range changed by {starChange}");
                 }
                 break;
         }
