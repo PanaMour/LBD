@@ -63,6 +63,8 @@ public class PlayerManager : NetworkBehaviour
     public bool isTargeting = false;
     public bool isTargetingTile = false;
     public LabyrinthObject teleportMonsterCandidate;
+    public bool sprintBoostActive = false;
+    public GameObject sprintBoostTarget = null;
     public GameObject activeMagicCard;
     public MagicTargetType currentTargetCriteria;
 
@@ -307,6 +309,13 @@ public class PlayerManager : NetworkBehaviour
 
             if (attackingUnit != null)
             {
+                if (sprintBoostActive && attackingUnit.gameObject != sprintBoostTarget)
+                {
+                    Debug.Log("Sprint Boost restriction: Other monsters cannot attack!");
+                    attackingUnit.waitingToAttack = false;
+                    return;
+                }
+
                 if (clickedMonster != null && !clickedMonster.hasAuthority)
                 {
                     attackingUnit.CmdAttackMonster(clickedMonster.gameObject);
@@ -336,8 +345,14 @@ public class PlayerManager : NetworkBehaviour
                 return;
             }
 
-            if (clickedMonster != null)
+            if (clickedMonster != null && clickedMonster.hasAuthority)
             {
+                if (sprintBoostActive && clickedMonster.gameObject != sprintBoostTarget)
+                {
+                    Debug.Log("Sprint Boost restriction: Other monsters cannot move!");
+                    return;
+                }
+
                 clickedMonster.ObjectToMove();
                 return;
             }
@@ -701,6 +716,12 @@ public class PlayerManager : NetworkBehaviour
         foreach (PlayerManager player in allPlayers)
         {
             player.hasDrawnThisTurn = false;
+
+            if (player.sprintBoostActive && player.sprintBoostTarget != null)
+            {
+                LabyrinthObject lo = player.sprintBoostTarget.GetComponent<LabyrinthObject>();
+                if (lo != null) lo.moveRange -= 4;
+            }
         }
 
         RpcGMChangeTurn();
@@ -712,6 +733,9 @@ public class PlayerManager : NetworkBehaviour
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
         pm.IsMyTurn = !pm.IsMyTurn;
         pm.hasDrawnThisTurn = false;
+
+        sprintBoostActive = false;
+        sprintBoostTarget = null;
         GameManager.turn++;
         UIManager.updateTurnText();
 
@@ -1146,21 +1170,25 @@ public class PlayerManager : NetworkBehaviour
                 break;
 
             case MagicTargetType.AnyAlly:
-                GameObject monsterCardObj = monsterScript.card;
-
-                if (monsterCardObj != null)
+                if (magicScript.equip)
                 {
-                    ThisCard thisCardScript = monsterCardObj.GetComponent<ThisCard>();
-                    if (thisCardScript != null)
+                    GameObject monsterCardObj = monsterScript.card;
+                    if (monsterCardObj != null)
                     {
-                        thisCardScript.boost += magicScript.equipBoost;
-                        thisCardScript.actualATK = thisCardScript.atk + thisCardScript.boost;
-                        thisCardScript.decreased = thisCardScript.actualATK;
+                        ThisCard thisCardScript = monsterCardObj.GetComponent<ThisCard>();
+                        if (thisCardScript != null)
+                        {
+                            thisCardScript.boost += magicScript.equipBoost;
+                            thisCardScript.actualATK = thisCardScript.atk + thisCardScript.boost;
+                            thisCardScript.decreased = thisCardScript.actualATK;
+                        }
+                        RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
                     }
-
-                    RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
-
-                    Debug.Log($"Equipped {magicScript.name} to {monsterScript.name}. Boost: {magicScript.equipBoost}");
+                }
+                else if (magicScript.id == 17)
+                {
+                    monsterScript.moveRange += 4;
+                    RpcActivateSprintBoost(targetMonster);
                 }
                 break;
         }
@@ -1168,6 +1196,14 @@ public class PlayerManager : NetworkBehaviour
         RpcShowCard(magicCard, "Played", 0);
     }
 
+    [ClientRpc]
+    public void RpcActivateSprintBoost(GameObject target)
+    {
+        sprintBoostActive = true;
+        sprintBoostTarget = target;
+
+        Debug.Log($"Sprint Boost Activated! {target.name} has +4 squares. Others are locked.");
+    }
     public void CancelTileTargeting()
     {
         isTargetingTile = false;
