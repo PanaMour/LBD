@@ -16,6 +16,8 @@ public class LabyrinthObject : NetworkBehaviour
     [SyncVar]
     public int moveRange;
     [SyncVar]
+    public bool isImmobile;
+    [SyncVar]
     public bool attackMode = true;
     [SyncVar]
     public int turnSummoned = 0;

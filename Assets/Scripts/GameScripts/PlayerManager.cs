@@ -353,6 +353,12 @@ public class PlayerManager : NetworkBehaviour
                     return;
                 }
 
+                if (clickedMonster.isImmobile)
+                {
+                    Debug.Log($"{clickedMonster.name} is Immobile and cannot move!");
+                    return;
+                }
+
                 clickedMonster.ObjectToMove();
                 return;
             }
@@ -651,6 +657,14 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
         }
+        else if (type == "RemoveImmobile")
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                tc.isImmobile = false;
+            }
+        }
     }
     [Command]
     public void CmdGMChangeState(string stateRequest)
@@ -842,12 +856,15 @@ public class PlayerManager : NetworkBehaviour
         GameObject monster = Instantiate(LabyrinthObjectPrefab);
         LabyrinthObject script = monster.GetComponent<LabyrinthObject>();
 
-        script.moveRange = cardNetId.gameObject.GetComponent<ThisCard>().stars;
+        ThisCard cardScript = cardNetId.gameObject.GetComponent<ThisCard>();
+
+        script.moveRange = cardScript.stars;
         script.monsterID = id;
         script.currentTileName = tileName;
-
-        script.attackMode = cardNetId.gameObject.GetComponent<ThisCard>().attackmode;
+        script.attackMode = cardScript.attackmode;
         script.turnSummoned = GameManager.turn;
+
+        script.isImmobile = cardScript.isImmobile;
 
         NetworkServer.Spawn(monster, connectionToClient);
         RpcLinkMonsterToCard(monster, cardNetId.gameObject);
@@ -1188,16 +1205,18 @@ public class PlayerManager : NetworkBehaviour
                     if (monsterCardObj != null)
                     {
                         ThisCard thisCardScript = monsterCardObj.GetComponent<ThisCard>();
+
                         if (thisCardScript != null)
                         {
                             thisCardScript.boost += magicScript.equipBoost;
                             thisCardScript.actualATK = thisCardScript.atk + thisCardScript.boost;
                             thisCardScript.decreased = thisCardScript.actualATK;
+
+                            RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
                         }
-                        RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
                     }
                 }
-                else if (magicScript.id == 17)
+                else if (magicScript.id == 17) // Sprint Boost
                 {
                     monsterScript.moveRange += 4;
                     RpcActivateSprintBoost(targetMonster);
@@ -1207,34 +1226,45 @@ public class PlayerManager : NetworkBehaviour
             case MagicTargetType.AnyUnit:
                 if (magicScript.equip)
                 {
-                    int starChange = 0;
-
-                    if (magicScript.id == 19) // Fleetfoot Blessing
-                    {
-                        monsterScript.moveRange += 2;
-                        starChange = 2;
-                    }
-                    else if (magicScript.id == 20) // Weighted Shackles
-                    {
-                        monsterScript.moveRange -= 2;
-                        if (monsterScript.moveRange < 0) monsterScript.moveRange = 0;
-                        starChange = -2;
-                    }
-
                     GameObject monsterCardObj = monsterScript.card;
-                    if (monsterCardObj != null)
+                    ThisCard thisCardScript = (monsterCardObj != null) ? monsterCardObj.GetComponent<ThisCard>() : null;
+
+                    if (magicScript.id == 18) // Mechanical Legs
                     {
-                        ThisCard thisCardScript = monsterCardObj.GetComponent<ThisCard>();
+                        monsterScript.isImmobile = false;
+                        if (thisCardScript != null) thisCardScript.isImmobile = false;
+
+                        if (monsterCardObj != null) RpcShowCard(monsterCardObj, "RemoveImmobile", 0);
+
+                        Debug.Log($"Equipped Mechanical Legs. {targetMonster.name} can now move!");
+                    }
+
+                    else if (magicScript.id == 19 || magicScript.id == 20)
+                    {
+                        int starChange = 0;
+
+                        if (magicScript.id == 19) // Fleetfoot Blessing
+                        {
+                            monsterScript.moveRange += 2;
+                            starChange = 2;
+                        }
+                        else if (magicScript.id == 20) // Weighted Shackles
+                        {
+                            monsterScript.moveRange -= 2;
+                            if (monsterScript.moveRange < 0) monsterScript.moveRange = 0;
+                            starChange = -2;
+                        }
+
                         if (thisCardScript != null)
                         {
                             thisCardScript.stars += starChange;
                             if (thisCardScript.stars < 0) thisCardScript.stars = 0;
                         }
 
-                        RpcShowCard(monsterCardObj, "ChangeStars", starChange);
-                    }
+                        if (monsterCardObj != null) RpcShowCard(monsterCardObj, "ChangeStars", starChange);
 
-                    Debug.Log($"Equipped {magicScript.name} to {targetMonster.name}. Move Range changed by {starChange}");
+                        Debug.Log($"Equipped {magicScript.name} to {targetMonster.name}. Move Range changed by {starChange}");
+                    }
                 }
                 break;
         }

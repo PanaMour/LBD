@@ -104,6 +104,9 @@ public class ThisCard : NetworkBehaviour
     public bool canMove = true;
     public bool hasMoved = false;
 
+    [SyncVar]
+    public bool isImmobile;
+
     void Start()
     {
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
