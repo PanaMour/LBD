@@ -195,6 +195,7 @@ MonoBehaviour:
   initialized: 0
   canMove: 1
   hasMoved: 0
+  isImmobile: 0
 --- !u!114 &8694465356798859483
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -610,6 +611,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scaleMultiplier: 1.5
   liftAmount: 0.05
+  forwardAmount: -0.05
   smoothSpeed: 15
 --- !u!1001 &357890490064734154
 PrefabInstance:

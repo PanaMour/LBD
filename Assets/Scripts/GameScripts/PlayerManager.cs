@@ -1266,6 +1266,41 @@ public class PlayerManager : NetworkBehaviour
                         Debug.Log($"Equipped {magicScript.name} to {targetMonster.name}. Move Range changed by {starChange}");
                     }
                 }
+                else if (magicScript.id == 16) // Labyrinth Dice
+                {
+                    GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+
+                    if (gridGen != null)
+                    {
+                        List<GridStat> validTiles = new List<GridStat>();
+
+                        foreach (Transform child in gridGen.transform)
+                        {
+                            GridStat tile = child.GetComponent<GridStat>();
+
+                            if (tile != null && tile.y > 0 && tile.y < 15)
+                            {
+                                if (child.GetComponentInChildren<LabyrinthObject>() == null)
+                                {
+                                    validTiles.Add(tile);
+                                }
+                            }
+                        }
+
+                        if (validTiles.Count > 0)
+                        {
+                            GridStat randomTile = validTiles[Random.Range(0, validTiles.Count)];
+
+                            monsterScript.CmdMoveToTile(randomTile.gameObject.name);
+
+                            Debug.Log($"Labyrinth Dice tossed {targetMonster.name} to {randomTile.gameObject.name}!");
+                        }
+                        else
+                        {
+                            Debug.LogWarning("No empty tiles found for Labyrinth Dice!");
+                        }
+                    }
+                }
                 break;
         }
 
