@@ -665,6 +665,11 @@ public class PlayerManager : NetworkBehaviour
                 tc.isImmobile = false;
             }
         }
+
+        if (hasAuthority)
+        {
+            CalculateBoardAuras();
+        }
     }
     [Command]
     public void CmdGMChangeState(string stateRequest)
@@ -1361,5 +1366,55 @@ public class PlayerManager : NetworkBehaviour
         }
 
         RpcShowCard(magicCard, "Played", 0);
+    }
+
+    void CalculateBoardAuras()
+    {
+        LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
+        ThisMagic[] allMagics = FindObjectsOfType<ThisMagic>();
+
+        int myCardCount = 0;
+        foreach (var m in allMonsters) if (m.hasAuthority) myCardCount++;
+        foreach (var magic in allMagics) if (magic.hasAuthority && magic.activated && !magic.beInGraveyard) myCardCount++;
+
+        foreach (var m in allMonsters)
+        {
+            if (m.hasAuthority && m.monsterID == 57 && m.card != null) // Snalien
+            {
+                ThisCard tc = m.card.GetComponent<ThisCard>();
+                if (tc != null)
+                {
+                    int targetAuraAtk = (myCardCount == 1) ? 400 : 0;
+                    int targetAuraDef = (myCardCount == 1) ? 200 : 0;
+
+                    if (tc.auraAtk != targetAuraAtk)
+                    {
+                        tc.auraAtk = targetAuraAtk;
+                        tc.auraDef = targetAuraDef;
+                        CmdUpdateAuraStats(m.card, targetAuraAtk, targetAuraDef);
+                    }
+                }
+            }
+        }
+    }
+
+    [Command]
+    public void CmdUpdateAuraStats(GameObject card, int auraAtk, int auraDef)
+    {
+        RpcUpdateAuraStats(card, auraAtk, auraDef);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateAuraStats(GameObject card, int auraAtk, int auraDef)
+    {
+        if (card != null)
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                tc.auraAtk = auraAtk;
+                tc.auraDef = auraDef;
+            }
+        }
     }
 }

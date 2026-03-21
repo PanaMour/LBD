@@ -70,6 +70,7 @@ public class ThisCard : NetworkBehaviour
 
     public int decreased;
     public int actualATK;
+    public int actualDEF;
     public int returnXcards;
     public bool useReturn;
 
@@ -106,6 +107,9 @@ public class ThisCard : NetworkBehaviour
 
     [SyncVar]
     public bool isImmobile;
+
+    public int auraAtk = 0;
+    public int auraDef = 0;
 
     void Start()
     {
@@ -163,6 +167,16 @@ public class ThisCard : NetworkBehaviour
             }
         }
 
+        if (thisId != 0 && thisId != id)
+        {
+            if (thisId < CardDataBase.cardList.Count)
+            {
+                thisCard.Clear();
+                thisCard.Add(CardDataBase.cardList[thisId]);
+                initialized = false;
+            }
+        }
+
         if (!initialized && thisCard.Count > 0)
         {
             id = thisCard[0].id;
@@ -184,9 +198,10 @@ public class ThisCard : NetworkBehaviour
         {
             nameText.text = "" + cardName;
             starsText.text = "" + stars;
-            actualATK = atk - decreased;
-            ATKText.text = "" + atk;
-            DEFText.text = "" + def;
+            actualATK = atk + boost + auraAtk - decreased;
+            actualDEF = def + auraDef;
+            ATKText.text = "" + actualATK;
+            DEFText.text = "" + actualDEF;
             descriptionText.text = "" + cardDescription;
             if (thisSprite != null) thatImage.sprite = thisSprite;
 
@@ -351,6 +366,7 @@ public class ThisCard : NetworkBehaviour
         {
             atk += boost;
             actualATK = atk;
+            actualDEF = def;
             boosted = true;
         }
         if (equippedTo != null)
@@ -360,6 +376,7 @@ public class ThisCard : NetworkBehaviour
             {
                 atk -= boost;
                 actualATK = atk;
+                actualDEF = def;
                 boost = 0;
                 equippedTo = null;
                 boosted = false;
@@ -376,7 +393,7 @@ public class ThisCard : NetworkBehaviour
     {
         if (canAttack == true && summoned == true && spell == false)
         {
-            if(Target != null)
+            if (Target != null)
             {
                 if (Target == Enemy)
                 {
@@ -390,7 +407,7 @@ public class ThisCard : NetworkBehaviour
                     }
                     if (!monstersExist)
                     {
-                        PlayerManager.CmdGMChangeLP(0, atk);
+                        PlayerManager.CmdGMChangeLP(0, actualATK);
                         targeting = false;
                         cantAttack = true;
                         hasMoved = true;
@@ -399,27 +416,30 @@ public class ThisCard : NetworkBehaviour
             }
             else
             {
-                foreach(Transform child in EnemySlots.transform)//child.child
+                foreach (Transform child in EnemySlots.transform)//child.child
                 {
                     foreach (Transform grandChild in child)
                     {
                         if (grandChild.GetComponent<ThisCard>().isTarget == true)
                         {
-                            grandChild.GetComponent<ThisCard>().decreased = atk;
-                            decreased = grandChild.GetComponent<ThisCard>().atk;
+                            ThisCard enemyCard = grandChild.GetComponent<ThisCard>();
+
+                            enemyCard.decreased = actualATK;
+                            decreased = enemyCard.actualATK;
                             cantAttack = true;
                             hasMoved = true;
-                            if (grandChild.GetComponent<ThisCard>().attackmode)
+
+                            if (enemyCard.attackmode) // Enemy is in Attack Mode
                             {
-                                if (grandChild.GetComponent<ThisCard>().atk < this.atk)
+                                if (enemyCard.actualATK < this.actualATK)
                                 {
                                     PlayerManager.CmdOpponentDestroyCard(grandChild.gameObject, 0);
-                                    PlayerManager.CmdGMChangeLP(0, this.atk - grandChild.GetComponent<ThisCard>().atk);
+                                    PlayerManager.CmdGMChangeLP(0, this.actualATK - enemyCard.actualATK);
                                 }
-                                else if (grandChild.GetComponent<ThisCard>().atk > this.atk)
+                                else if (enemyCard.actualATK > this.actualATK)
                                 {
                                     PlayerManager.CmdPlayerDestroyCard(Card, 0);
-                                    PlayerManager.CmdGMChangeLP(this.atk - grandChild.GetComponent<ThisCard>().atk, 0);
+                                    PlayerManager.CmdGMChangeLP(this.actualATK - enemyCard.actualATK, 0);
                                 }
                                 else
                                 {
@@ -427,15 +447,15 @@ public class ThisCard : NetworkBehaviour
                                     PlayerManager.CmdPlayerDestroyCard(Card, 0);
                                 }
                             }
-                            else if (!grandChild.GetComponent<ThisCard>().attackmode)
+                            else if (!enemyCard.attackmode) // Enemy is in Defense Mode
                             {
-                                if (grandChild.GetComponent<ThisCard>().def < this.atk)
+                                if (enemyCard.actualDEF < this.actualATK)
                                 {
                                     PlayerManager.CmdOpponentDestroyCard(grandChild.gameObject, 0);
                                 }
-                                else if (grandChild.GetComponent<ThisCard>().def > this.atk)
+                                else if (enemyCard.actualDEF > this.actualATK)
                                 {
-                                    PlayerManager.CmdGMChangeLP(this.atk - grandChild.GetComponent<ThisCard>().def, 0);
+                                    PlayerManager.CmdGMChangeLP(this.actualATK - enemyCard.actualDEF, 0);
                                 }
                                 else
                                 {
