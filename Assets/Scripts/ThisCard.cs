@@ -21,6 +21,8 @@ public class ThisCard : NetworkBehaviour
     public int atk;
     public int def;
     public string cardDescription;
+    public List<Type> currentTypes = new List<Type>();
+    public List<Attribute> currentAttributes = new List<Attribute>();
 
     public Text nameText;
     public Text starsText;
@@ -205,6 +207,17 @@ public class ThisCard : NetworkBehaviour
             descriptionText.text = "" + cardDescription;
             if (thisSprite != null) thatImage.sprite = thisSprite;
 
+            currentTypes.Clear();
+            currentAttributes.Clear();
+            currentTypes.Add(thisCard[0].type);
+            currentAttributes.Add(thisCard[0].attribute);
+            if (summoned && !beInGraveyard)
+            {
+                if (id == 39)
+                {
+                    if (!currentTypes.Contains(Type.Robot)) currentTypes.Add(Type.Robot);
+                }
+            }
             if (thisCard[0].color == "None") frame.color = new Color32(255, 255, 255, 255);
             else if (thisCard[0].color == "Brown") frame.color = new Color32(156, 73, 0, 255);
             else if (thisCard[0].color == "Red") frame.color = new Color32(255, 0, 0, 255);
