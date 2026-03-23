@@ -7,11 +7,10 @@ using UnityEngine.UI;
 [System.Serializable]
 public class ContextMenuItem
 {
-    // this class - just a box to some data
 
-    public string text;             // text to display on button
-    public Button button;           // sample button prefab
-    public Action<Image> action;    // delegate to method that needs to be executed when button is clicked
+    public string text;
+    public Button button;
+    public Action<Image> action;
 
     public ContextMenuItem(string text, Button button, Action<Image> action)
     {
@@ -23,10 +22,10 @@ public class ContextMenuItem
 
 public class ContextMenu : MonoBehaviour
 {
-    public Image contentPanel;              // content panel prefab
-    public Canvas canvas;                   // link to main canvas, where will be Context Menu
+    public Image contentPanel;
+    public Canvas canvas;
 
-    private static ContextMenu instance;    // some kind of singleton here
+    private static ContextMenu instance;
 
     public static ContextMenu Instance
     {
@@ -46,7 +45,6 @@ public class ContextMenu : MonoBehaviour
 
     public void CreateContextMenu(List<ContextMenuItem> items, Vector2 position)
     {
-        // here we are creating and displaying Context Menu
 
         Image panel = Instantiate(contentPanel, new Vector3(position.x, position.y, 0), Quaternion.identity) as Image;
         panel.transform.SetParent(canvas.transform);

@@ -121,30 +121,73 @@ public class DragDrop : NetworkBehaviour
                 ThisCard monsterScript = existingCard.GetComponent<ThisCard>();
                 if (monsterScript != null)
                 {
-                    monsterScript.isTarget = true;
+                    bool requiresSpecificType = false;
+                    Type requiredType = Type.Alien;
 
-                    GameObject openSpellSlot = FindEmptyActionSlot();
+                    if (magicScript.id == 11) { requiresSpecificType = true; requiredType = Type.Mineral; }
+                    else if (magicScript.id == 12) { requiresSpecificType = true; requiredType = Type.Alien; }
+                    else if (magicScript.id == 13) { requiresSpecificType = true; requiredType = Type.Human; }
+                    else if (magicScript.id == 14) { requiresSpecificType = true; requiredType = Type.Animal; }
+
+                    if (requiresSpecificType && !monsterScript.currentTypes.Contains(requiredType))
+                    {
+                        Debug.Log($"Cannot equip! This card requires a {requiredType}.");
+                        ReturnToHand();
+                        return;
+                    }
+
+                    LabyrinthObject target3DMonster = null;
+                    LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
+                    foreach (LabyrinthObject m in allMonsters)
+                    {
+                        if (m.card == existingCard)
+                        {
+                            target3DMonster = m;
+                            break;
+                        }
+                    }
+
+                    if (target3DMonster == null)
+                    {
+                        Debug.Log("Monster is not on the board yet!");
+                        ReturnToHand();
+                        return;
+                    }
+
+                    int preferredIndex = 1;
+                    string numberOnly = System.Text.RegularExpressions.Regex.Match(slot.name, @"\d+").Value;
+                    if (int.TryParse(numberOnly, out int result)) preferredIndex = result;
+                    GameObject openSpellSlot = FindPreferredActionSlot(preferredIndex);
 
                     if (openSpellSlot != null)
                     {
-                        PlaceCard(openSpellSlot, false);
+                        transform.SetParent(openSpellSlot.transform);
+                        transform.localPosition = slotPosition;
+                        transform.localRotation = Quaternion.Euler(90, 0, 0);
+                        transform.localScale = slotScale;
+                        magicScript.activated = true;
+
+                        int actualIndex = 0;
+                        string actualNumberStr = System.Text.RegularExpressions.Regex.Match(openSpellSlot.name, @"\d+").Value;
+                        if (int.TryParse(actualNumberStr, out int actualResult)) actualIndex = actualResult - 1;
+                        PlayerManager.CmdExecuteMagicEffect(gameObject, target3DMonster.gameObject, actualIndex);
+
+                        this.enabled = false;
                         return;
                     }
                     else
                     {
                         Debug.Log("No empty Spell/Trap zones available!");
-                        monsterScript.isTarget = false;
                         ReturnToHand();
                         return;
                     }
                 }
             }
 
-            Debug.Log("Equip Spell must be dropped ON TOP of a Monster!");
+            Debug.Log("Equip Spell must be dropped ON TOP of a Monster Card!");
             ReturnToHand();
             return;
         }
-
         if (cardScript != null && slot.name.Contains("PlayerSlot"))
         {
             if (PlayerManager.nomoresummons)
@@ -170,7 +213,7 @@ public class DragDrop : NetworkBehaviour
                 ReturnToHand();
                 return;
             }
-            else 
+            else
             {
                 if (existingCard == null)
                 {
@@ -192,8 +235,14 @@ public class DragDrop : NetworkBehaviour
         ReturnToHand();
     }
 
-    GameObject FindEmptyActionSlot()
+    GameObject FindPreferredActionSlot(int preferredIndex)
     {
+        GameObject preferredSlot = GameObject.Find("ActionSlot" + preferredIndex);
+        if (preferredSlot != null && GetCardInSlot(preferredSlot) == null)
+        {
+            return preferredSlot;
+        }
+
         for (int i = 1; i <= 4; i++)
         {
             GameObject s = GameObject.Find("ActionSlot" + i);
@@ -202,6 +251,7 @@ public class DragDrop : NetworkBehaviour
                 return s;
             }
         }
+
         return null;
     }
 

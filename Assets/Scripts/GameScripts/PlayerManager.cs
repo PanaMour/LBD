@@ -257,7 +257,7 @@ public class PlayerManager : NetworkBehaviour
 
                     if (targetCandidate != null)
                     {
-                        if (CheckTargetValidity(targetCandidate, currentTargetCriteria))
+                        if (CheckTargetValidity(activeMagicCard, targetCandidate, currentTargetCriteria))
                         {
                             if (currentTargetCriteria == MagicTargetType.UnmovedAlly)
                             {
@@ -269,7 +269,13 @@ public class PlayerManager : NetworkBehaviour
                                 return;
                             }
 
-                            CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject);
+                            int slotIndex = 0;
+                            if (activeMagicCard.transform.parent != null)
+                            {
+                                string numStr = System.Text.RegularExpressions.Regex.Match(activeMagicCard.transform.parent.name, @"\d+").Value;
+                                if (int.TryParse(numStr, out int res)) slotIndex = res - 1;
+                            }
+                            CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject, slotIndex);
                             CancelTargeting();
                         }
                         else
@@ -439,34 +445,24 @@ public class PlayerManager : NetworkBehaviour
         Debug.Log($"Targeting Mode Started: Looking for {type}");
     }
 
-    bool CheckTargetValidity(LabyrinthObject monster, MagicTargetType type)
+    bool CheckTargetValidity(GameObject magicCard, LabyrinthObject monster, MagicTargetType type)
     {
         bool isEnemy = !monster.hasAuthority;
         bool isAttack = monster.attackMode;
+        bool isValidTargetType = false;
 
         switch (type)
         {
-            case MagicTargetType.EnemyAttack:
-                return isEnemy && isAttack;
-
-            case MagicTargetType.EnemyDefense:
-                return isEnemy && !isAttack;
-
-            case MagicTargetType.AnyEnemy:
-                return isEnemy;
-
-            case MagicTargetType.AnyAlly:
-                return !isEnemy;
-
-            case MagicTargetType.AnyUnit:
-                return true;
-
-            case MagicTargetType.UnmovedAlly:
-                return !isEnemy && !monster.hasMovedThisTurn;
-
-            default:
-                return false;
+            case MagicTargetType.EnemyAttack: isValidTargetType = isEnemy && isAttack; break;
+            case MagicTargetType.EnemyDefense: isValidTargetType = isEnemy && !isAttack; break;
+            case MagicTargetType.AnyEnemy: isValidTargetType = isEnemy; break;
+            case MagicTargetType.AnyAlly: isValidTargetType = !isEnemy; break;
+            case MagicTargetType.AnyUnit: isValidTargetType = true; break;
+            case MagicTargetType.UnmovedAlly: isValidTargetType = !isEnemy && !monster.hasMovedThisTurn; break;
+            default: isValidTargetType = false; break;
         }
+
+        return isValidTargetType;
     }
 
     public void CancelTargeting()
@@ -1179,7 +1175,7 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [Command]
-    public void CmdExecuteMagicEffect(GameObject magicCard, GameObject targetMonster)
+    public void CmdExecuteMagicEffect(GameObject magicCard, GameObject targetMonster, int slotIndex)
     {
         ThisMagic magicScript = magicCard.GetComponent<ThisMagic>();
         LabyrinthObject monsterScript = targetMonster.GetComponent<LabyrinthObject>();
@@ -1309,7 +1305,7 @@ public class PlayerManager : NetworkBehaviour
                 break;
         }
 
-        RpcShowCard(magicCard, "Played", 0);
+        RpcShowCard(magicCard, "Played", slotIndex);
     }
 
     [ClientRpc]

@@ -377,9 +377,6 @@ public class ThisCard : NetworkBehaviour
     {
         if (boost > 0 && !boosted)
         {
-            atk += boost;
-            actualATK = atk;
-            actualDEF = def;
             boosted = true;
         }
         if (equippedTo != null)
@@ -387,9 +384,6 @@ public class ThisCard : NetworkBehaviour
             ThisMagic tm = equippedTo.GetComponent<ThisMagic>();
             if (tm != null && tm.beInGraveyard)
             {
-                atk -= boost;
-                actualATK = atk;
-                actualDEF = def;
                 boost = 0;
                 equippedTo = null;
                 boosted = false;

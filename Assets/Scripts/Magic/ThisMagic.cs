@@ -184,16 +184,19 @@ public class ThisMagic : NetworkBehaviour
 
         if (tag != "Unusable")
         {
-            if (targetType != MagicTargetType.None)
+            if (PlayerManager != null && PlayerManager.IsMyTurn && !activated)
             {
-                if (PlayerManager != null && PlayerManager.IsMyTurn && !activated)
-                {
-                    canBeActivated = true;
-                }
+                HandleActivationLogic();
             }
             else
             {
-                HandleActivationLogic();
+                canBeActivated = false;
+            }
+
+            DragDrop dd = gameObject.GetComponent<DragDrop>();
+            if (dd != null)
+            {
+                dd.enabled = canBeActivated;
             }
 
             bool inActionSlot = false;
@@ -237,7 +240,7 @@ public class ThisMagic : NetworkBehaviour
         }
         else if (equip && PlayerSlots != null)
         {
-            canBeActivated = CheckForMonsters(PlayerSlots);
+            canBeActivated = HasValidEquipTarget();
         }
         else if ((targetDestroy || changeAttack || changeDefense) && EnemySlots != null)
         {
@@ -260,6 +263,45 @@ public class ThisMagic : NetworkBehaviour
                 if (grandChild.GetComponent<ThisCard>() != null) return true;
             }
         }
+        return false;
+    }
+
+    bool HasValidEquipTarget()
+    {
+        bool requiresSpecificType = false;
+
+        Type requiredType = Type.Alien;
+
+        if (id == 11) { requiresSpecificType = true; requiredType = Type.Mineral; }
+        else if (id == 12) { requiresSpecificType = true; requiredType = Type.Alien; }
+        else if (id == 13) { requiresSpecificType = true; requiredType = Type.Human; }
+        else if (id == 14) { requiresSpecificType = true; requiredType = Type.Animal; }
+
+        List<GameObject> containersToCheck = new List<GameObject>();
+        if (targetType == MagicTargetType.AnyAlly || targetType == MagicTargetType.AnyUnit) containersToCheck.Add(PlayerSlots);
+        if (targetType == MagicTargetType.AnyEnemy || targetType == MagicTargetType.AnyUnit) containersToCheck.Add(EnemySlots);
+
+        if (containersToCheck.Count == 0) containersToCheck.Add(PlayerSlots);
+
+        foreach (GameObject container in containersToCheck)
+        {
+            if (container == null) continue;
+
+            foreach (Transform slot in container.transform)
+            {
+                foreach (Transform cardObj in slot)
+                {
+                    ThisCard monsterCard = cardObj.GetComponent<ThisCard>();
+                    if (monsterCard != null)
+                    {
+                        if (!requiresSpecificType) return true;
+
+                        if (monsterCard.currentTypes.Contains(requiredType)) return true;
+                    }
+                }
+            }
+        }
+
         return false;
     }
 
