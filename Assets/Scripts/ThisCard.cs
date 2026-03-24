@@ -255,20 +255,18 @@ public class ThisCard : NetworkBehaviour
             {
                 canBeTributed = true;
             }
-            bool tributeAvailable = false;
-            if (stars >= 5 && !summoned && !beInGraveyard && PlayerSlots != null)
-            {
-                foreach (Transform slot in PlayerSlots.transform)
-                {
-                    if (slot.childCount > 0)
-                    {
-                        ThisCard monsterOnField = slot.GetComponentInChildren<ThisCard>();
 
-                        if (monsterOnField != null && monsterOnField.canBeTributed)
-                        {
-                            tributeAvailable = true;
-                            break;
-                        }
+            bool tributeAvailable = false;
+
+            if (stars >= 5 && !summoned && !beInGraveyard)
+            {
+                ThisCard[] allCardsOnBoard = FindObjectsOfType<ThisCard>();
+                foreach (ThisCard c in allCardsOnBoard)
+                {
+                    if (c.hasAuthority && c.summoned && !c.beInGraveyard && c.canBeTributed)
+                    {
+                        tributeAvailable = true;
+                        break;
                     }
                 }
             }
