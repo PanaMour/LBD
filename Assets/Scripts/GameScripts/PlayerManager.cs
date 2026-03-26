@@ -67,6 +67,8 @@ public class PlayerManager : NetworkBehaviour
     public GameObject sprintBoostTarget = null;
     public GameObject activeMagicCard;
     public MagicTargetType currentTargetCriteria;
+    public GameObject activeMonsterEffectCard;
+    public string pendingMonsterEffect;
 
     public override void OnStartClient()
     {
@@ -257,37 +259,48 @@ public class PlayerManager : NetworkBehaviour
 
                     if (targetCandidate != null)
                     {
-                        if (CheckTargetValidity(activeMagicCard, targetCandidate, currentTargetCriteria))
+                        if (activeMagicCard != null)
                         {
-                            if (currentTargetCriteria == MagicTargetType.UnmovedAlly)
+                            if (CheckTargetValidity(activeMagicCard, targetCandidate, currentTargetCriteria))
                             {
-                                isTargeting = false;
-                                isTargetingTile = true;
-                                teleportMonsterCandidate = targetCandidate;
+                                if (currentTargetCriteria == MagicTargetType.UnmovedAlly)
+                                {
+                                    isTargeting = false;
+                                    isTargetingTile = true;
+                                    teleportMonsterCandidate = targetCandidate;
+                                    HighlightTeleportTiles(targetCandidate);
+                                    return;
+                                }
 
-                                HighlightTeleportTiles(targetCandidate);
-                                return;
+                                CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject, 0);
+                                CancelTargeting();
                             }
-
-                            int slotIndex = 0;
-                            if (activeMagicCard.transform.parent != null)
-                            {
-                                string numStr = System.Text.RegularExpressions.Regex.Match(activeMagicCard.transform.parent.name, @"\d+").Value;
-                                if (int.TryParse(numStr, out int res)) slotIndex = res - 1;
-                            }
-                            CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject, slotIndex);
-                            CancelTargeting();
+                            else Debug.Log("Invalid Target selected.");
+                            return;
                         }
-                        else
+
+                        else if (activeMonsterEffectCard != null)
                         {
-                            Debug.Log("Invalid Target selected.");
+                            if (pendingMonsterEffect == "ShadowImp")
+                            {
+                                ThisCard targetCard = targetCandidate.card.GetComponent<ThisCard>();
+
+                                if (targetCard != null && targetCard.currentAttributes.Contains(Attribute.Dark))
+                                {
+                                    CmdApplyTempAtk(targetCandidate.card, 200);
+                                    CancelTargeting();
+                                }
+                                else
+                                {
+                                    Debug.Log("Invalid Target: Shadow Imp can only target a DARK attribute monster!");
+                                }
+                            }
+                            return;
                         }
-                        return;
                     }
                 }
                 return;
             }
-
             LabyrinthObject clickedMonster = null;
             GridStat clickedTile = null;
 
@@ -469,6 +482,8 @@ public class PlayerManager : NetworkBehaviour
     {
         isTargeting = false;
         activeMagicCard = null;
+        activeMonsterEffectCard = null;
+        pendingMonsterEffect = "";
         Debug.Log("Targeting Cancelled");
     }
 
@@ -757,6 +772,11 @@ public class PlayerManager : NetworkBehaviour
     [ClientRpc]
     public void RpcGMChangeTurn()
     {
+        ThisCard[] allCardsOnBoard = FindObjectsOfType<ThisCard>();
+        foreach (ThisCard c in allCardsOnBoard)
+        {
+            c.tempAtk = 0;
+        }
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
         pm.IsMyTurn = !pm.IsMyTurn;
         pm.hasDrawnThisTurn = false;
@@ -992,6 +1012,14 @@ public class PlayerManager : NetworkBehaviour
             {
                 genericEffect.CmdSetBattleMode(genericEffect.attackmode);
                 genericEffect.summoned = true;
+            }
+
+            if (tempCard.GetComponent<ThisCard>().id == 46) // Shadow Imp
+            {
+                isTargeting = true;
+                activeMonsterEffectCard = tempCard;
+                pendingMonsterEffect = "ShadowImp";
+                Debug.Log("Targeting Mode Started: Select a Dark Attribute Monster!");
             }
 
             nomoresummons = true;
@@ -1368,6 +1396,7 @@ public class PlayerManager : NetworkBehaviour
     {
         LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
         ThisMagic[] allMagics = FindObjectsOfType<ThisMagic>();
+        ThisCard[] allCards = FindObjectsOfType<ThisCard>();
 
         int myCardCount = 0;
         foreach (var m in allMonsters) if (m.hasAuthority) myCardCount++;
@@ -1383,11 +1412,39 @@ public class PlayerManager : NetworkBehaviour
                     int targetAuraAtk = (myCardCount == 1) ? 400 : 0;
                     int targetAuraDef = (myCardCount == 1) ? 200 : 0;
 
-                    if (tc.auraAtk != targetAuraAtk)
+                    if (tc.auraAtk != targetAuraAtk || tc.auraDef != targetAuraDef)
                     {
                         tc.auraAtk = targetAuraAtk;
                         tc.auraDef = targetAuraDef;
                         CmdUpdateAuraStats(m.card, targetAuraAtk, targetAuraDef);
+                    }
+                }
+            }
+        }
+
+        int plantGraveyardCount = 0;
+        foreach (ThisCard card in allCards)
+        {
+            if (card.beInGraveyard && card.currentTypes.Contains(Type.Plant))
+            {
+                plantGraveyardCount++;
+            }
+        }
+
+        foreach (var m in allMonsters)
+        {
+            if (m.hasAuthority && m.monsterID == 25 && m.card != null) // Thorn Fairy
+            {
+                ThisCard tc = m.card.GetComponent<ThisCard>();
+                if (tc != null)
+                {
+                    int targetAuraAtk = plantGraveyardCount * 200;
+
+                    if (tc.auraAtk != targetAuraAtk)
+                    {
+                        tc.auraAtk = targetAuraAtk;
+
+                        CmdUpdateAuraStats(m.card, targetAuraAtk, tc.auraDef);
                     }
                 }
             }
@@ -1410,6 +1467,25 @@ public class PlayerManager : NetworkBehaviour
             {
                 tc.auraAtk = auraAtk;
                 tc.auraDef = auraDef;
+            }
+        }
+    }
+
+    [Command]
+    public void CmdApplyTempAtk(GameObject card, int amount)
+    {
+        RpcApplyTempAtk(card, amount);
+    }
+
+    [ClientRpc]
+    public void RpcApplyTempAtk(GameObject card, int amount)
+    {
+        if (card != null)
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                tc.tempAtk += amount;
             }
         }
     }

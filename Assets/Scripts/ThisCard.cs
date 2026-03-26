@@ -112,6 +112,8 @@ public class ThisCard : NetworkBehaviour
 
     public int auraAtk = 0;
     public int auraDef = 0;
+    public int tempAtk = 0;
+    public int tempDef = 0;
 
     void Start()
     {
@@ -200,8 +202,8 @@ public class ThisCard : NetworkBehaviour
         {
             nameText.text = "" + cardName;
             starsText.text = "" + stars;
-            actualATK = atk + boost + auraAtk - decreased;
-            actualDEF = def + auraDef;
+            actualATK = atk + boost + auraAtk + tempAtk - decreased;
+            actualDEF = def + tempDef + auraDef;
             ATKText.text = "" + actualATK;
             DEFText.text = "" + actualDEF;
             descriptionText.text = "" + cardDescription;
