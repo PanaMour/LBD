@@ -115,6 +115,10 @@ public class ThisCard : NetworkBehaviour
     public int tempAtk = 0;
     public int tempDef = 0;
 
+    public Property cardProperty;
+    public int plagueAtkLoss = 0;
+    public int plagueDefLoss = 0;
+
     void Start()
     {
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -149,13 +153,6 @@ public class ThisCard : NetworkBehaviour
         targeting = false;
         targetingEnemy = false;
     }
-    /*void OnMouseMove()
-    {
-        if (Input.GetMouseButtonDown(1))
-        {
-            Debug.Log("Right Click on " + cardName);/////////////////////////////////////////////////////////////////
-        }
-    }*/
 
     void Update()
     {
@@ -189,6 +186,7 @@ public class ThisCard : NetworkBehaviour
             atk = thisCard[0].atk;
             def = thisCard[0].def;
             cardDescription = thisCard[0].cardDescription;
+            cardProperty = thisCard[0].property;
             thisSprite = thisCard[0].thisImage;
             drawXcards = thisCard[0].drawXcards;
             returnXcards = thisCard[0].returnXcards;
@@ -202,8 +200,10 @@ public class ThisCard : NetworkBehaviour
         {
             nameText.text = "" + cardName;
             starsText.text = "" + stars;
-            actualATK = atk + boost + auraAtk + tempAtk - decreased;
-            actualDEF = def + tempDef + auraDef;
+            actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss - decreased;
+            actualDEF = def + tempDef + auraDef - plagueDefLoss;
+            if (actualATK < 0) actualATK = 0;
+            if (actualDEF < 0) actualDEF = 0;
             ATKText.text = "" + actualATK;
             DEFText.text = "" + actualDEF;
             descriptionText.text = "" + cardDescription;
@@ -440,11 +440,21 @@ public class ThisCard : NetworkBehaviour
                             {
                                 if (enemyCard.actualATK < this.actualATK)
                                 {
+                                    if (enemyCard.cardProperty == Property.Plague)
+                                    {
+                                        PlayerManager.CmdApplyPlagueDebuff(this.gameObject);
+                                    }
+
                                     PlayerManager.CmdOpponentDestroyCard(grandChild.gameObject, 0);
                                     PlayerManager.CmdGMChangeLP(0, this.actualATK - enemyCard.actualATK);
                                 }
                                 else if (enemyCard.actualATK > this.actualATK)
                                 {
+                                    if (this.cardProperty == Property.Plague)
+                                    {
+                                        PlayerManager.CmdApplyPlagueDebuff(grandChild.gameObject);
+                                    }
+
                                     PlayerManager.CmdPlayerDestroyCard(Card, 0);
                                     PlayerManager.CmdGMChangeLP(this.actualATK - enemyCard.actualATK, 0);
                                 }
@@ -458,6 +468,11 @@ public class ThisCard : NetworkBehaviour
                             {
                                 if (enemyCard.actualDEF < this.actualATK)
                                 {
+                                    if (enemyCard.cardProperty == Property.Plague)
+                                    {
+                                        PlayerManager.CmdApplyPlagueDebuff(this.gameObject);
+                                    }
+
                                     PlayerManager.CmdOpponentDestroyCard(grandChild.gameObject, 0);
                                 }
                                 else if (enemyCard.actualDEF > this.actualATK)

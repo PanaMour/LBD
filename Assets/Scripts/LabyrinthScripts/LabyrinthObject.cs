@@ -270,7 +270,9 @@ public class LabyrinthObject : NetworkBehaviour
 
         int myAtk = myCard.actualATK;
         int enemyAtk = enemyCard.actualATK;
-        int enemyDef = enemyCard.def;
+
+        int enemyDef = enemyCard.actualDEF;
+
         bool enemyIsAttackMode = targetScript.attackMode;
 
         hasMovedThisTurn = true;
@@ -283,6 +285,11 @@ public class LabyrinthObject : NetworkBehaviour
         {
             if (myAtk > enemyAtk)
             {
+                if (enemyCard.cardProperty == Property.Plague)
+                {
+                    pm.RpcApplyPlagueDebuff(this.card);
+                }
+
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
 
@@ -291,6 +298,11 @@ public class LabyrinthObject : NetworkBehaviour
             }
             else if (myAtk < enemyAtk)
             {
+                if (myCard.cardProperty == Property.Plague)
+                {
+                    pm.RpcApplyPlagueDebuff(targetScript.card);
+                }
+
                 NetworkServer.Destroy(this.gameObject);
                 pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
 
@@ -309,6 +321,11 @@ public class LabyrinthObject : NetworkBehaviour
         {
             if (myAtk > enemyDef)
             {
+                if (enemyCard.cardProperty == Property.Plague)
+                {
+                    pm.RpcApplyPlagueDebuff(this.card);
+                }
+
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
             }
@@ -319,7 +336,6 @@ public class LabyrinthObject : NetworkBehaviour
             }
         }
     }
-
     [Command]
     public void CmdDirectAttack()
     {

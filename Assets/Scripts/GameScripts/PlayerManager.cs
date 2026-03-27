@@ -131,17 +131,17 @@ public class PlayerManager : NetworkBehaviour
         for (int i = 0; i < 5; i++)
         {
             yield return new WaitForSeconds(1);
-            int r = Random.Range(0, 43);
-            if (r < 30)
+            int r = Random.Range(0, 82);
+            if (r < 60)
             {
-                Card.GetComponent<ThisCard>().thisId = Random.Range(1, 29);
+                Card.GetComponent<ThisCard>().thisId = Random.Range(1, 59);
                 GameObject card = Instantiate(Card, new Vector2(0, 0), Quaternion.identity);
                 NetworkServer.Spawn(card, connectionToClient);
                 RpcShowCard(card, "Dealt", 0);
             }
-            else if (r >= 30)
+            else if (r >= 60)
             {
-                Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 14);
+                Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 23);
                 GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
                 NetworkServer.Spawn(card, connectionToClient);
                 RpcShowCard(card, "Dealt", 0);
@@ -152,17 +152,17 @@ public class PlayerManager : NetworkBehaviour
     IEnumerator DrawCard()
     {
         yield return new WaitForSeconds(1);
-        int r = Random.Range(0, 43);
-        if (r < 30)
+        int r = Random.Range(0, 82);
+        if (r < 60)
         {
-            Card.GetComponent<ThisCard>().thisId = Random.Range(1, 29);
+            Card.GetComponent<ThisCard>().thisId = Random.Range(1, 59);
             GameObject card = Instantiate(Card, new Vector2(0, 0), Quaternion.identity);
             NetworkServer.Spawn(card, connectionToClient);
             RpcShowCard(card, "Dealt", 0);
         }
-        else if (r >= 30)
+        else if (r >= 60)
         {
-            Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 14);
+            Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 23);
             GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
             NetworkServer.Spawn(card, connectionToClient);
             RpcShowCard(card, "Dealt", 0);
@@ -1486,6 +1486,28 @@ public class PlayerManager : NetworkBehaviour
             if (tc != null)
             {
                 tc.tempAtk += amount;
+            }
+        }
+    }
+
+    [Command]
+    public void CmdApplyPlagueDebuff(GameObject targetCard)
+    {
+        RpcApplyPlagueDebuff(targetCard);
+    }
+
+    [ClientRpc]
+    public void RpcApplyPlagueDebuff(GameObject targetCard)
+    {
+        if (targetCard != null)
+        {
+            ThisCard tc = targetCard.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                tc.plagueAtkLoss += 500;
+                tc.plagueDefLoss += 500;
+
+                Debug.Log($"{tc.cardName} was infected by the Plague and permanently lost 500 ATK & DEF!");
             }
         }
     }
