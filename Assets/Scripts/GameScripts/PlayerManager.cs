@@ -826,13 +826,25 @@ public class PlayerManager : NetworkBehaviour
     [ClientRpc]
     public void RpcGMChangeBattlePosition(GameObject card, bool ATKDEF)
     {
-        if (ATKDEF)
+        ThisCard tc = card.GetComponent<ThisCard>();
+        if (tc != null)
         {
-            card.GetComponent<ThisCard>().attackmode = true;
-        }
-        else
-        {
-            card.GetComponent<ThisCard>().attackmode = false;
+            tc.attackmode = ATKDEF;
+
+            LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
+            foreach (LabyrinthObject m in allMonsters)
+            {
+                if (m.card == card)
+                {
+                    m.attackMode = ATKDEF;
+
+                    if (ATKDEF && m.hasAuthority && IsMyTurn)
+                    {
+                        Debug.Log("Switched to Attack! Movement unlocked.");
+                    }
+                    break;
+                }
+            }
         }
     }
 
