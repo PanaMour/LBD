@@ -470,7 +470,7 @@ public class GridBehavior : MonoBehaviour
         }
     }
 
-    public void ShowPossiblePaths(GameObject labyrinthObject)
+    public void ShowPossiblePaths(GameObject labyrinthObject, int forcedRange = -1)
     {
         HighlightRange(false);
         objectToMove = labyrinthObject;
@@ -480,10 +480,17 @@ public class GridBehavior : MonoBehaviour
         startY = currentStat.y;
 
         LabyrinthObject labScript = labyrinthObject.GetComponent<LabyrinthObject>();
-        spaces = labScript.moveRange;
+
+        if (forcedRange != -1)
+        {
+            spaces = forcedRange;
+        }
+        else
+        {
+            spaces = labScript.moveRange;
+        }
 
         HighlightRange(true);
-
         CheckAttackableNeighbors(startX, startY);
     }
 

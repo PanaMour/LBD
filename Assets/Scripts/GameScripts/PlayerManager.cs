@@ -295,6 +295,16 @@ public class PlayerManager : NetworkBehaviour
                                     Debug.Log("Invalid Target: Shadow Imp can only target a DARK attribute monster!");
                                 }
                             }
+                            else if (pendingMonsterEffect == "Rattlesnake")
+                            {
+                                GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+                                if (gridGen != null)
+                                {
+                                    gridGen.GetComponent<GridBehavior>().ShowPossiblePaths(targetCandidate.gameObject, 3);
+
+                                    CancelTargeting();
+                                }
+                            }
                             return;
                         }
                     }
@@ -1032,6 +1042,14 @@ public class PlayerManager : NetworkBehaviour
                 activeMonsterEffectCard = tempCard;
                 pendingMonsterEffect = "ShadowImp";
                 Debug.Log("Targeting Mode Started: Select a Dark Attribute Monster!");
+            }
+
+            if (tempCard.GetComponent<ThisCard>().id == 51) // Rattlesnake
+            {
+                isTargeting = true;
+                activeMonsterEffectCard = tempCard;
+                pendingMonsterEffect = "Rattlesnake";
+                Debug.Log("Rattlesnake: Select a monster to move!");
             }
 
             nomoresummons = true;
