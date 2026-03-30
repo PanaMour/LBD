@@ -738,18 +738,6 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [Command]
-    public void CmdGMChangeKEKW(GameObject yourKEKW, GameObject myKEKW)
-    {
-        RpcGMChangeKEKW(yourKEKW, myKEKW);
-    }
-
-    [ClientRpc]
-    public void RpcGMChangeKEKW(GameObject yourKEKW, GameObject myKEKW)
-    {
-        GameManager.ChangeKEKW(yourKEKW, myKEKW, hasAuthority);
-    }
-
-    [Command]
     public void CmdGMChangeLP(int playerLP,int opponentLP)
     {
         RpcGMChangeLP(playerLP, opponentLP);
