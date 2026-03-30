@@ -426,7 +426,8 @@ public class GridBehavior : MonoBehaviour
         {
             LabyrinthObject labScript = objectToMove.GetComponent<LabyrinthObject>();
 
-            if (labScript.hasAuthority)
+            PlayerManager localPM = Mirror.NetworkClient.connection.identity.GetComponent<PlayerManager>();
+            if (labScript.hasAuthority || localPM.IsMyTurn)
             {
                 labScript.CmdMoveToTile(targetTile.name);
 
