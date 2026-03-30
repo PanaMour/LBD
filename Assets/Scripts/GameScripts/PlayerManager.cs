@@ -1541,4 +1541,37 @@ public class PlayerManager : NetworkBehaviour
             }
         }
     }
+
+    [Command]
+    public void CmdForceMoveMonster(GameObject monsterToMove, string targetTileName)
+    {
+        LabyrinthObject monsterScript = monsterToMove.GetComponent<LabyrinthObject>();
+        if (monsterScript != null)
+        {
+            monsterScript.currentTileName = targetTileName;
+            monsterScript.hasMovedThisTurn = true;
+
+            Debug.Log($"[SERVER] Rattlesnake forced {monsterToMove.name} to move to {targetTileName}");
+        }
+    }
+
+    [ClientRpc]
+    public void RpcApplyDemonLadyShred(GameObject targetCard)
+    {
+        if (targetCard != null)
+        {
+            ThisCard tc = targetCard.GetComponent<ThisCard>();
+            if (tc != null) tc.battleDefPenalty = 500;
+        }
+    }
+
+    [ClientRpc]
+    public void RpcResetDemonLadyShred(GameObject targetCard)
+    {
+        if (targetCard != null)
+        {
+            ThisCard tc = targetCard.GetComponent<ThisCard>();
+            if (tc != null) tc.battleDefPenalty = 0;
+        }
+    }
 }

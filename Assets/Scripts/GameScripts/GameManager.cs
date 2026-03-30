@@ -68,13 +68,13 @@ public class GameManager : NetworkBehaviour
     {
         if (hasAuthority)
         {
-            PlayerLP.staticLP += playerLP;
+            PlayerLP.staticLP -= playerLP;
             OpponentLP.staticLP -= opponentLP;
         }
         else
         {
             PlayerLP.staticLP -= opponentLP;
-            OpponentLP.staticLP += playerLP;
+            OpponentLP.staticLP -= playerLP;
         }
     }
 
@@ -89,19 +89,5 @@ public class GameManager : NetworkBehaviour
             OpponentVariables += variables;
         }
         UIManager.updatePlayerText();
-    }
-
-    public void ChangeKEKW(GameObject yourKEKW, GameObject myKEKW ,bool hasAuthority)
-    {
-        if (hasAuthority)
-        {
-            KEKW = myKEKW.GetComponent<Image>();
-            KEKW.enabled = true;
-        }
-        else
-        {
-            KEKW = yourKEKW.GetComponent<Image>();
-            KEKW.enabled = true;
-        }
     }
 }

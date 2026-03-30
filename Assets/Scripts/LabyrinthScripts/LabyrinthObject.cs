@@ -268,6 +268,18 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (myCard == null || enemyCard == null) return;
 
+        PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
+        if (pm == null) return;
+
+        if (myCard.id == 45) // Demon Lady
+        {
+            Debug.Log("Demon Lady is attacking! Shredding 500 DEF.");
+            enemyCard.battleDefPenalty = 500;
+            enemyCard.RecalculateStats();
+
+            pm.RpcApplyDemonLadyShred(targetScript.card);
+        }
+
         int myAtk = myCard.actualATK;
         int enemyAtk = enemyCard.actualATK;
 
@@ -278,8 +290,6 @@ public class LabyrinthObject : NetworkBehaviour
         hasMovedThisTurn = true;
         waitingToAttack = false;
         ResetGridColors();
-
-        PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
 
         if (enemyIsAttackMode)
         {
@@ -335,6 +345,9 @@ public class LabyrinthObject : NetworkBehaviour
                 pm.RpcGMChangeLP(damage, 0);
             }
         }
+        enemyCard.battleDefPenalty = 0;
+        enemyCard.RecalculateStats();
+        pm.RpcResetDemonLadyShred(targetScript.card);
     }
     [Command]
     public void CmdDirectAttack()

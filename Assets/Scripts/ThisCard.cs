@@ -119,6 +119,8 @@ public class ThisCard : NetworkBehaviour
     public int plagueAtkLoss = 0;
     public int plagueDefLoss = 0;
 
+    public int battleDefPenalty = 0;
+
     void Start()
     {
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -201,7 +203,7 @@ public class ThisCard : NetworkBehaviour
             nameText.text = "" + cardName;
             starsText.text = "" + stars;
             actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss - decreased;
-            actualDEF = def + tempDef + auraDef - plagueDefLoss;
+            actualDEF = def + tempDef + auraDef - plagueDefLoss - battleDefPenalty;
             if (actualATK < 0) actualATK = 0;
             if (actualDEF < 0) actualDEF = 0;
             ATKText.text = "" + actualATK;
@@ -588,5 +590,17 @@ public class ThisCard : NetworkBehaviour
     {
         drawX = drawXcards;
         useReturn = false;
+    }
+
+    public void RecalculateStats()
+    {
+        actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss - decreased;
+        actualDEF = def + auraDef - plagueDefLoss - battleDefPenalty;
+
+        if (actualATK < 0) actualATK = 0;
+        if (actualDEF < 0) actualDEF = 0;
+
+        if (ATKText != null) ATKText.text = "" + actualATK;
+        if (DEFText != null) DEFText.text = "" + actualDEF;
     }
 }

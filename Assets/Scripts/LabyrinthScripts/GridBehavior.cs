@@ -425,16 +425,20 @@ public class GridBehavior : MonoBehaviour
         if (dist > 0 && dist <= spaces)
         {
             LabyrinthObject labScript = objectToMove.GetComponent<LabyrinthObject>();
+            PlayerManager myPM = NetworkClient.connection.identity.GetComponent<PlayerManager>();
 
-            PlayerManager localPM = Mirror.NetworkClient.connection.identity.GetComponent<PlayerManager>();
-            if (labScript.hasAuthority || localPM.IsMyTurn)
+            if (labScript.hasAuthority)
             {
                 labScript.CmdMoveToTile(targetTile.name);
+            }
+            else if (myPM != null && myPM.IsMyTurn)
+            {
+                myPM.CmdForceMoveMonster(objectToMove, targetTile.name);
+            }
 
-                if (labScript.card != null)
-                {
-                    labScript.card.GetComponent<ThisCard>().hasMoved = true;
-                }
+            if (labScript.card != null)
+            {
+                labScript.card.GetComponent<ThisCard>().hasMoved = true;
             }
 
             HighlightRange(false);
