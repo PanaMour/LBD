@@ -117,6 +117,19 @@ public class LabyrinthObject : NetworkBehaviour
             transform.SetParent(targetTileTransform, true);
             transform.localPosition = new Vector3(0, 0.55f, 0);
 
+            GridStat newTile = targetTileTransform.GetComponent<GridStat>();
+            if (newTile != null && newTile.isFatalSquare)
+            {
+                Debug.Log("LANDED ON A FATAL SQUARE!");
+                if (isServer)
+                {
+                    newTile.isFatalSquare = false;
+                    PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
+                    pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
+                    NetworkServer.Destroy(this.gameObject);
+                }
+            }
+
             bool isClientMonster = (hasAuthority && !isServer) || (!hasAuthority && isServer);
 
             if (isClientMonster)

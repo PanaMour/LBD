@@ -1,12 +1,18 @@
-﻿using System.Collections;
+﻿using Mirror;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class GridStat : MonoBehaviour
+public class GridStat : NetworkBehaviour
 {
     public int visited = -1;
     public int x = 0;
     public int y = 0;
+    [SyncVar]
+    public bool isFatalSquare = false;
+    [SyncVar]
+    public int trapDuration = 0;
     // Start is called before the first frame update
     void Start()
     {

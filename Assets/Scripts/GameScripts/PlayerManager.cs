@@ -246,6 +246,15 @@ public class PlayerManager : NetworkBehaviour
                         }
                         return;
                     }
+                    else if (activeMagicCard != null && activeMagicCard.GetComponent<ThisMagic>().id == 21)
+                    {
+                        if (targetTileCandidate.GetComponentInChildren<LabyrinthObject>() == null)
+                        {
+                            CmdSetFatalSquare(targetTileCandidate.gameObject.name);
+                            CancelTileTargeting();
+                        }
+                        return;
+                    }
                 }
                 return;
             }
@@ -448,6 +457,29 @@ public class PlayerManager : NetworkBehaviour
 
         if (magicScript != null)
         {
+            if (magicScript.targetType == MagicTargetType.EmptySquare)
+            {
+                isTargetingTile = true;
+                activeMagicCard = card;
+
+                GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+                if (gridGen != null)
+                {
+                    foreach (Transform child in gridGen.transform)
+                    {
+                        GridStat tile = child.GetComponent<GridStat>();
+                        if (tile != null && child.GetComponentInChildren<LabyrinthObject>() == null)
+                        {
+                            Renderer r = child.GetComponentInChildren<Renderer>();
+                            if (r != null) r.material.color = Color.yellow;
+                        }
+                    }
+                }
+
+                Debug.Log("Fatal Square: Select an empty square on the grid!");
+                return;
+            }
+
             if (magicScript.targetType != MagicTargetType.None)
             {
                 StartTargetingMode(card, magicScript.targetType);
@@ -764,7 +796,31 @@ public class PlayerManager : NetworkBehaviour
             }
         }
 
+        GridStat[] allTiles = FindObjectsOfType<GridStat>();
+        foreach (GridStat tile in allTiles)
+        {
+            if (tile.isFatalSquare)
+            {
+                tile.trapDuration--;
+                if (tile.trapDuration <= 0)
+                {
+                    tile.isFatalSquare = false;
+                    RpcResetTileColor(tile.gameObject.name);
+                }
+            }
+        }
         RpcGMChangeTurn();
+    }
+
+    [ClientRpc]
+    void RpcResetTileColor(string tileName)
+    {
+        GameObject tileObj = GameObject.Find(tileName);
+        if (tileObj != null)
+        {
+            Renderer r = tileObj.GetComponentInChildren<Renderer>();
+            if (r != null) r.material.color = Color.white;
+        }
     }
 
     [ClientRpc]
@@ -1369,7 +1425,10 @@ public class PlayerManager : NetworkBehaviour
         activeMagicCard = null;
 
         GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
-        if (gridGen != null) gridGen.GetComponent<GridBehavior>().ResetTileColors();
+        if (gridGen != null)
+        {
+            gridGen.GetComponent<GridBehavior>().ResetTileColors();
+        }
     }
 
     void HighlightTeleportTiles(LabyrinthObject monster)
@@ -1560,6 +1619,34 @@ public class PlayerManager : NetworkBehaviour
         {
             ThisCard tc = targetCard.GetComponent<ThisCard>();
             if (tc != null) tc.battleDefPenalty = 0;
+        }
+    }
+
+    [Command]
+    public void CmdSetFatalSquare(string tileName)
+    {
+        GameObject tileObj = GameObject.Find(tileName);
+
+        if (tileObj != null)
+        {
+            GridStat gs = tileObj.GetComponent<GridStat>();
+            if (gs != null)
+            {
+                gs.isFatalSquare = true;
+                gs.trapDuration = 2;
+                RpcShowTrapEffect(tileName);
+            }
+        }
+    }
+
+    [ClientRpc]
+    void RpcShowTrapEffect(string tileName)
+    {
+        GameObject tileObj = GameObject.Find(tileName);
+        if (tileObj != null)
+        {
+            Renderer r = tileObj.GetComponentInChildren<Renderer>();
+            if (r != null) r.material.color = new Color(0.5f, 0, 0.5f);
         }
     }
 }
