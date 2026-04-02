@@ -70,6 +70,7 @@ public class ThisMagic : NetworkBehaviour
     public GameObject equippedTo;
 
     private bool initialized = false;
+    public GameObject lastTargetedMonster;
 
     void Start()
     {

@@ -1238,31 +1238,32 @@ public class PlayerManager : NetworkBehaviour
     [Server]
     public void ServerCollectTreasure(GameObject chest)
     {
+        GridStat tileStat = chest.GetComponentInParent<GridStat>();
+        LabyrinthObject collector = (tileStat != null) ? tileStat.GetComponentInChildren<LabyrinthObject>() : null;
+
         NetworkServer.Destroy(chest);
 
-        List<int> labyrinthCardIds = new List<int>();
-
+        List<KeyValuePair<string, int>> labyrinthPool = new List<KeyValuePair<string, int>>();
         for (int i = 1; i < CardDataBase.cardList.Count; i++)
+            if (CardDataBase.cardList[i].type == Type.Labyrinth) labyrinthPool.Add(new KeyValuePair<string, int>("Monster", i));
+
+        for (int i = 0; i < MagicDataBase.magicList.Count; i++)
+            if (MagicDataBase.magicList[i].magicType == MagicType.Labyrinth) labyrinthPool.Add(new KeyValuePair<string, int>("Magic", i));
+
+        if (labyrinthPool.Count > 0)
         {
-            if (CardDataBase.cardList[i].type == Type.Labyrinth)
+            var choice = labyrinthPool[Random.Range(0, labyrinthPool.Count)];
+
+            if (choice.Key == "Magic" && choice.Value == 15) // Labyrinth Love
             {
-                labyrinthCardIds.Add(i);
+                StartCoroutine(AutoplayLabyrinthLove(choice.Value, collector));
+                return;
             }
-        }
 
-        if (labyrinthCardIds.Count > 0)
-        {
-            int randomId = labyrinthCardIds[Random.Range(0, labyrinthCardIds.Count)];
-            StartCoroutine(DrawSpecificCard(randomId));
-
-            Debug.Log($"Player collected treasure! Drawing Card ID: {randomId}");
-        }
-        else
-        {
-            Debug.LogWarning("No cards of Type.Labyrinth found in CardDataBase!");
+            if (choice.Key == "Monster") StartCoroutine(DrawSpecificCard(choice.Value));
+            else StartCoroutine(DrawSpecificMagic(choice.Value));
         }
     }
-
     IEnumerator DrawSpecificCard(int cardId)
     {
         yield return new WaitForSeconds(0.5f);
@@ -1276,6 +1277,48 @@ public class PlayerManager : NetworkBehaviour
         RpcShowCard(cardObj, "Dealt", 0);
     }
 
+    IEnumerator DrawSpecificMagic(int magicId)
+    {
+        yield return new WaitForSeconds(0.5f);
+        GameObject magicObj = Instantiate(Magic, Vector2.zero, Quaternion.identity);
+        magicObj.GetComponent<ThisMagic>().thisId = magicId;
+        NetworkServer.Spawn(magicObj, connectionToClient);
+        RpcShowCard(magicObj, "Dealt", 0);
+    }
+
+    IEnumerator AutoplayLabyrinthLove(int magicId, LabyrinthObject collector)
+    {
+        GameObject magicObj = Instantiate(Magic, Vector2.zero, Quaternion.identity);
+        ThisMagic magicScript = magicObj.GetComponent<ThisMagic>();
+        magicScript.thisId = magicId;
+        NetworkServer.Spawn(magicObj, connectionToClient);
+
+        int targetSlotIndex = 0;
+        for (int i = 0; i < PlayerActionSockets.Count; i++)
+        {
+            if (PlayerActionSockets[i].transform.childCount == 0)
+            {
+                targetSlotIndex = i;
+                break;
+            }
+        }
+
+        RpcShowCard(magicObj, "Played", targetSlotIndex);
+
+        yield return new WaitForSeconds(1.5f);
+
+        if (collector != null)
+        {
+            ThisCard stats = collector.card.GetComponent<ThisCard>();
+            int gainAmount = Mathf.Max(stats.actualATK, stats.actualDEF);
+            RpcGMChangeLP(-gainAmount, 0);
+            Debug.Log($"Autoplay: Labyrinth Love healed {gainAmount}!");
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        RpcShowCard(magicObj, "PlayerDestroyed", 0);
+    }
     [Command]
     public void CmdExecuteMagicEffect(GameObject magicCard, GameObject targetMonster, int slotIndex)
     {
@@ -1283,6 +1326,7 @@ public class PlayerManager : NetworkBehaviour
         LabyrinthObject monsterScript = targetMonster.GetComponent<LabyrinthObject>();
 
         if (magicScript == null || monsterScript == null) return;
+        magicScript.lastTargetedMonster = monsterScript.card;
 
         switch (magicScript.targetType)
         {

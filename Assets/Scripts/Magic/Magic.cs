@@ -15,7 +15,8 @@ public enum MagicTargetType
 public enum MagicType
 {
     Normal,
-    Armor
+    Armor,
+    Labyrinth
 }
 
 [System.Serializable]
@@ -39,12 +40,14 @@ public class Magic
     public bool equip;
     public int equipBoost;
 
+    public MagicType magicType;
+
     public Magic()
     {
 
     }
 
-    public Magic(int Id, string CardName, string CardDescription, Sprite ThisImage, string Color, MagicTargetType TargetType, int DrawXCards, int ReturnXcards, int DamageHealedBySpell, int DamageDealtBySpell, bool TargetDestroy, bool ChangeAttack, bool ChangeDefense, bool Equip, int EquipBoost)
+    public Magic(int Id, string CardName, string CardDescription, Sprite ThisImage, string Color, MagicTargetType TargetType, int DrawXCards, int ReturnXcards, int DamageHealedBySpell, int DamageDealtBySpell, bool TargetDestroy, bool ChangeAttack, bool ChangeDefense, bool Equip, int EquipBoost, MagicType MagicType)
     {
         id = Id;
         cardName = CardName;
@@ -63,5 +66,6 @@ public class Magic
         changeDefense = ChangeDefense;
         equip = Equip;
         equipBoost = EquipBoost;
+        magicType = MagicType;
     }
 }
