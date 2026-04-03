@@ -314,19 +314,31 @@ public class GridBehavior : MonoBehaviour
     }
     bool TestDirection(int x, int y, int step, int direction)
     {
+        bool hasWallwalk = false;
+        if (objectToMove != null)
+        {
+            LabyrinthObject labScript = objectToMove.GetComponent<LabyrinthObject>();
+            if (labScript != null && labScript.card != null)
+            {
+                ThisCard cardData = labScript.card.GetComponent<ThisCard>();
+                if (cardData != null && cardData.cardProperty == Property.Wallwalk)
+                {
+                    hasWallwalk = true;
+                }
+            }
+        }
+
         switch (direction)
         {
             case 4: // Attempting to move LEFT (Check x-1)
                 if (x - 1 > -1 && gridArray[x - 1, y] && gridArray[x - 1, y].GetComponent<GridStat>().visited == step)
                 {
-                    // 1. Check Walls
-                    if (BlocksDirection(x, y, "Left") || BlocksDirection(x - 1, y, "Right")) return false;
+                    if (!hasWallwalk)
+                    {
+                        if (BlocksDirection(x, y, "Left") || BlocksDirection(x - 1, y, "Right")) return false;
+                    }
 
-                    // 2. Check Occupancy (THE FIX)
-                    // Only check occupancy if we are calculating distances (step == -1) 
-                    // or finding the path (step > -1). 
                     if (IsOccupied(x - 1, y)) return false;
-
                     return true;
                 }
                 return false;
@@ -334,10 +346,12 @@ public class GridBehavior : MonoBehaviour
             case 3: // Attempting to move DOWN (Check y-1)
                 if (y - 1 > -1 && gridArray[x, y - 1] && gridArray[x, y - 1].GetComponent<GridStat>().visited == step)
                 {
-                    if (BlocksDirection(x, y, "Bottom") || BlocksDirection(x, y - 1, "Top")) return false;
+                    if (!hasWallwalk)
+                    {
+                        if (BlocksDirection(x, y, "Bottom") || BlocksDirection(x, y - 1, "Top")) return false;
+                    }
 
                     if (IsOccupied(x, y - 1)) return false;
-
                     return true;
                 }
                 return false;
@@ -345,10 +359,12 @@ public class GridBehavior : MonoBehaviour
             case 2: // Attempting to move RIGHT (Check x+1)
                 if (x + 1 < columns && gridArray[x + 1, y] && gridArray[x + 1, y].GetComponent<GridStat>().visited == step)
                 {
-                    if (BlocksDirection(x, y, "Right") || BlocksDirection(x + 1, y, "Left")) return false;
+                    if (!hasWallwalk)
+                    {
+                        if (BlocksDirection(x, y, "Right") || BlocksDirection(x + 1, y, "Left")) return false;
+                    }
 
                     if (IsOccupied(x + 1, y)) return false;
-
                     return true;
                 }
                 return false;
@@ -356,10 +372,11 @@ public class GridBehavior : MonoBehaviour
             case 1: // Attempting to move UP (Check y+1)
                 if (y + 1 < rows && gridArray[x, y + 1] && gridArray[x, y + 1].GetComponent<GridStat>().visited == step)
                 {
-                    if (BlocksDirection(x, y, "Up") || BlocksDirection(x, y + 1, "Bottom")) return false;
-
+                    if (!hasWallwalk)
+                    {
+                        if (BlocksDirection(x, y, "Up") || BlocksDirection(x, y + 1, "Bottom")) return false;
+                    }
                     if (IsOccupied(x, y + 1)) return false;
-
                     return true;
                 }
                 return false;
@@ -511,15 +528,23 @@ public class GridBehavior : MonoBehaviour
     {
         if (targetX < 0 || targetX >= columns || targetY < 0 || targetY >= rows) return;
 
+        if (objectToMove == null) return;
+
         string opposite = "";
         if (direction == "Right") opposite = "Left";
         if (direction == "Left") opposite = "Right";
         if (direction == "Top") opposite = "Bottom";
         if (direction == "Bottom") opposite = "Top";
 
-        if (BlocksDirection(sourceX, sourceY, direction) || BlocksDirection(targetX, targetY, opposite))
+        LabyrinthObject attacker = objectToMove.GetComponent<LabyrinthObject>();
+        ThisCard attackerCard = attacker.card.GetComponent<ThisCard>();
+
+        if (attackerCard.cardProperty != Property.Wallwalk)
         {
-            return;
+            if (BlocksDirection(sourceX, sourceY, direction) || BlocksDirection(targetX, targetY, opposite))
+            {
+                return;
+            }
         }
 
         GameObject tile = gridArray[targetX, targetY];
