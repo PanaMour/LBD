@@ -1520,30 +1520,20 @@ public class PlayerManager : NetworkBehaviour
         ThisCard[] allCards = FindObjectsOfType<ThisCard>();
 
         int myCardCount = 0;
-        foreach (var m in allMonsters) if (m.hasAuthority) myCardCount++;
-        foreach (var magic in allMagics) if (magic.hasAuthority && magic.activated && !magic.beInGraveyard) myCardCount++;
+        bool smallogIsOnField = false;
+        int plantGraveyardCount = 0;
+
+        foreach (var magic in allMagics)
+        {
+            if (magic.hasAuthority && magic.activated && !magic.beInGraveyard) myCardCount++;
+        }
 
         foreach (var m in allMonsters)
         {
-            if (m.hasAuthority && m.monsterID == 57 && m.card != null) // Snalien
-            {
-                ThisCard tc = m.card.GetComponent<ThisCard>();
-                if (tc != null)
-                {
-                    int targetAuraAtk = (myCardCount == 1) ? 400 : 0;
-                    int targetAuraDef = (myCardCount == 1) ? 200 : 0;
-
-                    if (tc.auraAtk != targetAuraAtk || tc.auraDef != targetAuraDef)
-                    {
-                        tc.auraAtk = targetAuraAtk;
-                        tc.auraDef = targetAuraDef;
-                        CmdUpdateAuraStats(m.card, targetAuraAtk, targetAuraDef);
-                    }
-                }
-            }
+            if (m.hasAuthority) myCardCount++;
+            if (m.monsterID == 34) smallogIsOnField = true; // Check for Smallog
         }
 
-        int plantGraveyardCount = 0;
         foreach (ThisCard card in allCards)
         {
             if (card.beInGraveyard && card.currentTypes.Contains(Type.Plant))
@@ -1554,20 +1544,39 @@ public class PlayerManager : NetworkBehaviour
 
         foreach (var m in allMonsters)
         {
-            if (m.hasAuthority && m.monsterID == 25 && m.card != null) // Thorn Fairy
+            if (!m.hasAuthority || m.card == null) continue;
+
+            ThisCard tc = m.card.GetComponent<ThisCard>();
+            if (tc == null) continue;
+
+            int targetAuraAtk = tc.auraAtk;
+            int targetAuraDef = tc.auraDef;
+            bool hasAuraEffect = false;
+
+            if (m.monsterID == 57) // Snalien
             {
-                ThisCard tc = m.card.GetComponent<ThisCard>();
-                if (tc != null)
-                {
-                    int targetAuraAtk = plantGraveyardCount * 200;
+                targetAuraAtk = (myCardCount == 1) ? 400 : 0;
+                targetAuraDef = (myCardCount == 1) ? 200 : 0;
+                hasAuraEffect = true;
+            }
+            else if (m.monsterID == 25) // Thorn Fairy
+            {
+                targetAuraAtk = plantGraveyardCount * 200;
+                targetAuraDef = 0;
+                hasAuraEffect = true;
+            }
+            else if (m.monsterID == 33) // Logigas
+            {
+                targetAuraAtk = smallogIsOnField ? 500 : 0;
+                targetAuraDef = smallogIsOnField ? 500 : 0;
+                hasAuraEffect = true;
+            }
 
-                    if (tc.auraAtk != targetAuraAtk)
-                    {
-                        tc.auraAtk = targetAuraAtk;
-
-                        CmdUpdateAuraStats(m.card, targetAuraAtk, tc.auraDef);
-                    }
-                }
+            if (hasAuraEffect && (tc.auraAtk != targetAuraAtk || tc.auraDef != targetAuraDef))
+            {
+                tc.auraAtk = targetAuraAtk;
+                tc.auraDef = targetAuraDef;
+                CmdUpdateAuraStats(m.card, targetAuraAtk, targetAuraDef);
             }
         }
     }
