@@ -318,6 +318,12 @@ public class LabyrinthObject : NetworkBehaviour
 
                 int damage = myAtk - enemyAtk;
                 pm.RpcGMChangeLP(0, damage);
+
+                if (this.monsterID == 26) // Heartstealer
+                {
+                    pm.RpcGMChangeLP(-500, 0);
+                    Debug.Log("Heartstealer activated! Gained 500 LP.");
+                }
             }
             else if (myAtk < enemyAtk)
             {
@@ -351,6 +357,12 @@ public class LabyrinthObject : NetworkBehaviour
 
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
+
+                if (this.monsterID == 26) // Heartstealer
+                {
+                    pm.RpcGMChangeLP(-500, 0);
+                    Debug.Log("Heartstealer activated! Gained 500 LP.");
+                }
             }
             else if (myAtk < enemyDef)
             {
