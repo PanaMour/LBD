@@ -263,6 +263,28 @@ public class PlayerManager : NetworkBehaviour
             {
                 foreach (RaycastHit hit in hits)
                 {
+                    if (pendingMonsterEffect == "Aetherwing")
+                    {
+                        ThisMagic targetMagic = hit.collider.GetComponent<ThisMagic>();
+                        if (targetMagic == null) targetMagic = hit.collider.GetComponentInParent<ThisMagic>();
+
+                        if (targetMagic != null && targetMagic.activated)
+                        {
+                            if (!targetMagic.hasAuthority)
+                            {
+                                CmdOpponentDestroyCard(targetMagic.gameObject, 0);
+                                Debug.Log("Aetherwing Butterfly destroyed an enemy spell!");
+
+                                CancelTargeting();
+                                return;
+                            }
+                            else
+                            {
+                                Debug.Log("Invalid Target: You must select an ENEMY magic card!");
+                            }
+                        }
+                        continue;
+                    }
                     LabyrinthObject targetCandidate = hit.collider.GetComponent<LabyrinthObject>();
                     if (targetCandidate == null) targetCandidate = hit.collider.GetComponentInParent<LabyrinthObject>();
 
@@ -1094,6 +1116,14 @@ public class PlayerManager : NetworkBehaviour
                 activeMonsterEffectCard = tempCard;
                 pendingMonsterEffect = "Rattlesnake";
                 Debug.Log("Rattlesnake: Select a monster to move!");
+            }
+
+            if (tempCard.GetComponent<ThisCard>().id == 56) // Aetherwing Butterfly
+            {
+                isTargeting = true;
+                activeMonsterEffectCard = tempCard;
+                pendingMonsterEffect = "Aetherwing";
+                Debug.Log("Aetherwing Butterfly: Select an Enemy Magic/Action card to destroy!");
             }
 
             nomoresummons = true;
