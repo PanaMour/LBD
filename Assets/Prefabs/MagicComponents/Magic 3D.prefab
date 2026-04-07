@@ -75,6 +75,7 @@ MonoBehaviour:
     changeDefense: 0
     equip: 0
     equipBoost: 0
+    magicType: 0
   thisId: 9
   id: 0
   magicName: 
@@ -116,6 +117,7 @@ MonoBehaviour:
   equip: 0
   equipBoost: 0
   equippedTo: {fileID: 0}
+  lastTargetedMonster: {fileID: 0}
 --- !u!114 &8262497931863256714
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,6 +481,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scaleMultiplier: 1.5
   liftAmount: 0.05
+  forwardAmount: -0.05
   smoothSpeed: 15
 --- !u!223 &2249666712005733853
 Canvas:
@@ -617,6 +620,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: MagicCardBack
+      objectReference: {fileID: 0}
+    - target: {fileID: 6311572886699624251, guid: 38aa6fb3979291443969e6997b90c7a4,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38aa6fb3979291443969e6997b90c7a4, type: 3}

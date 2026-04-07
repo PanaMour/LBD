@@ -112,6 +112,7 @@ MonoBehaviour:
   EnemyActionSockets: []
   Card: {fileID: 6605747384558647205, guid: ff16c307dc45ad148a11efef8b1789d4, type: 3}
   Magic: {fileID: 626048065440055933, guid: bda94aaab39f2c1449a145d10a629712, type: 3}
+  Action: {fileID: 5046316688007180663, guid: 01698656ce8277743969533412a312df, type: 3}
   CardToHand: {fileID: 1260750737870900169, guid: ddfaf1d468e354446bf7bf1c1c530a34,
     type: 3}
   CardsPlayed: 0
@@ -125,3 +126,12 @@ MonoBehaviour:
   TreasureChestPrefab: {fileID: 4900892709646839478, guid: 9acf395d02c23274eb7fd01b016365da,
     type: 3}
   TreasureTileColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  isTargeting: 0
+  isTargetingTile: 0
+  teleportMonsterCandidate: {fileID: 0}
+  sprintBoostActive: 0
+  sprintBoostTarget: {fileID: 0}
+  activeMagicCard: {fileID: 0}
+  currentTargetCriteria: 0
+  activeMonsterEffectCard: {fileID: 0}
+  pendingMonsterEffect: 

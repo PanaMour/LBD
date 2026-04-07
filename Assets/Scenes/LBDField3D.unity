@@ -253,9 +253,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &4008775
 GameObject:
   m_ObjectHideFlags: 0
@@ -482,9 +486,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &7623416
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,9 +625,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &9990048
 GameObject:
   m_ObjectHideFlags: 0
@@ -1045,9 +1057,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &21828494
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1265,9 +1281,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &26298786
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1739,9 +1759,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &42187798
 GameObject:
   m_ObjectHideFlags: 0
@@ -1874,9 +1898,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &46169388
 GameObject:
   m_ObjectHideFlags: 0
@@ -2009,9 +2037,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &49214253
 GameObject:
   m_ObjectHideFlags: 0
@@ -2075,9 +2107,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &49214257
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2364,9 +2400,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &56784792
 GameObject:
   m_ObjectHideFlags: 0
@@ -2430,9 +2470,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &56784796
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2556,9 +2600,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &58905753
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2776,9 +2824,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &68200130
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2902,9 +2954,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &79097658
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3161,9 +3217,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &86677927
 GameObject:
   m_ObjectHideFlags: 0
@@ -3296,9 +3356,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &91769666
 GameObject:
   m_ObjectHideFlags: 0
@@ -3431,9 +3495,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &93837197
 GameObject:
   m_ObjectHideFlags: 0
@@ -3497,9 +3565,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &93837201
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3623,9 +3695,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &97633277
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3912,9 +3988,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &99666028
 GameObject:
   m_ObjectHideFlags: 0
@@ -4166,9 +4246,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &104005234
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4361,9 +4445,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &108554530
 GameObject:
   m_ObjectHideFlags: 0
@@ -4496,9 +4584,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &111808650
 GameObject:
   m_ObjectHideFlags: 0
@@ -4631,9 +4723,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &112426965
 GameObject:
   m_ObjectHideFlags: 0
@@ -4766,9 +4862,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &115202114
 GameObject:
   m_ObjectHideFlags: 0
@@ -4995,9 +5095,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &121039996
 GameObject:
   m_ObjectHideFlags: 0
@@ -5130,9 +5234,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &122756339
 GameObject:
   m_ObjectHideFlags: 0
@@ -5265,9 +5373,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &126190042
 GameObject:
   m_ObjectHideFlags: 0
@@ -5494,9 +5606,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &133910737
 GameObject:
   m_ObjectHideFlags: 0
@@ -5560,9 +5676,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &133910741
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5686,9 +5806,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &134965386
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5906,9 +6030,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &141259449
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -6101,9 +6229,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &148215423
 GameObject:
   m_ObjectHideFlags: 0
@@ -6330,9 +6462,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &150582993
 GameObject:
   m_ObjectHideFlags: 0
@@ -6426,7 +6562,7 @@ Transform:
   - {fileID: 1728251756}
   - {fileID: 13700036}
   m_Father: {fileID: 0}
-  m_RootOrder: 12
+  m_RootOrder: 13
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &157499501
 GameObject:
@@ -6560,9 +6696,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!4 &161426102 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4228710486485710762, guid: 3c0972941b5babd40b4b1bf1d158eed3,
@@ -6820,9 +6960,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &174051099
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7134,9 +7278,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &179795994
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7260,9 +7408,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &180225528
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7455,9 +7607,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &188394289
 GameObject:
   m_ObjectHideFlags: 0
@@ -7521,9 +7677,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &188394293
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -7716,9 +7876,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &196341948
 GameObject:
   m_ObjectHideFlags: 0
@@ -7851,9 +8015,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &206265369
 GameObject:
   m_ObjectHideFlags: 0
@@ -8080,9 +8248,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &208371488
 GameObject:
   m_ObjectHideFlags: 0
@@ -8403,9 +8575,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &225108895
 GameObject:
   m_ObjectHideFlags: 0
@@ -8469,9 +8645,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &225108899
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8595,9 +8775,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &229221551
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8790,9 +8974,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &231296110
 GameObject:
   m_ObjectHideFlags: 0
@@ -8856,9 +9044,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &231296114
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9051,9 +9243,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &238608255
 GameObject:
   m_ObjectHideFlags: 0
@@ -9280,9 +9476,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &242212624
 GameObject:
   m_ObjectHideFlags: 0
@@ -9415,9 +9615,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &242952025
 GameObject:
   m_ObjectHideFlags: 0
@@ -9550,9 +9754,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &243010638
 GameObject:
   m_ObjectHideFlags: 0
@@ -9685,9 +9893,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &248866722
 GameObject:
   m_ObjectHideFlags: 0
@@ -9820,9 +10032,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &249256357
 GameObject:
   m_ObjectHideFlags: 0
@@ -9955,9 +10171,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &255581190
 GameObject:
   m_ObjectHideFlags: 0
@@ -10021,9 +10241,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &255581194
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10216,9 +10440,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &268695326
 GameObject:
   m_ObjectHideFlags: 0
@@ -10282,9 +10510,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &268695330
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -10477,9 +10709,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &281374163
 GameObject:
   m_ObjectHideFlags: 0
@@ -10612,9 +10848,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &283698253
 GameObject:
   m_ObjectHideFlags: 0
@@ -10747,9 +10987,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &284033659
 GameObject:
   m_ObjectHideFlags: 0
@@ -10882,9 +11126,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &287619854
 GameObject:
   m_ObjectHideFlags: 0
@@ -11111,9 +11359,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &292773411
 GameObject:
   m_ObjectHideFlags: 0
@@ -11246,9 +11498,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &296611077
 GameObject:
   m_ObjectHideFlags: 0
@@ -11381,9 +11637,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &297749149
 GameObject:
   m_ObjectHideFlags: 0
@@ -11516,9 +11776,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &298652641
 GameObject:
   m_ObjectHideFlags: 0
@@ -11651,9 +11915,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &299125123
 GameObject:
   m_ObjectHideFlags: 0
@@ -11974,9 +12242,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &301144210
 GameObject:
   m_ObjectHideFlags: 0
@@ -12109,9 +12381,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &304522720
 GameObject:
   m_ObjectHideFlags: 0
@@ -12244,9 +12520,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &307223638
 GameObject:
   m_ObjectHideFlags: 0
@@ -12379,9 +12659,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &319054270
 GameObject:
   m_ObjectHideFlags: 0
@@ -12514,9 +12798,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &319639524
 GameObject:
   m_ObjectHideFlags: 0
@@ -12649,9 +12937,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &319644715
 GameObject:
   m_ObjectHideFlags: 0
@@ -12878,9 +13170,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &329075533
 GameObject:
   m_ObjectHideFlags: 0
@@ -13038,9 +13334,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &334831000
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13233,9 +13533,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &340220443
 GameObject:
   m_ObjectHideFlags: 0
@@ -13299,9 +13603,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &340220447
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13425,9 +13733,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &341647186
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13551,9 +13863,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &349578308
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13840,9 +14156,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1001 &352276157
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -13908,7 +14228,7 @@ PrefabInstance:
     - target: {fileID: 4114058636836021151, guid: b069d65f34299c44da208f895f561d81,
         type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4114058636836021151, guid: b069d65f34299c44da208f895f561d81,
         type: 3}
@@ -14045,9 +14365,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &353430436
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14334,9 +14658,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &358040713
 GameObject:
   m_ObjectHideFlags: 0
@@ -14469,9 +14797,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &359257938
 GameObject:
   m_ObjectHideFlags: 0
@@ -14535,9 +14867,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &359257942
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -14830,9 +15166,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &363226568
 GameObject:
   m_ObjectHideFlags: 0
@@ -14896,9 +15236,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &363226572
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15210,9 +15554,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &372670517
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15405,9 +15753,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &379937133
 GameObject:
   m_ObjectHideFlags: 0
@@ -15565,9 +15917,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &390449567
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15691,9 +16047,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &390758801
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15817,9 +16177,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &391338067
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -15943,9 +16307,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &393257532
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16138,9 +16506,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &402565649
 GameObject:
   m_ObjectHideFlags: 0
@@ -16273,9 +16645,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &405782586
 GameObject:
   m_ObjectHideFlags: 0
@@ -16433,9 +16809,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &406762341
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16559,9 +16939,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &409303259
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16942,9 +17326,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &419324421
 GameObject:
   m_ObjectHideFlags: 0
@@ -17008,9 +17396,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &419324425
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -17203,9 +17595,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &431699675
 GameObject:
   m_ObjectHideFlags: 0
@@ -17363,9 +17759,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &432697434
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -17570,9 +17970,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &434867594
 GameObject:
   m_ObjectHideFlags: 0
@@ -17705,9 +18109,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &437319111
 GameObject:
   m_ObjectHideFlags: 0
@@ -17840,9 +18248,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &437665277 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 622265350588184770, guid: e17e669271b796e4ba12e85e6709234e,
@@ -18237,9 +18649,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &441018536
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18432,9 +18848,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &445383456
 GameObject:
   m_ObjectHideFlags: 0
@@ -18567,9 +18987,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &445504420
 GameObject:
   m_ObjectHideFlags: 0
@@ -18847,9 +19271,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &446243738
 GameObject:
   m_ObjectHideFlags: 0
@@ -19076,9 +19504,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &453917290
 GameObject:
   m_ObjectHideFlags: 0
@@ -19211,9 +19643,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &455355083
 GameObject:
   m_ObjectHideFlags: 0
@@ -19346,9 +19782,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &457381979
 GameObject:
   m_ObjectHideFlags: 0
@@ -19481,9 +19921,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &457981358
 GameObject:
   m_ObjectHideFlags: 0
@@ -19710,9 +20154,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &462466361
 GameObject:
   m_ObjectHideFlags: 0
@@ -20092,9 +20540,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &464928605
 GameObject:
   m_ObjectHideFlags: 0
@@ -20227,9 +20679,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &466618495
 GameObject:
   m_ObjectHideFlags: 0
@@ -20387,9 +20843,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &469226688
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20582,9 +21042,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &471307997
 GameObject:
   m_ObjectHideFlags: 0
@@ -20648,9 +21112,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &471308001
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -20843,9 +21311,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &472176421
 GameObject:
   m_ObjectHideFlags: 0
@@ -20978,9 +21450,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &472342676
 GameObject:
   m_ObjectHideFlags: 0
@@ -21113,9 +21589,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &473956246
 GameObject:
   m_ObjectHideFlags: 0
@@ -21248,9 +21728,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &476586630
 GameObject:
   m_ObjectHideFlags: 0
@@ -21314,9 +21798,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &476586634
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21697,9 +22185,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &488238704
 GameObject:
   m_ObjectHideFlags: 0
@@ -21763,9 +22255,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &488238708
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -21958,9 +22454,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &506519316
 GameObject:
   m_ObjectHideFlags: 0
@@ -22093,9 +22593,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &508808563
 GameObject:
   m_ObjectHideFlags: 0
@@ -22253,9 +22757,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &509472546
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -22448,9 +22956,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &515452467
 GameObject:
   m_ObjectHideFlags: 0
@@ -22583,9 +23095,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!224 &516803741 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2274515994277818387, guid: 70650ca29dfcfbf42a6e33582762a5d7,
@@ -22938,9 +23454,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &530939778
 GameObject:
   m_ObjectHideFlags: 0
@@ -23073,9 +23593,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &533442175
 GameObject:
   m_ObjectHideFlags: 0
@@ -23139,9 +23663,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &533442179
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -23334,9 +23862,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!4 &540184434 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5495892532785397712, guid: d2716b0019f94f8479af75c2a98efdb7,
@@ -23475,9 +24007,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &543916931
 GameObject:
   m_ObjectHideFlags: 0
@@ -23610,9 +24146,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &546987378
 GameObject:
   m_ObjectHideFlags: 0
@@ -23745,9 +24285,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &554851354
 GameObject:
   m_ObjectHideFlags: 0
@@ -23889,9 +24433,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &555957900
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -24084,9 +24632,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &566378397
 GameObject:
   m_ObjectHideFlags: 0
@@ -24150,9 +24702,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &566378401
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -24345,9 +24901,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &574549239
 GameObject:
   m_ObjectHideFlags: 0
@@ -24411,9 +24971,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &574549243
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -24606,9 +25170,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &580303725
 GameObject:
   m_ObjectHideFlags: 0
@@ -24741,9 +25309,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &584399078
 GameObject:
   m_ObjectHideFlags: 0
@@ -25064,9 +25636,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &586817392
 GameObject:
   m_ObjectHideFlags: 0
@@ -25199,9 +25775,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &588849345
 GameObject:
   m_ObjectHideFlags: 0
@@ -25428,9 +26008,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &591337017
 GameObject:
   m_ObjectHideFlags: 0
@@ -25657,9 +26241,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &617756337
 GameObject:
   m_ObjectHideFlags: 0
@@ -25886,9 +26474,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &622553617
 GameObject:
   m_ObjectHideFlags: 0
@@ -26021,9 +26613,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &623803224
 GameObject:
   m_ObjectHideFlags: 0
@@ -26156,9 +26752,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &625605311
 GameObject:
   m_ObjectHideFlags: 0
@@ -26222,9 +26822,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &625605315
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -26348,9 +26952,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &627953642
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -26543,9 +27151,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &642915691
 GameObject:
   m_ObjectHideFlags: 0
@@ -26899,9 +27511,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &659815798
 GameObject:
   m_ObjectHideFlags: 0
@@ -26965,9 +27581,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &659815802
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -27254,9 +27874,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &668010781
 GameObject:
   m_ObjectHideFlags: 0
@@ -27389,9 +28013,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &669657941
 GameObject:
   m_ObjectHideFlags: 0
@@ -27618,9 +28246,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &670092004
 GameObject:
   m_ObjectHideFlags: 0
@@ -27753,9 +28385,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &670171214
 GameObject:
   m_ObjectHideFlags: 0
@@ -27888,9 +28524,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &672001034
 GameObject:
   m_ObjectHideFlags: 0
@@ -27954,9 +28594,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &672001038
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -28174,9 +28818,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &674930678
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -28394,9 +29042,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &684821272
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -28589,9 +29241,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &695644927
 GameObject:
   m_ObjectHideFlags: 0
@@ -28912,9 +29568,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &701801278
 GameObject:
   m_ObjectHideFlags: 0
@@ -29047,9 +29707,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &705341882
 GameObject:
   m_ObjectHideFlags: 0
@@ -29492,9 +30156,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &716594965
 GameObject:
   m_ObjectHideFlags: 0
@@ -29652,9 +30320,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &721926310
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -29847,9 +30519,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &725835624
 GameObject:
   m_ObjectHideFlags: 0
@@ -30195,9 +30871,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &738053437
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -30484,9 +31164,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &739316459
 GameObject:
   m_ObjectHideFlags: 0
@@ -30773,9 +31457,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &741404290
 GameObject:
   m_ObjectHideFlags: 0
@@ -30839,9 +31527,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &741404294
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31034,9 +31726,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &747510855
 GameObject:
   m_ObjectHideFlags: 0
@@ -31191,9 +31887,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &747636881
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31411,9 +32111,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &761741723
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31631,9 +32335,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &770207361
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -31826,9 +32534,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &776283515
 GameObject:
   m_ObjectHideFlags: 0
@@ -31961,9 +32673,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &776378650
 GameObject:
   m_ObjectHideFlags: 0
@@ -32096,9 +32812,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &781898745
 GameObject:
   m_ObjectHideFlags: 0
@@ -32256,9 +32976,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &784887602
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -32496,9 +33220,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &790851985
 GameObject:
   m_ObjectHideFlags: 0
@@ -32656,9 +33384,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &791392386
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -32782,9 +33514,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &792027227
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -32977,9 +33713,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &796606695
 GameObject:
   m_ObjectHideFlags: 0
@@ -33300,9 +34040,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &801445435
 GameObject:
   m_ObjectHideFlags: 0
@@ -33435,9 +34179,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &804217356
 GameObject:
   m_ObjectHideFlags: 0
@@ -33532,6 +34280,80 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 804217356}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1001 &806528660
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 973.6685
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 571.54004
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -231.3385
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 804105169003055592, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 998660232865028215, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: m_Name
+      value: ActionDataBase
+      objectReference: {fileID: 0}
+    - target: {fileID: 8574958405506267945, guid: 2ee4ed405674c3c47a708decce67faf5,
+        type: 3}
+      propertyPath: sceneId
+      value: 4238357173
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 2ee4ed405674c3c47a708decce67faf5, type: 3}
 --- !u!1 &810901863
 GameObject:
   m_ObjectHideFlags: 0
@@ -33664,9 +34486,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &810928468
 GameObject:
   m_ObjectHideFlags: 0
@@ -33799,9 +34625,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &812590947
 GameObject:
   m_ObjectHideFlags: 0
@@ -33838,7 +34668,7 @@ Transform:
   - {fileID: 1704505966002022797}
   - {fileID: 1704505965765347216}
   m_Father: {fileID: 0}
-  m_RootOrder: 13
+  m_RootOrder: 14
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &812827303
 GameObject:
@@ -34160,9 +34990,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!4 &822910589 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1840930240853087231, guid: a69dc5be726dc644fb3bf22af10e0814,
@@ -34301,9 +35135,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &825751421
 GameObject:
   m_ObjectHideFlags: 0
@@ -34436,9 +35274,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &828705005
 GameObject:
   m_ObjectHideFlags: 0
@@ -34665,9 +35507,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &830130118
 GameObject:
   m_ObjectHideFlags: 0
@@ -34731,9 +35577,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &830130122
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -34926,9 +35776,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &843097016
 GameObject:
   m_ObjectHideFlags: 0
@@ -35061,9 +35915,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &847369275
 GameObject:
   m_ObjectHideFlags: 0
@@ -35196,9 +36054,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &854584256
 GameObject:
   m_ObjectHideFlags: 0
@@ -35331,9 +36193,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &858703010
 GameObject:
   m_ObjectHideFlags: 0
@@ -35466,9 +36332,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &859250621
 GameObject:
   m_ObjectHideFlags: 0
@@ -35601,9 +36471,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &859352516
 GameObject:
   m_ObjectHideFlags: 0
@@ -35736,9 +36610,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &859799300
 GameObject:
   m_ObjectHideFlags: 0
@@ -35802,9 +36680,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &859799304
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -36091,9 +36973,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &867769744
 GameObject:
   m_ObjectHideFlags: 0
@@ -36226,9 +37112,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &872601910
 GameObject:
   m_ObjectHideFlags: 0
@@ -36292,9 +37182,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &872601914
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -36675,9 +37569,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &876712911
 GameObject:
   m_ObjectHideFlags: 0
@@ -36835,9 +37733,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &881531420
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -37124,9 +38026,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &893586056
 GameObject:
   m_ObjectHideFlags: 0
@@ -37259,9 +38165,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &896415521
 GameObject:
   m_ObjectHideFlags: 0
@@ -37325,9 +38235,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &896415525
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -37586,9 +38500,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &900911024
 GameObject:
   m_ObjectHideFlags: 0
@@ -37652,9 +38570,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &900911028
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -37847,9 +38769,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &906688492
 GameObject:
   m_ObjectHideFlags: 0
@@ -37982,9 +38908,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &908650575
 GameObject:
   m_ObjectHideFlags: 0
@@ -38211,9 +39141,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &911246377
 GameObject:
   m_ObjectHideFlags: 0
@@ -38440,9 +39374,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &916367906
 GameObject:
   m_ObjectHideFlags: 0
@@ -38669,9 +39607,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &920892963
 GameObject:
   m_ObjectHideFlags: 0
@@ -38730,7 +39672,7 @@ Transform:
   - {fileID: 440967202}
   - {fileID: 1479078477}
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &925818938
 GameObject:
@@ -38795,9 +39737,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &925818942
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -38990,9 +39936,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &931846274
 GameObject:
   m_ObjectHideFlags: 0
@@ -39125,9 +40075,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &932903583
 GameObject:
   m_ObjectHideFlags: 0
@@ -39221,9 +40175,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &932912273
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -39347,9 +40305,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &942124582
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -39542,9 +40504,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &944473620
 GameObject:
   m_ObjectHideFlags: 0
@@ -39677,9 +40643,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &958063545
 GameObject:
   m_ObjectHideFlags: 0
@@ -39812,9 +40782,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &961626585
 GameObject:
   m_ObjectHideFlags: 0
@@ -39878,9 +40852,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &961626589
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -40004,9 +40982,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &961697536
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -40199,9 +41181,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &964941701
 GameObject:
   m_ObjectHideFlags: 0
@@ -40265,9 +41251,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &964941705
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -40460,9 +41450,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &966454416
 GameObject:
   m_ObjectHideFlags: 0
@@ -40595,9 +41589,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &967372830
 GameObject:
   m_ObjectHideFlags: 0
@@ -40730,9 +41728,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &967404594
 GameObject:
   m_ObjectHideFlags: 0
@@ -40796,9 +41798,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &967404598
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -41085,9 +42091,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &972885384
 GameObject:
   m_ObjectHideFlags: 0
@@ -41151,9 +42161,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &972885388
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -41420,9 +42434,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &993766450
 GameObject:
   m_ObjectHideFlags: 0
@@ -41555,9 +42573,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &999514458
 GameObject:
   m_ObjectHideFlags: 0
@@ -41715,9 +42737,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1002738274
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -41814,7 +42840,7 @@ Transform:
   - {fileID: 161426102}
   - {fileID: 822910589}
   m_Father: {fileID: 0}
-  m_RootOrder: 14
+  m_RootOrder: 15
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1023464945
 GameObject:
@@ -41879,9 +42905,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1023464949
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -42074,9 +43104,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!4 &1033547152 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3595893243499714432, guid: c2b8e0a6e2826504eb813d05a4148b21,
@@ -42215,9 +43249,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1037050174
 GameObject:
   m_ObjectHideFlags: 0
@@ -42281,9 +43319,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1037050178
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -42476,9 +43518,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1042519637
 GameObject:
   m_ObjectHideFlags: 0
@@ -42611,9 +43657,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1057684896
 GameObject:
   m_ObjectHideFlags: 0
@@ -42677,9 +43727,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1057684900
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -42872,9 +43926,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1066823772
 GameObject:
   m_ObjectHideFlags: 0
@@ -43007,9 +44065,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1078701045
 GameObject:
   m_ObjectHideFlags: 0
@@ -43236,9 +44298,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1084831658
 GameObject:
   m_ObjectHideFlags: 0
@@ -43371,9 +44437,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1085569018
 GameObject:
   m_ObjectHideFlags: 0
@@ -43600,9 +44670,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1089046672
 GameObject:
   m_ObjectHideFlags: 0
@@ -43735,9 +44809,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1090172147
 GameObject:
   m_ObjectHideFlags: 0
@@ -43870,9 +44948,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1092831530
 GameObject:
   m_ObjectHideFlags: 0
@@ -44099,9 +45181,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1095745796
 GameObject:
   m_ObjectHideFlags: 0
@@ -44541,9 +45627,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1104616892
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -44667,9 +45757,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1105314632
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -44793,9 +45887,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1106163135
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -45082,9 +46180,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1112369877
 GameObject:
   m_ObjectHideFlags: 0
@@ -45217,9 +46319,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1112995804
 GameObject:
   m_ObjectHideFlags: 0
@@ -45352,9 +46458,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1115197280
 GameObject:
   m_ObjectHideFlags: 0
@@ -45487,9 +46597,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1116198292
 GameObject:
   m_ObjectHideFlags: 0
@@ -45553,9 +46667,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1116198296
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -45748,9 +46866,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1119743553
 GameObject:
   m_ObjectHideFlags: 0
@@ -45883,9 +47005,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1120351892
 GameObject:
   m_ObjectHideFlags: 0
@@ -46112,9 +47238,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1121578285
 GameObject:
   m_ObjectHideFlags: 0
@@ -46247,9 +47377,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1122314853
 GameObject:
   m_ObjectHideFlags: 0
@@ -46476,9 +47610,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1125447348
 GameObject:
   m_ObjectHideFlags: 0
@@ -46611,9 +47749,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!224 &1128299170 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4382750326876760128, guid: 6aa4d31d56d545647940bf0bc3b35a06,
@@ -46752,9 +47894,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1131702770
 GameObject:
   m_ObjectHideFlags: 0
@@ -46887,9 +48033,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1132405331
 GameObject:
   m_ObjectHideFlags: 0
@@ -46953,9 +48103,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1132405335
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -47242,9 +48396,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1158396271
 GameObject:
   m_ObjectHideFlags: 0
@@ -47377,9 +48535,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1158924274
 GameObject:
   m_ObjectHideFlags: 0
@@ -47443,9 +48605,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1158924278
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -47638,9 +48804,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1160037085
 GameObject:
   m_ObjectHideFlags: 0
@@ -47961,9 +49131,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1167314707
 GameObject:
   m_ObjectHideFlags: 0
@@ -48096,9 +49270,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1172599220
 GameObject:
   m_ObjectHideFlags: 0
@@ -48162,9 +49340,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1172599224
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -48288,9 +49470,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1173265262
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -48577,9 +49763,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1179179958
 GameObject:
   m_ObjectHideFlags: 0
@@ -48712,9 +49902,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1179848021
 GameObject:
   m_ObjectHideFlags: 0
@@ -48847,9 +50041,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1183620377
 GameObject:
   m_ObjectHideFlags: 0
@@ -48982,9 +50180,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1186385344
 GameObject:
   m_ObjectHideFlags: 0
@@ -49117,9 +50319,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1189927076
 GameObject:
   m_ObjectHideFlags: 0
@@ -49346,9 +50552,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1194946610
 GameObject:
   m_ObjectHideFlags: 0
@@ -49412,9 +50622,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1194946614
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -49538,9 +50752,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1195636095
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -49664,9 +50882,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1196858863
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -49884,9 +51106,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1210053695
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -50173,9 +51399,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1217603359
 GameObject:
   m_ObjectHideFlags: 0
@@ -50402,9 +51632,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1235009182
 GameObject:
   m_ObjectHideFlags: 0
@@ -50631,9 +51865,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1239783872
 GameObject:
   m_ObjectHideFlags: 0
@@ -50697,9 +51935,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1239783876
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -50823,9 +52065,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1243011812
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -51018,9 +52264,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1249274184
 GameObject:
   m_ObjectHideFlags: 0
@@ -51153,9 +52403,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1251096431
 GameObject:
   m_ObjectHideFlags: 0
@@ -51288,9 +52542,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1251486986
 GameObject:
   m_ObjectHideFlags: 0
@@ -51354,9 +52612,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1251486990
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -51643,9 +52905,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1258478729
 GameObject:
   m_ObjectHideFlags: 0
@@ -51709,9 +52975,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1258478733
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -51904,9 +53174,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1267679169
 GameObject:
   m_ObjectHideFlags: 0
@@ -51970,9 +53244,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1267679173
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -52165,9 +53443,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1279191541
 GameObject:
   m_ObjectHideFlags: 0
@@ -52231,9 +53513,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1279191545
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -52520,9 +53806,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1289635699
 GameObject:
   m_ObjectHideFlags: 0
@@ -52680,9 +53970,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1293497014
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -52806,9 +54100,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1294199856
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -53001,9 +54299,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1300548174
 GameObject:
   m_ObjectHideFlags: 0
@@ -53136,9 +54438,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1301345670
 GameObject:
   m_ObjectHideFlags: 0
@@ -53365,9 +54671,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1001 &1308938655
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -53644,9 +54954,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1315004879
 GameObject:
   m_ObjectHideFlags: 0
@@ -53804,9 +55118,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1315994809
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -53999,9 +55317,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1323107300
 GameObject:
   m_ObjectHideFlags: 0
@@ -54134,9 +55456,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1324974637
 GameObject:
   m_ObjectHideFlags: 0
@@ -54269,9 +55595,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1331842504
 GameObject:
   m_ObjectHideFlags: 0
@@ -54335,9 +55665,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1331842508
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -54530,9 +55864,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1349810000
 GameObject:
   m_ObjectHideFlags: 0
@@ -54665,9 +56003,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1352506674
 GameObject:
   m_ObjectHideFlags: 0
@@ -54800,9 +56142,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1353511170
 GameObject:
   m_ObjectHideFlags: 0
@@ -54935,9 +56281,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1354206004
 GameObject:
   m_ObjectHideFlags: 0
@@ -55070,9 +56420,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1355185660
 GameObject:
   m_ObjectHideFlags: 0
@@ -55136,9 +56490,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1355185664
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -55331,9 +56689,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1357912419
 GameObject:
   m_ObjectHideFlags: 0
@@ -55397,9 +56759,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1357912423
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -55592,9 +56958,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!224 &1363641695 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7247852543703541657, guid: b4107ab785f4e0c42978d419e44c8809,
@@ -55664,9 +57034,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1366736546
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -55953,9 +57327,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1370760179
 GameObject:
   m_ObjectHideFlags: 0
@@ -56088,9 +57466,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1374830738
 GameObject:
   m_ObjectHideFlags: 0
@@ -56223,9 +57605,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1379443756
 GameObject:
   m_ObjectHideFlags: 0
@@ -56383,9 +57769,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1380615758
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -56578,9 +57968,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1397817754
 GameObject:
   m_ObjectHideFlags: 0
@@ -56644,9 +58038,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1397817758
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -56839,9 +58237,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1401752427
 GameObject:
   m_ObjectHideFlags: 0
@@ -56974,9 +58376,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1402191350
 GameObject:
   m_ObjectHideFlags: 0
@@ -57040,9 +58446,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1402191354
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -57329,9 +58739,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1406751047
 GameObject:
   m_ObjectHideFlags: 0
@@ -57464,9 +58878,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!4 &1406993438 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5364241084560152000, guid: fb9758d36632e7d46827edf0159ccc48,
@@ -57605,9 +59023,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1417446845
 GameObject:
   m_ObjectHideFlags: 0
@@ -57740,9 +59162,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1419615366
 GameObject:
   m_ObjectHideFlags: 0
@@ -57806,9 +59232,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1419615370
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -58130,9 +59560,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1428708558
 GameObject:
   m_ObjectHideFlags: 0
@@ -58265,9 +59699,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1429409102
 GameObject:
   m_ObjectHideFlags: 0
@@ -58400,9 +59838,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1431394757
 GameObject:
   m_ObjectHideFlags: 0
@@ -58654,9 +60096,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1438671411
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -58780,9 +60226,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1446108997
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -59069,9 +60519,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1459182979
 GameObject:
   m_ObjectHideFlags: 0
@@ -59204,9 +60658,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1462692261
 GameObject:
   m_ObjectHideFlags: 0
@@ -59270,9 +60728,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1462692265
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -59465,9 +60927,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1464081479
 GameObject:
   m_ObjectHideFlags: 0
@@ -59531,9 +60997,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1464081483
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -59751,9 +61221,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1465879713
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -60134,9 +61608,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1473066971
 GameObject:
   m_ObjectHideFlags: 0
@@ -60200,9 +61678,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1473066975
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -60395,9 +61877,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1477769157
 GameObject:
   m_ObjectHideFlags: 0
@@ -60624,9 +62110,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1479078476
 GameObject:
   m_ObjectHideFlags: 0
@@ -60896,9 +62386,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1480398977
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -61022,9 +62516,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1481261529
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -61148,9 +62646,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1486971716
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -61437,9 +62939,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1493132632
 GameObject:
   m_ObjectHideFlags: 0
@@ -61503,9 +63009,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1493132636
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -61698,9 +63208,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1498215657
 GameObject:
   m_ObjectHideFlags: 0
@@ -61833,9 +63347,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1499278125
 GameObject:
   m_ObjectHideFlags: 0
@@ -61968,9 +63486,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1500307427
 GameObject:
   m_ObjectHideFlags: 0
@@ -62103,9 +63625,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1501375592
 GameObject:
   m_ObjectHideFlags: 0
@@ -62169,9 +63695,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1501375596
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -62364,9 +63894,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1505497224
 GameObject:
   m_ObjectHideFlags: 0
@@ -62593,9 +64127,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1516492021
 GameObject:
   m_ObjectHideFlags: 0
@@ -62822,9 +64360,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1528150946
 GameObject:
   m_ObjectHideFlags: 0
@@ -62957,9 +64499,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1529369582
 GameObject:
   m_ObjectHideFlags: 0
@@ -63092,9 +64638,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1530066416
 GameObject:
   m_ObjectHideFlags: 0
@@ -63227,9 +64777,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1533722228
 GameObject:
   m_ObjectHideFlags: 0
@@ -63362,9 +64916,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!4 &1535102564 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6680935204193171073, guid: 0ba6d2ee81683ff4a9c7956e2d29a20b,
@@ -63528,9 +65086,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1549607682
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -63654,9 +65216,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1550291306
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -63849,9 +65415,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1552093791
 GameObject:
   m_ObjectHideFlags: 0
@@ -64156,9 +65726,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!4 &1555448012 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 8581752065514058752, guid: 8309bebd291a9e445a16315ddb5fc10c,
@@ -64391,9 +65965,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1585434581
 GameObject:
   m_ObjectHideFlags: 0
@@ -64526,9 +66104,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1589294769
 GameObject:
   m_ObjectHideFlags: 0
@@ -64661,9 +66243,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1595797684
 GameObject:
   m_ObjectHideFlags: 0
@@ -64796,9 +66382,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1596203285
 GameObject:
   m_ObjectHideFlags: 0
@@ -64931,9 +66521,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1605159301
 GameObject:
   m_ObjectHideFlags: 0
@@ -64997,9 +66591,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1605159305
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -65192,9 +66790,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1613270620
 GameObject:
   m_ObjectHideFlags: 0
@@ -65258,9 +66860,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1613270624
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -65453,9 +67059,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1615159996
 GameObject:
   m_ObjectHideFlags: 0
@@ -65613,9 +67223,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1615866947
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -65739,9 +67353,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1621240053
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -65934,9 +67552,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1624604363
 GameObject:
   m_ObjectHideFlags: 0
@@ -66163,9 +67785,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1627103370
 GameObject:
   m_ObjectHideFlags: 0
@@ -66229,9 +67855,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1627103374
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -66424,9 +68054,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1628695458
 GameObject:
   m_ObjectHideFlags: 0
@@ -66559,9 +68193,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1635992195
 GameObject:
   m_ObjectHideFlags: 0
@@ -66625,9 +68263,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1635992199
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -66820,9 +68462,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1649816664
 GameObject:
   m_ObjectHideFlags: 0
@@ -66955,9 +68601,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1654068015
 GameObject:
   m_ObjectHideFlags: 0
@@ -67021,9 +68671,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1654068019
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -67216,9 +68870,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1660551992
 GameObject:
   m_ObjectHideFlags: 0
@@ -67282,9 +68940,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1660551996
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -67408,9 +69070,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1664017764
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -67603,9 +69269,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1666766705
 GameObject:
   m_ObjectHideFlags: 0
@@ -67669,9 +69339,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1666766709
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -67889,9 +69563,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1670161509
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -68295,9 +69973,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1674856506
 GameObject:
   m_ObjectHideFlags: 0
@@ -68430,9 +70112,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1680908320
 GameObject:
   m_ObjectHideFlags: 0
@@ -68778,9 +70464,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1686439778
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -69067,9 +70757,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1690142882
 GameObject:
   m_ObjectHideFlags: 0
@@ -69321,9 +71015,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1695637203
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -69453,9 +71151,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1699771391
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -69673,9 +71375,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1700375641
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -69868,9 +71574,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1702387132
 GameObject:
   m_ObjectHideFlags: 0
@@ -70097,9 +71807,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1711569494
 GameObject:
   m_ObjectHideFlags: 0
@@ -70232,9 +71946,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1712923041
 GameObject:
   m_ObjectHideFlags: 0
@@ -70461,9 +72179,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1714618518
 GameObject:
   m_ObjectHideFlags: 0
@@ -70527,9 +72249,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1714618522
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -70728,9 +72454,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1720837754
 GameObject:
   m_ObjectHideFlags: 0
@@ -70863,9 +72593,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1722606025
 GameObject:
   m_ObjectHideFlags: 0
@@ -70998,9 +72732,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1723317253
 GameObject:
   m_ObjectHideFlags: 0
@@ -71158,9 +72896,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1723479831
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -71353,9 +73095,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1727214268
 GameObject:
   m_ObjectHideFlags: 0
@@ -71488,9 +73234,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!4 &1728251756 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2968225061104867840, guid: 5ce6013ffccf9c3438c30b9d11502322,
@@ -71560,9 +73310,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1729694059
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -71755,9 +73509,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1731325195
 GameObject:
   m_ObjectHideFlags: 0
@@ -71821,9 +73579,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1731325199
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -72016,9 +73778,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1738388717
 GameObject:
   m_ObjectHideFlags: 0
@@ -72245,9 +74011,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1739838931
 GameObject:
   m_ObjectHideFlags: 0
@@ -72311,9 +74081,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1739838935
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -72600,9 +74374,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1747164855
 GameObject:
   m_ObjectHideFlags: 0
@@ -72760,9 +74538,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1750091807
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -73221,9 +75003,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1766369904
 GameObject:
   m_ObjectHideFlags: 0
@@ -73314,7 +75100,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1773757201
 GameObject:
@@ -73448,9 +75234,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1775006228
 GameObject:
   m_ObjectHideFlags: 0
@@ -73583,9 +75373,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1779477512
 GameObject:
   m_ObjectHideFlags: 0
@@ -73743,9 +75537,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1786726484
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -73938,9 +75736,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1793526434
 GameObject:
   m_ObjectHideFlags: 0
@@ -74073,9 +75875,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1794294480
 GameObject:
   m_ObjectHideFlags: 0
@@ -74208,9 +76014,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1795362110
 GameObject:
   m_ObjectHideFlags: 0
@@ -74343,9 +76153,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1799169972
 GameObject:
   m_ObjectHideFlags: 0
@@ -74478,9 +76292,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1799649859
 GameObject:
   m_ObjectHideFlags: 0
@@ -74613,9 +76431,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1805413149
 GameObject:
   m_ObjectHideFlags: 0
@@ -74748,9 +76570,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1806901419
 GameObject:
   m_ObjectHideFlags: 0
@@ -75071,9 +76897,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1814435792
 GameObject:
   m_ObjectHideFlags: 0
@@ -75137,9 +76967,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1814435796
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -75263,9 +77097,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1816341894
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -75389,9 +77227,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1820480954
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -75584,9 +77426,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1830882324
 GameObject:
   m_ObjectHideFlags: 0
@@ -75719,9 +77565,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1836481250
 GameObject:
   m_ObjectHideFlags: 0
@@ -75854,9 +77704,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1837904417
 GameObject:
   m_ObjectHideFlags: 0
@@ -75920,9 +77774,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1837904421
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -76115,9 +77973,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1842110221
 GameObject:
   m_ObjectHideFlags: 0
@@ -76250,9 +78112,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1842970440
 GameObject:
   m_ObjectHideFlags: 0
@@ -76385,9 +78251,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1846218745
 GameObject:
   m_ObjectHideFlags: 0
@@ -76520,9 +78390,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1846320118
 GameObject:
   m_ObjectHideFlags: 0
@@ -76868,9 +78742,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1858173184
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -77024,9 +78902,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1863232999
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -77219,9 +79101,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1869976054
 GameObject:
   m_ObjectHideFlags: 0
@@ -77448,9 +79334,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1873797591
 GameObject:
   m_ObjectHideFlags: 0
@@ -77583,9 +79473,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1874146767
 GameObject:
   m_ObjectHideFlags: 0
@@ -77649,9 +79543,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1874146771
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -77775,9 +79673,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1875760985
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -77901,9 +79803,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1877764173
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -78096,9 +80002,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1880864240
 GameObject:
   m_ObjectHideFlags: 0
@@ -78162,9 +80072,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1880864244
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -78357,9 +80271,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1887419383
 GameObject:
   m_ObjectHideFlags: 0
@@ -78492,9 +80410,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1895576993
 GameObject:
   m_ObjectHideFlags: 0
@@ -78627,9 +80549,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1895819601
 GameObject:
   m_ObjectHideFlags: 0
@@ -78693,9 +80619,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1895819605
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -78888,9 +80818,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1897483551
 GameObject:
   m_ObjectHideFlags: 0
@@ -79023,9 +80957,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1898961047
 GameObject:
   m_ObjectHideFlags: 0
@@ -79158,9 +81096,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1904218203
 GameObject:
   m_ObjectHideFlags: 0
@@ -79387,9 +81329,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1907769790
 GameObject:
   m_ObjectHideFlags: 0
@@ -79522,9 +81468,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1910723794
 GameObject:
   m_ObjectHideFlags: 0
@@ -79751,9 +81701,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1918640535
 GameObject:
   m_ObjectHideFlags: 0
@@ -79886,9 +81840,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1922042388
 GameObject:
   m_ObjectHideFlags: 0
@@ -80115,9 +82073,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1927000981
 GameObject:
   m_ObjectHideFlags: 0
@@ -80181,9 +82143,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1927000985
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -80376,9 +82342,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1932609375
 GameObject:
   m_ObjectHideFlags: 0
@@ -80511,9 +82481,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1936141940
 GameObject:
   m_ObjectHideFlags: 0
@@ -80646,9 +82620,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1938825954
 GameObject:
   m_ObjectHideFlags: 0
@@ -80712,9 +82690,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1938825958
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -81189,9 +83171,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1959548097
 GameObject:
   m_ObjectHideFlags: 0
@@ -81324,9 +83310,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1961760661
 GameObject:
   m_ObjectHideFlags: 0
@@ -81484,9 +83474,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1963119558
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -81685,9 +83679,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!224 &1968577538 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3570478595504403214, guid: 6a8c7865bd3d395448cfcacdd58496d6,
@@ -81826,9 +83824,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1969587877
 GameObject:
   m_ObjectHideFlags: 0
@@ -81892,9 +83894,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1969587881
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -82087,9 +84093,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1971028480
 GameObject:
   m_ObjectHideFlags: 0
@@ -82222,9 +84232,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1974208702
 GameObject:
   m_ObjectHideFlags: 0
@@ -82357,9 +84371,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &1976444821
 GameObject:
   m_ObjectHideFlags: 0
@@ -82705,9 +84723,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &1990960066
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -83113,9 +85135,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 7
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2008079909
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -83239,9 +85265,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2008273908
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -83434,9 +85464,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2018913374
 GameObject:
   m_ObjectHideFlags: 0
@@ -83569,9 +85603,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2022101625
 GameObject:
   m_ObjectHideFlags: 0
@@ -83704,9 +85742,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2023180598
 GameObject:
   m_ObjectHideFlags: 0
@@ -83770,9 +85812,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2023180602
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -83965,9 +86011,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2024685819
 GameObject:
   m_ObjectHideFlags: 0
@@ -84194,9 +86244,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2030367170
 GameObject:
   m_ObjectHideFlags: 0
@@ -84329,9 +86383,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2031097485
 GameObject:
   m_ObjectHideFlags: 0
@@ -84395,9 +86453,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 10
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2031097489
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -85138,9 +87200,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2039199357
 GameObject:
   m_ObjectHideFlags: 0
@@ -85273,9 +87339,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 8
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2055070809
 GameObject:
   m_ObjectHideFlags: 0
@@ -85408,9 +87478,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2057150372
 GameObject:
   m_ObjectHideFlags: 0
@@ -85543,9 +87617,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 4
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2059707286
 GameObject:
   m_ObjectHideFlags: 0
@@ -85609,9 +87687,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2059707290
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -85804,9 +87886,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2063613545
 GameObject:
   m_ObjectHideFlags: 0
@@ -86033,9 +88119,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2068703960
 GameObject:
   m_ObjectHideFlags: 0
@@ -86193,9 +88283,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2069272863
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -86413,9 +88507,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2076247201
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -86727,9 +88825,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 13
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2092732238
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -86922,9 +89024,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 0
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2101029324
 GameObject:
   m_ObjectHideFlags: 0
@@ -87057,9 +89163,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 6
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2102060776
 GameObject:
   m_ObjectHideFlags: 0
@@ -87192,9 +89302,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 6
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2104834417
 GameObject:
   m_ObjectHideFlags: 0
@@ -87421,9 +89535,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 3
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2105856142
 GameObject:
   m_ObjectHideFlags: 0
@@ -87556,9 +89674,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2109958443
 GameObject:
   m_ObjectHideFlags: 0
@@ -87622,9 +89744,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 9
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2109958447
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -87748,9 +89874,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 5
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2111342129
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -87943,9 +90073,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 10
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2111664709
 GameObject:
   m_ObjectHideFlags: 0
@@ -88078,9 +90212,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2111725862
 GameObject:
   m_ObjectHideFlags: 0
@@ -88307,9 +90445,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 11
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2113666446
 GameObject:
   m_ObjectHideFlags: 0
@@ -88373,9 +90515,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2113666450
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -88568,9 +90714,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2120757617
 GameObject:
   m_ObjectHideFlags: 0
@@ -88703,9 +90853,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 5
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2124250168
 GameObject:
   m_ObjectHideFlags: 0
@@ -88769,9 +90923,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 2
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2124250172
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -88964,9 +91122,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 2
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2127187626
 GameObject:
   m_ObjectHideFlags: 0
@@ -89193,9 +91355,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 1
   y: 14
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2137386964
 GameObject:
   m_ObjectHideFlags: 0
@@ -89259,9 +91425,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 9
   y: 1
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2137386968
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -89454,9 +91624,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 8
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2137919721
 GameObject:
   m_ObjectHideFlags: 0
@@ -89520,9 +91694,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 7
   y: 15
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2137919725
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -89715,9 +91893,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 3
   y: 0
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!1 &2145332666
 GameObject:
   m_ObjectHideFlags: 0
@@ -89781,9 +91963,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 977998c5247e95545b817d676a0883b2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   visited: -1
   x: 4
   y: 12
+  isFatalSquare: 0
+  trapDuration: 0
 --- !u!65 &2145332670
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -90123,7 +92309,7 @@ PrefabInstance:
     - target: {fileID: 5674435266430383304, guid: d43ccdbb5dbba42449c95219bd5aeac5,
         type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 5674435266430383304, guid: d43ccdbb5dbba42449c95219bd5aeac5,
         type: 3}
@@ -92633,7 +94819,7 @@ PrefabInstance:
     - target: {fileID: 9108561456335674851, guid: 4e8caabc31e0f9f4ca219be1920ca007,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 9108561456335674851, guid: 4e8caabc31e0f9f4ca219be1920ca007,
         type: 3}

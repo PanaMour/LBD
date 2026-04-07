@@ -40,6 +40,7 @@ public class PlayerManager : NetworkBehaviour
 
     public GameObject Card;
     public GameObject Magic;
+    public GameObject Action;
     public GameObject CardToHand;
 
     public int CardsPlayed = 0;
@@ -131,7 +132,7 @@ public class PlayerManager : NetworkBehaviour
         for (int i = 0; i < 5; i++)
         {
             yield return new WaitForSeconds(1);
-            int r = Random.Range(0, 82);
+            int r = Random.Range(0, 87);
             if (r < 60)
             {
                 Card.GetComponent<ThisCard>().thisId = Random.Range(1, 59);
@@ -139,10 +140,17 @@ public class PlayerManager : NetworkBehaviour
                 NetworkServer.Spawn(card, connectionToClient);
                 RpcShowCard(card, "Dealt", 0);
             }
-            else if (r >= 60)
+            else if (r >= 60 && r<83)
             {
                 Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 23);
                 GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
+                NetworkServer.Spawn(card, connectionToClient);
+                RpcShowCard(card, "Dealt", 0);
+            }
+            else if (r >= 83)
+            {
+                Action.GetComponent<ThisAction>().thisId = Random.Range(1, 6);
+                GameObject card = Instantiate(Action, new Vector2(0, 0), Quaternion.identity);
                 NetworkServer.Spawn(card, connectionToClient);
                 RpcShowCard(card, "Dealt", 0);
             }
@@ -152,7 +160,7 @@ public class PlayerManager : NetworkBehaviour
     IEnumerator DrawCard()
     {
         yield return new WaitForSeconds(1);
-        int r = Random.Range(0, 82);
+        int r = Random.Range(0, 87);
         if (r < 60)
         {
             Card.GetComponent<ThisCard>().thisId = Random.Range(1, 59);
@@ -160,10 +168,17 @@ public class PlayerManager : NetworkBehaviour
             NetworkServer.Spawn(card, connectionToClient);
             RpcShowCard(card, "Dealt", 0);
         }
-        else if (r >= 60)
+        else if (r >= 60 && r <83)
         {
             Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 23);
             GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
+            NetworkServer.Spawn(card, connectionToClient);
+            RpcShowCard(card, "Dealt", 0);
+        }
+        else if (r >= 83)
+        {
+            Action.GetComponent<ThisAction>().thisId = Random.Range(1, 6);
+            GameObject card = Instantiate(Action, new Vector2(0, 0), Quaternion.identity);
             NetworkServer.Spawn(card, connectionToClient);
             RpcShowCard(card, "Dealt", 0);
         }
@@ -514,6 +529,15 @@ public class PlayerManager : NetworkBehaviour
         CmdPlayCard(card, index);
     }
 
+    public void PlayActionCard(GameObject card, int index)
+    {
+        ThisAction actionScript = card.GetComponent<ThisAction>();
+
+        if (actionScript != null)
+        {
+            CmdPlayCard(card, index);
+        }
+    }
     void StartTargetingMode(GameObject card, MagicTargetType type)
     {
         isTargeting = true;
@@ -606,6 +630,12 @@ public class PlayerManager : NetworkBehaviour
 
                     if (card.GetComponent<ThisCard>() != null)
                         card.GetComponent<ThisCard>().cardBack = false;
+
+                    if (card.GetComponent<ThisMagic>() != null)
+                        card.GetComponent<ThisMagic>().cardBack = false;
+
+                    if (card.GetComponent<ThisAction>() != null)
+                        card.GetComponent<ThisAction>().cardBack = false;
                 }
             }
             else
@@ -618,6 +648,12 @@ public class PlayerManager : NetworkBehaviour
 
                     if (card.GetComponent<ThisCard>() != null)
                         card.GetComponent<ThisCard>().cardBack = true;
+
+                    if (card.GetComponent<ThisMagic>() != null)
+                        card.GetComponent<ThisMagic>().cardBack = true;
+
+                    if (card.GetComponent<ThisAction>() != null)
+                        card.GetComponent<ThisAction>().cardBack = true;
                 }
             }
         }
@@ -629,6 +665,7 @@ public class PlayerManager : NetworkBehaviour
             {
                 if (card.GetComponent<ThisMagic>() != null) targetSocket = PlayerActionSockets[index].transform;
                 if (card.GetComponent<ThisCard>() != null) targetSocket = PlayerSockets[index].transform;
+                if (card.GetComponent<ThisAction>() != null) targetSocket = PlayerActionSockets[index].transform;
 
                 CmdGMCardPlayed();
             }
@@ -636,6 +673,7 @@ public class PlayerManager : NetworkBehaviour
             {
                 if (card.GetComponent<ThisMagic>() != null) targetSocket = EnemyActionSockets[index].transform;
                 if (card.GetComponent<ThisCard>() != null) targetSocket = EnemySockets[index].transform;
+                if (card.GetComponent<ThisAction>() != null) targetSocket = EnemyActionSockets[index].transform;
             }
 
             if (targetSocket != null)
@@ -665,6 +703,23 @@ public class PlayerManager : NetworkBehaviour
                     card.GetComponent<ThisCard>().cardBack = false;
                     card.GetComponent<ThisCard>().summoned = true;
                     card.GetComponent<ThisCard>().faceup = true;
+                }
+                if (card.GetComponent<ThisAction>() != null)
+                {
+                    ThisAction ta = card.GetComponent<ThisAction>();
+                    ta.activated = false;
+                    ta.faceup = false;
+
+                    if (hasAuthority)
+                    {
+                        ta.cardBack = false;
+                        // Make it slightly transparent for the owner so they know it's set
+                        card.GetComponent<CanvasGroup>().alpha = 0.8f; 
+                    }
+                    else
+                    {
+                        ta.cardBack = true;
+                    }
                 }
             }
         }
