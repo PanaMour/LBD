@@ -635,7 +635,11 @@ public class PlayerManager : NetworkBehaviour
                         card.GetComponent<ThisMagic>().cardBack = false;
 
                     if (card.GetComponent<ThisAction>() != null)
+                    {
                         card.GetComponent<ThisAction>().cardBack = false;
+                        CanvasGroup cg = card.GetComponent<CanvasGroup>();
+                        if (cg != null) cg.alpha = 1.0f;
+                    }
                 }
             }
             else
@@ -710,15 +714,17 @@ public class PlayerManager : NetworkBehaviour
                     ta.activated = false;
                     ta.faceup = false;
 
+                    CanvasGroup cg = card.GetComponent<CanvasGroup>();
+
                     if (hasAuthority)
                     {
-                        ta.cardBack = false;
-                        // Make it slightly transparent for the owner so they know it's set
-                        card.GetComponent<CanvasGroup>().alpha = 0.8f; 
+                        ta.cardBack = true;
+                        if (cg != null) cg.alpha = 0.5f;
                     }
                     else
                     {
                         ta.cardBack = true;
+                        if (cg != null) cg.alpha = 1.0f;
                     }
                 }
             }

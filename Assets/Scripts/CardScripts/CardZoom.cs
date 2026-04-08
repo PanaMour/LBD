@@ -21,7 +21,12 @@ public class CardZoom : NetworkBehaviour
     public Text zoomCardNameText;
     public Text zoomText;
     public Image zoomImage;
+
     public Text zoomDescriptionText;
+    public GameObject zoomStandardDescContainer;
+    public GameObject zoomReqContainer;
+    public GameObject zoomActionDescContainer;
+
     public Text zoomATKtext;
     public Text zoomDEFtext;
     public Text zoomStarstext;
@@ -37,7 +42,6 @@ public class CardZoom : NetworkBehaviour
         Canvas = GameObject.Find("Main Canvas");
         zoomCardNameText = GameObject.Find("ZoomNameText").GetComponent<Text>();
         zoomImage = GameObject.Find("ZoomImage").GetComponent<Image>();
-        zoomDescriptionText = GameObject.Find("ZoomDescriptionText").GetComponent<Text>();
         zoomText = GameObject.Find("ExplainZoomText").GetComponent<Text>();
         zoomATKtext = GameObject.Find("ZoomATKtext").GetComponent<Text>();
         zoomDEFtext = GameObject.Find("ZoomDEFtext").GetComponent<Text>();
@@ -48,6 +52,18 @@ public class CardZoom : NetworkBehaviour
         zoomBackground = GameObject.Find("ZoomBackground").GetComponent<Image>();
         zoomCanvas = GameObject.Find("ZoomCardCanvas").GetComponent<Image>();
         zoomCardBack = GameObject.Find("ZoomCardBack").GetComponent<Image>();
+
+        if (zoomBackground != null)
+        {
+            Transform bg = zoomBackground.transform;
+
+            zoomStandardDescContainer = bg.Find("CardDescription")?.gameObject;
+            if (zoomStandardDescContainer != null)
+                zoomDescriptionText = zoomStandardDescContainer.transform.Find("ZoomDescriptionText")?.GetComponent<Text>();
+
+            zoomReqContainer = bg.Find("ZoomRequirement")?.gameObject;
+            zoomActionDescContainer = bg.Find("ZoomActionDescription")?.gameObject;
+        }
 
         NameText = gameObject.transform.Find("CardCanvas").Find("Background").Find("CardName").Find("NameText").GetComponent<Text>();
         Image = gameObject.transform.Find("CardCanvas").Find("Background").Find("Image").GetComponent<Image>();
@@ -60,7 +76,6 @@ public class CardZoom : NetworkBehaviour
 
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         PlayerManager = networkIdentity.GetComponent<PlayerManager>();
-
     }
 
     public void OnHoverEnter()
@@ -73,20 +88,19 @@ public class CardZoom : NetworkBehaviour
             zoomStars.transform.localScale = new Vector3(1, 1, 1);
             zoomCardNameText.text = NameText.text;
             zoomImage.sprite = Image.sprite;
-            zoomDescriptionText.text = DescriptionText.text;
+
+            if (zoomStandardDescContainer != null) zoomStandardDescContainer.SetActive(true);
+            if (zoomReqContainer != null) zoomReqContainer.SetActive(false);
+            if (zoomActionDescContainer != null) zoomActionDescContainer.SetActive(false);
+
+            if (zoomDescriptionText != null) zoomDescriptionText.text = DescriptionText.text;
+
             zoomATKtext.text = ATKtext.text;
             zoomDEFtext.text = DEFtext.text;
             zoomStarstext.text = StarsText.text;
             zoomBackground.color = Background.color;
             zoomText.text = Card.GetComponent<ThisCard>().descriptionText.text;
             zoomCanvas.color = CardCanvas.color;
-            //PlayerManager.CmdZoomCard(name);
-            /*zoomCard = Instantiate(gameObject, new Vector2(Input.mousePosition.x, Input.mousePosition.y + 250), Quaternion.identity);
-            zoomCard.transform.SetParent(Canvas.transform, true);
-            zoomCard.layer = LayerMask.NameToLayer("Zoom");
-
-            RectTransform rect = zoomCard.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(240, 344);*/
         }
         else if (!hasAuthority)
         {
@@ -98,7 +112,5 @@ public class CardZoom : NetworkBehaviour
 
     public void OnHoverExit()
     {
-        //PlayerManager.CmdDestroyZoomCard();
-        //Destroy(zoomCard);
     }
 }

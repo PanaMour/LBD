@@ -39,6 +39,7 @@ GameObject:
   - component: {fileID: 3611489622785008730}
   - component: {fileID: 8847510008274101179}
   - component: {fileID: 2470440514462427753}
+  - component: {fileID: 6677468521887640429}
   m_Layer: 12
   m_Name: Action 3D
   m_TagString: Untagged
@@ -372,14 +373,35 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   actionCardData: {fileID: 0}
+  localBackground: {fileID: 0}
+  localCanvas: {fileID: 0}
   zoomCardNameText: {fileID: 0}
   zoomText: {fileID: 0}
   zoomImage: {fileID: 0}
   zoomDescriptionText: {fileID: 0}
+  zoomRequirementText: {fileID: 0}
+  zoomActionDescriptionText: {fileID: 0}
+  zoomStandardDescContainer: {fileID: 0}
+  zoomReqContainer: {fileID: 0}
+  zoomActionDescContainer: {fileID: 0}
   zoomStars: {fileID: 0}
   zoomATK: {fileID: 0}
   zoomDEF: {fileID: 0}
   zoomCardBack: {fileID: 0}
+  zoomBackground: {fileID: 0}
+  zoomCanvas: {fileID: 0}
+--- !u!225 &6677468521887640429
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5046316688007180663}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1001 &218680714220025868
 PrefabInstance:
   m_ObjectHideFlags: 0

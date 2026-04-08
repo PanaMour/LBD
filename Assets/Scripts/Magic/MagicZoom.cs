@@ -21,7 +21,12 @@ public class MagicZoom : NetworkBehaviour
     public Text zoomCardNameText;
     public Text zoomText;
     public Image zoomImage;
+
     public Text zoomDescriptionText;
+    public GameObject zoomStandardDescContainer;
+    public GameObject zoomReqContainer;
+    public GameObject zoomActionDescContainer;
+
     public Text zoomATKtext;
     public Text zoomDEFtext;
     public Text zoomStarstext;
@@ -37,7 +42,6 @@ public class MagicZoom : NetworkBehaviour
         Canvas = GameObject.Find("Main Canvas");
         zoomCardNameText = GameObject.Find("ZoomNameText").GetComponent<Text>();
         zoomImage = GameObject.Find("ZoomImage").GetComponent<Image>();
-        zoomDescriptionText = GameObject.Find("ZoomDescriptionText").GetComponent<Text>();
         zoomText = GameObject.Find("ExplainZoomText").GetComponent<Text>();
         zoomATKtext = GameObject.Find("ZoomATKtext").GetComponent<Text>();
         zoomDEFtext = GameObject.Find("ZoomDEFtext").GetComponent<Text>();
@@ -49,6 +53,18 @@ public class MagicZoom : NetworkBehaviour
         zoomCanvas = GameObject.Find("ZoomCardCanvas").GetComponent<Image>();
         zoomCardBack = GameObject.Find("ZoomCardBack").GetComponent<Image>();
 
+        if (zoomBackground != null)
+        {
+            Transform bg = zoomBackground.transform;
+
+            zoomStandardDescContainer = bg.Find("CardDescription")?.gameObject;
+            if (zoomStandardDescContainer != null)
+                zoomDescriptionText = zoomStandardDescContainer.transform.Find("ZoomDescriptionText")?.GetComponent<Text>();
+
+            zoomReqContainer = bg.Find("ZoomRequirement")?.gameObject;
+            zoomActionDescContainer = bg.Find("ZoomActionDescription")?.gameObject;
+        }
+
         NameText = gameObject.transform.Find("MagicCanvas").Find("MagicBackground").Find("MagicName").Find("MagicNameText").GetComponent<Text>();
         Image = gameObject.transform.Find("MagicCanvas").Find("MagicBackground").Find("MagicImage").GetComponent<Image>();
         DescriptionText = gameObject.transform.Find("MagicCanvas").Find("MagicBackground").Find("MagicDescription").Find("MagicDescriptionText").GetComponent<Text>();
@@ -57,7 +73,6 @@ public class MagicZoom : NetworkBehaviour
 
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         PlayerManager = networkIdentity.GetComponent<PlayerManager>();
-
     }
 
     public void OnHoverEnter()
@@ -70,17 +85,16 @@ public class MagicZoom : NetworkBehaviour
             zoomStars.transform.localScale = new Vector3(0, 0, 0);
             zoomCardNameText.text = NameText.text;
             zoomImage.sprite = Image.sprite;
-            zoomDescriptionText.text = DescriptionText.text;
+
+            if (zoomStandardDescContainer != null) zoomStandardDescContainer.SetActive(true);
+            if (zoomReqContainer != null) zoomReqContainer.SetActive(false);
+            if (zoomActionDescContainer != null) zoomActionDescContainer.SetActive(false);
+
+            if (zoomDescriptionText != null) zoomDescriptionText.text = DescriptionText.text;
+
             zoomBackground.color = Background.color;
             zoomCanvas.color = MagicCanvas.color;
             zoomText.text = Magic.GetComponent<ThisMagic>().magicdescriptionText.text;
-            //PlayerManager.CmdZoomCard(name);
-            /*zoomCard = Instantiate(gameObject, new Vector2(Input.mousePosition.x, Input.mousePosition.y + 250), Quaternion.identity);
-            zoomCard.transform.SetParent(Canvas.transform, true);
-            zoomCard.layer = LayerMask.NameToLayer("Zoom");
-
-            RectTransform rect = zoomCard.GetComponent<RectTransform>();
-            rect.sizeDelta = new Vector2(240, 344);*/
         }
         else
         {
@@ -91,7 +105,5 @@ public class MagicZoom : NetworkBehaviour
 
     public void OnHoverExit()
     {
-        //PlayerManager.CmdDestroyZoomCard();
-        //Destroy(zoomCard);
     }
 }

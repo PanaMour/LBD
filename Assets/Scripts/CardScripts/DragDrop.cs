@@ -111,6 +111,7 @@ public class DragDrop : NetworkBehaviour
     {
         ThisCard cardScript = GetComponent<ThisCard>();
         ThisMagic magicScript = GetComponent<ThisMagic>();
+        ThisAction actionScript = GetComponent<ThisAction>(); // --- NEW ---
 
         GameObject existingCard = GetCardInSlot(slot);
 
@@ -188,6 +189,7 @@ public class DragDrop : NetworkBehaviour
             ReturnToHand();
             return;
         }
+
         if (cardScript != null && slot.name.Contains("PlayerSlot"))
         {
             if (PlayerManager.nomoresummons)
@@ -232,6 +234,16 @@ public class DragDrop : NetworkBehaviour
             }
         }
 
+        // --- NEW: ACTION CARD LOGIC ---
+        if (actionScript != null && slot.name.Contains("ActionSlot"))
+        {
+            if (existingCard == null)
+            {
+                PlaceActionCard(slot);
+                return;
+            }
+        }
+
         ReturnToHand();
     }
 
@@ -259,11 +271,13 @@ public class DragDrop : NetworkBehaviour
     {
         foreach (Transform child in slot.transform)
         {
-            if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null)
+            // --- NEW: Added Action check so the slot knows it's occupied ---
+            if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null || child.GetComponent<ThisAction>() != null)
                 return child.gameObject;
         }
         return null;
     }
+
     void PlaceCard(GameObject slot, bool isMonster)
     {
         isDraggable = false;
@@ -295,6 +309,29 @@ public class DragDrop : NetworkBehaviour
             PlayerManager.PlayMagicCard(gameObject, index);
             this.enabled = false;
         }
+    }
+
+    // --- NEW: Specific placement logic for Action Cards ---
+    void PlaceActionCard(GameObject slot)
+    {
+        isDraggable = false;
+
+        transform.SetParent(slot.transform);
+        transform.localPosition = slotPosition;
+        transform.localRotation = Quaternion.Euler(90, 0, 0);
+        transform.localScale = slotScale;
+
+        string numberOnly = System.Text.RegularExpressions.Regex.Match(slot.name, @"\d+").Value;
+        int index = 0;
+        if (int.TryParse(numberOnly, out int result)) index = result - 1;
+
+        // Tell the server we played an Action card (so the opponent sees it face-down)
+        if (PlayerManager != null)
+        {
+            PlayerManager.PlayActionCard(gameObject, index);
+        }
+
+        this.enabled = false; // Turn off dragging now that it's set
     }
 
     public void ReturnToHand()
