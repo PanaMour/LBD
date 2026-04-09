@@ -27,7 +27,7 @@ public class ThisAction : NetworkBehaviour
     [SyncVar] public bool cardBack = false;
     public bool faceup = false;
     public bool activated = false;
-    public bool beInGraveyard = false;
+    [SyncVar] public bool beInGraveyard = false;
 
     public GameObject CardBackVisual;
 
@@ -74,9 +74,12 @@ public class ThisAction : NetworkBehaviour
         if (descriptionText != null) descriptionText.text = cardDescription;
         if (artworkImage != null && thisImage != null) artworkImage.sprite = thisImage;
 
-        if (CardBackVisual != null)
+        if (CardBackVisual != null) CardBackVisual.SetActive(cardBack);
+
+        Transform canvasTrans = transform.Find("ActionCanvas");
+        if (canvasTrans != null)
         {
-            CardBackVisual.SetActive(cardBack);
+            canvasTrans.gameObject.SetActive(!cardBack);
         }
     }
 }

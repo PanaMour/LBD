@@ -276,6 +276,48 @@ public class LabyrinthObject : NetworkBehaviour
         LabyrinthObject targetScript = targetObj.GetComponent<LabyrinthObject>();
         if (targetScript == null) return;
 
+        PlayerManager attackerPM = connectionToClient.identity.GetComponent<PlayerManager>();
+
+        NetworkIdentity defenderIdentity = targetObj.GetComponent<NetworkIdentity>();
+        PlayerManager defenderPM = defenderIdentity.connectionToClient.identity.GetComponent<PlayerManager>();
+
+        GameObject validTrap = null;
+
+        ThisAction[] allActions = FindObjectsOfType<ThisAction>();
+        foreach (ThisAction action in allActions)
+        {
+            if (action.connectionToClient == defenderIdentity.connectionToClient && !action.faceup)
+            {
+                if (action.connectionToClient == defenderIdentity.connectionToClient && !action.faceup && !action.beInGraveyard)
+                {
+                    if (action.id == 4) // Last Stand Barrier
+                    {
+                        if (targetScript.attackMode == true)
+                        {
+                            validTrap = action.gameObject;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (validTrap != null && defenderPM != null)
+        {
+            Debug.Log("Valid Trap found! Pausing attack to ask defender...");
+            defenderPM.TargetAskActivateTrap(defenderIdentity.connectionToClient, validTrap, this.gameObject, targetObj);
+        }
+        else
+        {
+            ServerResolveAttack(targetObj, false, 0);
+        }
+    }
+    [Server]
+    public void ServerResolveAttack(GameObject targetObj, bool trapActivated, int trapId)
+    {
+        LabyrinthObject targetScript = targetObj.GetComponent<LabyrinthObject>();
+        if (targetScript == null) return;
+
         ThisCard myCard = card.GetComponent<ThisCard>();
         ThisCard enemyCard = targetScript.card.GetComponent<ThisCard>();
 
@@ -289,16 +331,24 @@ public class LabyrinthObject : NetworkBehaviour
             Debug.Log("Demon Lady is attacking! Shredding 500 DEF.");
             enemyCard.battleDefPenalty = 500;
             enemyCard.RecalculateStats();
-
             pm.RpcApplyDemonLadyShred(targetScript.card);
         }
 
         int myAtk = myCard.actualATK;
         int enemyAtk = enemyCard.actualATK;
-
         int enemyDef = enemyCard.actualDEF;
 
         bool enemyIsAttackMode = targetScript.attackMode;
+
+        if (trapActivated)
+        {
+            if (trapId == 4) // Last Stand Barrier
+            {
+                enemyIsAttackMode = false;
+                enemyDef += enemyAtk;
+                Debug.Log($"Last Stand Barrier activated! {enemyCard.cardName} DEF is boosted to {enemyDef} for this battle!");
+            }
+        }
 
         hasMovedThisTurn = true;
         waitingToAttack = false;
@@ -308,10 +358,7 @@ public class LabyrinthObject : NetworkBehaviour
         {
             if (myAtk > enemyAtk)
             {
-                if (enemyCard.cardProperty == Property.Plague)
-                {
-                    pm.RpcApplyPlagueDebuff(this.card);
-                }
+                if (enemyCard.cardProperty == Property.Plague) pm.RpcApplyPlagueDebuff(this.card);
 
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
@@ -327,10 +374,7 @@ public class LabyrinthObject : NetworkBehaviour
             }
             else if (myAtk < enemyAtk)
             {
-                if (myCard.cardProperty == Property.Plague)
-                {
-                    pm.RpcApplyPlagueDebuff(targetScript.card);
-                }
+                if (myCard.cardProperty == Property.Plague) pm.RpcApplyPlagueDebuff(targetScript.card);
 
                 NetworkServer.Destroy(this.gameObject);
                 pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
@@ -350,10 +394,7 @@ public class LabyrinthObject : NetworkBehaviour
         {
             if (myAtk > enemyDef)
             {
-                if (enemyCard.cardProperty == Property.Plague)
-                {
-                    pm.RpcApplyPlagueDebuff(this.card);
-                }
+                if (enemyCard.cardProperty == Property.Plague) pm.RpcApplyPlagueDebuff(this.card);
 
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
@@ -370,6 +411,7 @@ public class LabyrinthObject : NetworkBehaviour
                 pm.RpcGMChangeLP(damage, 0);
             }
         }
+
         enemyCard.battleDefPenalty = 0;
         enemyCard.RecalculateStats();
         pm.RpcResetDemonLadyShred(targetScript.card);

@@ -736,6 +736,7 @@ public class PlayerManager : NetworkBehaviour
                 card.GetComponent<ThisCard>().beInGraveyard = true;
                 MonstersPlayed--;
             }
+            if (card.GetComponent<ThisAction>() != null) card.GetComponent<ThisAction>().beInGraveyard = true;
 
             GameObject targetYard = hasAuthority ? EnemyYard : PlayerYard;
 
@@ -745,6 +746,7 @@ public class PlayerManager : NetworkBehaviour
         {
             if (card.GetComponent<ThisCard>() != null)
                 card.GetComponent<ThisCard>().beInGraveyard = true;
+            if (card.GetComponent<ThisAction>() != null) card.GetComponent<ThisAction>().beInGraveyard = true;
 
             GameObject targetYard = hasAuthority ? PlayerYard : EnemyYard;
 
@@ -1791,6 +1793,54 @@ public class PlayerManager : NetworkBehaviour
         {
             Renderer r = tileObj.GetComponentInChildren<Renderer>();
             if (r != null) r.material.color = new Color(0.5f, 0, 0.5f);
+        }
+    }
+
+    [TargetRpc]
+    public void TargetAskActivateTrap(NetworkConnection target, GameObject trapCard, GameObject attacker, GameObject defender)
+    {
+        string trapName = trapCard.GetComponent<ThisAction>().cardName;
+
+        SpawnBox($"Opponent is attacking! Activate {trapName}?", "Activate", "Decline",
+            () =>
+            {
+                Destroy(activeUIBox);
+                CmdAnswerTrapPrompt(true, trapCard, attacker, defender);
+            },
+            () =>
+            {
+                Destroy(activeUIBox);
+                CmdAnswerTrapPrompt(false, trapCard, attacker, defender);
+            }
+        );
+    }
+
+    [Command]
+    public void CmdAnswerTrapPrompt(bool wantsToActivate, GameObject trapCard, GameObject attacker, GameObject defender)
+    {
+        if (wantsToActivate)
+        {
+            RpcShowCard(trapCard, "Played", 0);
+
+            ThisAction actionScript = trapCard.GetComponent<ThisAction>();
+            actionScript.faceup = true;
+            actionScript.beInGraveyard = true;
+
+            if (actionScript.id == 4)
+            {
+                Debug.Log("Last Stand Barrier Activated! Switching to Defense!");
+
+                RpcGMChangeBattlePosition(defender.GetComponent<LabyrinthObject>().card, false);
+            }
+
+            attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, true, actionScript.id);
+
+            CmdPlayerDestroyCard(trapCard, 0);
+        }
+        else
+        {
+            Debug.Log("Player declined to use the trap.");
+            attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, false, 0);
         }
     }
 }
