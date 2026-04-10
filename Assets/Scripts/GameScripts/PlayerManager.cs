@@ -718,7 +718,7 @@ public class PlayerManager : NetworkBehaviour
 
                     if (hasAuthority)
                     {
-                        ta.cardBack = true;
+                        ta.cardBack = false;
                         if (cg != null) cg.alpha = 0.5f;
                     }
                     else

@@ -41,6 +41,12 @@ public class ThisAction : NetworkBehaviour
         requirementText = transform.Find("ActionCanvas").Find("ActionBackground").Find("ActionRequirement").Find("ActionRequirementText").GetComponent<Text>();
 
         descriptionText = transform.Find("ActionCanvas").Find("ActionBackground").Find("ActionDescription").Find("ActionDescriptionText").GetComponent<Text>();
+
+        Transform backTrans = transform.Find("ActionCanvas")?.Find("ActionBackground").Find("ActionCardBack");
+        if (backTrans != null)
+        {
+            CardBackVisual = backTrans.gameObject;
+        }
     }
 
     void Start()
@@ -74,12 +80,9 @@ public class ThisAction : NetworkBehaviour
         if (descriptionText != null) descriptionText.text = cardDescription;
         if (artworkImage != null && thisImage != null) artworkImage.sprite = thisImage;
 
-        if (CardBackVisual != null) CardBackVisual.SetActive(cardBack);
-
-        Transform canvasTrans = transform.Find("ActionCanvas");
-        if (canvasTrans != null)
+        if (CardBackVisual != null)
         {
-            canvasTrans.gameObject.SetActive(!cardBack);
+            CardBackVisual.SetActive(cardBack);
         }
     }
 }
