@@ -129,6 +129,13 @@ public class GridBehavior : MonoBehaviour
                             Transform realQuad = obj.transform.Find("Quad");
                             if (realQuad != null)
                                 realQuad.GetComponent<Renderer>().material.mainTexture = texToCopy;
+
+                            string texName = texToCopy.name;
+                            string idStr = texName.Replace("labyrinthblock", "");
+                            int bID = 0;
+                            if (!string.IsNullOrEmpty(idStr)) int.TryParse(idStr, out bID);
+
+                            if (stat != null) stat.blockID = bID;
                         }
                     }
                 }

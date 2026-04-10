@@ -298,6 +298,14 @@ public class LabyrinthObject : NetworkBehaviour
                             break;
                         }
                     }
+                    else if (action.id == 5) // Intercept
+                    {
+                        if (CheckIfNextToWallOrInBase(targetObj))
+                        {
+                            validTrap = action.gameObject;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -347,6 +355,20 @@ public class LabyrinthObject : NetworkBehaviour
                 enemyIsAttackMode = false;
                 enemyDef += enemyAtk;
                 Debug.Log($"Last Stand Barrier activated! {enemyCard.cardName} DEF is boosted to {enemyDef} for this battle!");
+            }
+            else if (trapId == 5) // Intercept
+            {
+                Debug.Log("Intercept activated! The attack is completely negated.");
+
+                enemyCard.battleDefPenalty = 0;
+                enemyCard.RecalculateStats();
+                pm.RpcResetDemonLadyShred(targetScript.card);
+
+                hasMovedThisTurn = true;
+                waitingToAttack = false;
+                ResetGridColors();
+
+                return;
             }
         }
 
@@ -466,5 +488,25 @@ public class LabyrinthObject : NetworkBehaviour
             if (child == null) continue;
             SetLayerRecursively(child.gameObject, newLayer);
         }
+    }
+
+    bool CheckIfNextToWallOrInBase(GameObject defenderObj)
+    {
+        GridStat defGrid = defenderObj.GetComponentInParent<GridStat>();
+        if (defGrid == null) return false;
+
+        if (defGrid.y == 0 || defGrid.y == 1 || defGrid.y == 14 || defGrid.y == 15) return true;
+
+        int[] openBlocks = { 0, 15, 16, 17, 18, 31, 32, 33, 34, 35, 36, 41, 42, 43, 44, 45, 46 };
+
+        for (int i = 0; i < openBlocks.Length; i++)
+        {
+            if (defGrid.blockID == openBlocks[i])
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

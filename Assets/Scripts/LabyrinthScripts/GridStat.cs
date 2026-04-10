@@ -8,6 +8,7 @@ public class GridStat : NetworkBehaviour
     public int visited = -1;
     public int x = 0;
     public int y = 0;
+    public int blockID = 0;
     [SyncVar]
     public bool isFatalSquare = false;
     [SyncVar]
