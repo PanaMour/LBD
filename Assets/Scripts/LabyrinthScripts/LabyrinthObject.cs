@@ -232,6 +232,12 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (hasMovedThisTurn) return;
 
+        if (isImmobile)
+        {
+            Debug.Log("This monster is Immobile and cannot move!");
+            return;
+        }
+
         if (!attackMode)
         {
             Debug.Log("Cannot move or attack in Defense Mode!");
@@ -276,35 +282,43 @@ public class LabyrinthObject : NetworkBehaviour
         LabyrinthObject targetScript = targetObj.GetComponent<LabyrinthObject>();
         if (targetScript == null) return;
 
-        PlayerManager attackerPM = connectionToClient.identity.GetComponent<PlayerManager>();
+        ThisCard myCard = card.GetComponent<ThisCard>();
+        ThisCard enemyCard = targetScript.card.GetComponent<ThisCard>();
+        if (myCard == null || enemyCard == null) return;
 
+        PlayerManager attackerPM = connectionToClient.identity.GetComponent<PlayerManager>();
         NetworkIdentity defenderIdentity = targetObj.GetComponent<NetworkIdentity>();
         PlayerManager defenderPM = defenderIdentity.connectionToClient.identity.GetComponent<PlayerManager>();
+
+        int predictedDef = enemyCard.actualDEF;
+        if (myCard.id == 45) predictedDef -= 500;
+
+        bool willDefenderDie = false;
+        if (targetScript.attackMode && myCard.actualATK >= enemyCard.actualATK) willDefenderDie = true;
+        if (!targetScript.attackMode && myCard.actualATK > predictedDef) willDefenderDie = true;
+
 
         GameObject validTrap = null;
 
         ThisAction[] allActions = FindObjectsOfType<ThisAction>();
         foreach (ThisAction action in allActions)
         {
-            if (action.connectionToClient == defenderIdentity.connectionToClient && !action.faceup)
+            if (action.connectionToClient == defenderIdentity.connectionToClient && !action.faceup && !action.beInGraveyard)
             {
-                if (action.connectionToClient == defenderIdentity.connectionToClient && !action.faceup && !action.beInGraveyard)
+                if (action.id == 4) // Last Stand Barrier
                 {
-                    if (action.id == 4) // Last Stand Barrier
+                    if (targetScript.attackMode == true) { validTrap = action.gameObject; break; }
+                }
+                else if (action.id == 5) // Intercept
+                {
+                    if (CheckIfNextToWallOrInBase(targetObj)) { validTrap = action.gameObject; break; }
+                }
+                else if (action.id == 2) // Phantom Binding
+                {
+                    if (willDefenderDie)
                     {
-                        if (targetScript.attackMode == true)
-                        {
-                            validTrap = action.gameObject;
-                            break;
-                        }
-                    }
-                    else if (action.id == 5) // Intercept
-                    {
-                        if (CheckIfNextToWallOrInBase(targetObj))
-                        {
-                            validTrap = action.gameObject;
-                            break;
-                        }
+                        validTrap = action.gameObject;
+                        break;
                     }
                 }
             }
@@ -380,6 +394,12 @@ public class LabyrinthObject : NetworkBehaviour
         {
             if (myAtk > enemyAtk)
             {
+                if (trapActivated && trapId == 2) // Phantom Binding
+                {
+                    this.isImmobile = true;
+                    Debug.Log("Phantom Binding triggered! The attacker is now Immobile.");
+                }
+
                 if (enemyCard.cardProperty == Property.Plague) pm.RpcApplyPlagueDebuff(this.card);
 
                 NetworkServer.Destroy(targetScript.gameObject);
@@ -416,6 +436,12 @@ public class LabyrinthObject : NetworkBehaviour
         {
             if (myAtk > enemyDef)
             {
+                if (trapActivated && trapId == 2) // Phantom Binding
+                {
+                    this.isImmobile = true;
+                    Debug.Log("Phantom Binding triggered! The attacker is now Immobile.");
+                }
+
                 if (enemyCard.cardProperty == Property.Plague) pm.RpcApplyPlagueDebuff(this.card);
 
                 NetworkServer.Destroy(targetScript.gameObject);
