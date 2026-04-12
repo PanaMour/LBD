@@ -68,6 +68,7 @@ public class PlayerManager : NetworkBehaviour
     public GameObject sprintBoostTarget = null;
     public GameObject activeMagicCard;
     public MagicTargetType currentTargetCriteria;
+    public int pendingSlotIndex;
     public GameObject activeMonsterEffectCard;
     public string pendingMonsterEffect;
     [SyncVar] public bool honeySnareActive = false;
@@ -319,7 +320,7 @@ public class PlayerManager : NetworkBehaviour
                                     return;
                                 }
 
-                                CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject, 0);
+                                CmdExecuteMagicEffect(activeMagicCard, targetCandidate.gameObject, pendingSlotIndex);
                                 CancelTargeting();
                             }
                             else Debug.Log("Invalid Target selected.");
@@ -489,16 +490,70 @@ public class PlayerManager : NetworkBehaviour
         CmdPlayCard(card, index);
     }
 
+    bool HasValidTargets(MagicTargetType type)
+    {
+        if (type == MagicTargetType.None || type == MagicTargetType.EmptySquare) return true;
+
+        LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
+
+        if (type == MagicTargetType.AnyEnemy || type == MagicTargetType.EnemyAttack || type == MagicTargetType.EnemyDefense)
+        {
+            foreach (var m in allMonsters)
+            {
+                if (!m.hasAuthority) 
+                {
+                    if (type == MagicTargetType.AnyEnemy) return true;
+                    if (type == MagicTargetType.EnemyAttack && m.attackMode) return true;
+                    if (type == MagicTargetType.EnemyDefense && !m.attackMode) return true;
+                }
+            }
+            return false;
+        }
+
+        if (type == MagicTargetType.AnyAlly || type == MagicTargetType.UnmovedAlly)
+        {
+            foreach (var m in allMonsters)
+            {
+                if (m.hasAuthority)
+                {
+                    if (type == MagicTargetType.AnyAlly) return true;
+                    if (type == MagicTargetType.UnmovedAlly && !m.hasMovedThisTurn) return true;
+                }
+            }
+            return false;
+        }
+
+        if (type == MagicTargetType.AnyUnit) return allMonsters.Length > 0;
+
+        return true;
+    }
+
     public void PlayMagicCard(GameObject card, int index)
     {
         ThisMagic magicScript = card.GetComponent<ThisMagic>();
 
         if (magicScript != null)
         {
+            if (!HasValidTargets(magicScript.targetType))
+            {
+                Debug.Log("Cannot activate: No valid targets on the board!");
+                DragDrop dd = card.GetComponent<DragDrop>();
+                if (dd != null) dd.ReturnToHand();
+                return;
+            }
+
+            CmdPlayCard(card, index);
+
+            card.transform.SetParent(PlayerActionSockets[index].transform, true);
+            card.transform.localPosition = new Vector3(0, 1.0f, 0);
+            card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
+            card.transform.localRotation = Quaternion.Euler(90, 0, 0);
+
             if (magicScript.targetType == MagicTargetType.EmptySquare)
             {
                 isTargetingTile = true;
                 activeMagicCard = card;
+                pendingSlotIndex = index;
 
                 GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
                 if (gridGen != null)
@@ -513,21 +568,23 @@ public class PlayerManager : NetworkBehaviour
                         }
                     }
                 }
-
                 Debug.Log("Fatal Square: Select an empty square on the grid!");
                 return;
             }
 
             if (magicScript.targetType != MagicTargetType.None)
             {
+                pendingSlotIndex = index;
                 StartTargetingMode(card, magicScript.targetType);
                 return;
             }
 
             magicScript.Activate();
         }
-
-        CmdPlayCard(card, index);
+        else
+        {
+            CmdPlayCard(card, index);
+        }
     }
 
     public void PlayActionCard(GameObject card, int index)
@@ -570,10 +627,16 @@ public class PlayerManager : NetworkBehaviour
     public void CancelTargeting()
     {
         isTargeting = false;
+
+        if (activeMagicCard != null)
+        {
+            CmdPlayerDestroyCard(activeMagicCard, 0);
+        }
+
         activeMagicCard = null;
         activeMonsterEffectCard = null;
         pendingMonsterEffect = "";
-        Debug.Log("Targeting Cancelled");
+        Debug.Log("Targeting Cancelled. Spell fizzled and went to Graveyard.");
     }
 
     [Command]
@@ -1452,8 +1515,16 @@ public class PlayerManager : NetworkBehaviour
                 break;
 
             case MagicTargetType.AnyEnemy:
-                NetworkServer.Destroy(targetMonster);
-                RpcShowCard(monsterScript.card, "OpponentDestroyed", 0);
+                if (magicScript.id == 9) // Exhaust
+                {
+                    RpcApplyTempAtk(monsterScript.card, -400);
+                    Debug.Log($"Exhaust Activated! {targetMonster.name} loses 400 ATK until the end of the turn.");
+                }
+                else
+                {
+                    NetworkServer.Destroy(targetMonster);
+                    RpcShowCard(monsterScript.card, "OpponentDestroyed", 0);
+                }
                 break;
 
             case MagicTargetType.AnyAlly:
@@ -1562,7 +1633,10 @@ public class PlayerManager : NetworkBehaviour
                 break;
         }
 
-        RpcShowCard(magicCard, "Played", slotIndex);
+        if (!magicScript.equip)
+        {
+            CmdPlayerDestroyCard(magicCard, 0);
+        }
     }
 
     [ClientRpc]
@@ -1577,6 +1651,12 @@ public class PlayerManager : NetworkBehaviour
     {
         isTargetingTile = false;
         teleportMonsterCandidate = null;
+
+        if (activeMagicCard != null)
+        {
+            CmdPlayerDestroyCard(activeMagicCard, 0);
+        }
+
         activeMagicCard = null;
 
         GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
