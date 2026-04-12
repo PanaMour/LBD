@@ -234,8 +234,18 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (isImmobile)
         {
-            Debug.Log("This monster is Immobile and cannot move!");
+            Debug.Log("This monster is permanently bound and cannot move!");
             return;
+        }
+
+        PlayerManager[] allPlayers = FindObjectsOfType<PlayerManager>();
+        foreach (PlayerManager player in allPlayers)
+        {
+            if (player.honeySnareActive)
+            {
+                Debug.Log("Honey Snare is active! The board is stuck in honey this turn.");
+                return;
+            }
         }
 
         if (!attackMode)

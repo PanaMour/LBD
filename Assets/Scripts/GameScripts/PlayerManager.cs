@@ -70,6 +70,7 @@ public class PlayerManager : NetworkBehaviour
     public MagicTargetType currentTargetCriteria;
     public GameObject activeMonsterEffectCard;
     public string pendingMonsterEffect;
+    [SyncVar] public bool honeySnareActive = false;
 
     public override void OnStartClient()
     {
@@ -874,6 +875,8 @@ public class PlayerManager : NetworkBehaviour
         {
             player.hasDrawnThisTurn = false;
 
+            player.honeySnareActive = false; 
+
             if (player.sprintBoostActive && player.sprintBoostTarget != null)
             {
                 LabyrinthObject lo = player.sprintBoostTarget.GetComponent<LabyrinthObject>();
@@ -894,7 +897,23 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
         }
+
         RpcGMChangeTurn();
+
+        ThisAction[] allActions = FindObjectsOfType<ThisAction>();
+        foreach (ThisAction action in allActions)
+        {
+            if (action.id == 3 && !action.faceup && !action.beInGraveyard)
+            {
+                NetworkIdentity trapIdentity = action.GetComponent<NetworkIdentity>();
+                PlayerManager ownerPM = trapIdentity.connectionToClient.identity.GetComponent<PlayerManager>();
+
+                if (ownerPM != null)
+                {
+                    ownerPM.TargetAskActivateTrap(trapIdentity.connectionToClient, action.gameObject, null, null);
+                }
+            }
+        }
     }
 
     [ClientRpc]
@@ -1027,7 +1046,6 @@ public class PlayerManager : NetworkBehaviour
     {
         GameObject monster = Instantiate(LabyrinthObjectPrefab);
         LabyrinthObject script = monster.GetComponent<LabyrinthObject>();
-
         ThisCard cardScript = cardNetId.gameObject.GetComponent<ThisCard>();
 
         script.moveRange = cardScript.stars;
@@ -1801,7 +1819,9 @@ public class PlayerManager : NetworkBehaviour
     {
         string trapName = trapCard.GetComponent<ThisAction>().cardName;
 
-        SpawnBox($"Opponent is attacking! Activate {trapName}?", "Activate", "Decline",
+        string msg = (attacker != null) ? $"Opponent is attacking! Activate {trapName}?" : $"Start of turn! Activate {trapName}?";
+
+        SpawnBox(msg, "Activate", "Decline",
             () =>
             {
                 Destroy(activeUIBox);
@@ -1826,21 +1846,31 @@ public class PlayerManager : NetworkBehaviour
             actionScript.faceup = true;
             actionScript.beInGraveyard = true;
 
-            if (actionScript.id == 4)
+            if (actionScript.id == 4) // Last Stand Barrier
             {
-                Debug.Log("Last Stand Barrier Activated! Switching to Defense!");
-
                 RpcGMChangeBattlePosition(defender.GetComponent<LabyrinthObject>().card, false);
             }
+            else if (actionScript.id == 3) // Honey Snare
+            {
+                Debug.Log("Honey Snare Activated! Locking down the board.");
+                this.honeySnareActive = true;
 
-            attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, true, actionScript.id);
+            }
+
+            if (attacker != null && defender != null)
+            {
+                attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, true, actionScript.id);
+            }
 
             CmdPlayerDestroyCard(trapCard, 0);
         }
         else
         {
             Debug.Log("Player declined to use the trap.");
-            attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, false, 0);
+            if (attacker != null && defender != null)
+            {
+                attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, false, 0);
+            }
         }
     }
 }
