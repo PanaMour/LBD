@@ -323,6 +323,10 @@ public class LabyrinthObject : NetworkBehaviour
                 {
                     if (CheckIfNextToWallOrInBase(targetObj)) { validTrap = action.gameObject; break; }
                 }
+                else if (action.id == 1) // Echo of Silence
+                {
+                    validTrap = action.gameObject; break;
+                }
                 else if (action.id == 2) // Phantom Binding
                 {
                     if (willDefenderDie)
@@ -374,7 +378,26 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (trapActivated)
         {
-            if (trapId == 4) // Last Stand Barrier
+            if (trapId == 1) // Echo Of Silence
+            {
+                int gyMonsterCount = 0;
+                ThisCard[] allCards = FindObjectsOfType<ThisCard>();
+
+                foreach (ThisCard c in allCards)
+                {
+                    if (c.connectionToClient == targetScript.connectionToClient && c.beInGraveyard)
+                    {
+                        gyMonsterCount++;
+                    }
+                }
+
+                int atkLoss = gyMonsterCount * 100;
+                myAtk -= atkLoss;
+                if (myAtk < 0) myAtk = 0; 
+
+                Debug.Log($"Echo of Silence triggered! {gyMonsterCount} monsters in GY. Attacker loses {atkLoss} ATK. New ATK: {myAtk}");
+            }
+            else if (trapId == 4) // Last Stand Barrier
             {
                 enemyIsAttackMode = false;
                 enemyDef += enemyAtk;

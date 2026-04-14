@@ -72,6 +72,10 @@ public class PlayerManager : NetworkBehaviour
     public GameObject activeMonsterEffectCard;
     public string pendingMonsterEffect;
     [SyncVar] public bool honeySnareActive = false;
+    public bool isTargetingDiscard = false;
+    public GameObject pendingAttacker;
+    public GameObject pendingDefender;
+    public GameObject pendingTrap;
 
     public override void OnStartClient()
     {
@@ -205,17 +209,58 @@ public class PlayerManager : NetworkBehaviour
 
     public void Update()
     {
-        if (!IsMyTurn || !hasAuthority) return;
+        if (!hasAuthority) return;
+        if (!IsMyTurn && !isTargetingDiscard) return;
 
         if (Input.GetMouseButtonDown(1))
+
+            if (Input.GetMouseButtonDown(1))
         {
             if (isTargeting) CancelTargeting();
             if (isTargetingTile) CancelTileTargeting();
+            if (isTargetingDiscard)
+            {
+                CmdAnswerTrapPrompt(false, pendingTrap, pendingAttacker, pendingDefender);
+                isTargetingDiscard = false;
+                pendingTrap = null; pendingAttacker = null; pendingDefender = null;
+            }
             return;
         }
 
         if (Input.GetMouseButtonDown(0))
         {
+            if (isTargetingDiscard)
+            {
+                Ray rayDiscard = Camera.main.ScreenPointToRay(Input.mousePosition);
+                RaycastHit[] discardHits = Physics.RaycastAll(rayDiscard);
+
+                bool clickedValidCard = false;
+
+                foreach (RaycastHit hit in discardHits)
+                {
+                    NetworkIdentity netId = hit.collider.GetComponentInParent<NetworkIdentity>();
+
+                    if (netId != null && netId.hasAuthority)
+                    {
+                        if (netId.transform.parent != null && netId.transform.parent.name == "Hand_Anchor")
+                        {
+                            CmdResolveEchoOfSilence(netId.gameObject, pendingTrap, pendingAttacker, pendingDefender);
+
+                            isTargetingDiscard = false;
+                            pendingTrap = null; pendingAttacker = null; pendingDefender = null;
+                            clickedValidCard = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (!clickedValidCard)
+                {
+                    Debug.Log("Please click a valid card in your hand to discard, or right-click to cancel.");
+                }
+
+                return;
+            }
             LabyrinthObject attackingUnit = null;
             LabyrinthObject[] allUnits = FindObjectsOfType<LabyrinthObject>();
 
@@ -968,12 +1013,15 @@ public class PlayerManager : NetworkBehaviour
         {
             if (action.id == 3 && !action.faceup && !action.beInGraveyard)
             {
-                NetworkIdentity trapIdentity = action.GetComponent<NetworkIdentity>();
-                PlayerManager ownerPM = trapIdentity.connectionToClient.identity.GetComponent<PlayerManager>();
-
-                if (ownerPM != null)
+                if (action.transform.parent != null && action.transform.parent.name.Contains("ActionSlot"))
                 {
-                    ownerPM.TargetAskActivateTrap(trapIdentity.connectionToClient, action.gameObject, null, null);
+                    NetworkIdentity trapIdentity = action.GetComponent<NetworkIdentity>();
+                    PlayerManager ownerPM = trapIdentity.connectionToClient.identity.GetComponent<PlayerManager>();
+
+                    if (ownerPM != null)
+                    {
+                        ownerPM.TargetAskActivateTrap(trapIdentity.connectionToClient, action.gameObject, null, null);
+                    }
                 }
             }
         }
@@ -1899,6 +1947,13 @@ public class PlayerManager : NetworkBehaviour
     {
         string trapName = trapCard.GetComponent<ThisAction>().cardName;
 
+        if (trapCard.GetComponent<ThisAction>().id == 1 && PlayerArea.transform.childCount == 0)
+        {
+            Debug.Log("Cannot activate Echo of Silence: Hand is empty!");
+            CmdAnswerTrapPrompt(false, trapCard, attacker, defender);
+            return;
+        }
+
         string msg = (attacker != null) ? $"Opponent is attacking! Activate {trapName}?" : $"Start of turn! Activate {trapName}?";
 
         SpawnBox(msg, "Activate", "Decline",
@@ -1934,7 +1989,11 @@ public class PlayerManager : NetworkBehaviour
             {
                 Debug.Log("Honey Snare Activated! Locking down the board.");
                 this.honeySnareActive = true;
-
+            }
+            else if (actionScript.id == 1) // Echo of Silence
+            {
+                TargetStartDiscardForEcho(connectionToClient, trapCard, attacker, defender);
+                return;
             }
 
             if (attacker != null && defender != null)
@@ -1951,6 +2010,40 @@ public class PlayerManager : NetworkBehaviour
             {
                 attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, false, 0);
             }
+        }
+    }
+
+    [TargetRpc]
+    public void TargetStartDiscardForEcho(NetworkConnection target, GameObject trap, GameObject attacker, GameObject defender)
+    {
+        isTargetingDiscard = true;
+        pendingTrap = trap;
+        pendingAttacker = attacker;
+        pendingDefender = defender;
+        Debug.Log("Echo of Silence: Select a card in your hand to discard!");
+    }
+
+    [Command]
+    public void CmdResolveEchoOfSilence(GameObject discardedCard, GameObject trapCard, GameObject attacker, GameObject defender)
+    {
+        if (discardedCard.GetComponent<ThisCard>() != null) discardedCard.GetComponent<ThisCard>().beInGraveyard = true;
+        if (discardedCard.GetComponent<ThisMagic>() != null) discardedCard.GetComponent<ThisMagic>().beInGraveyard = true;
+        if (discardedCard.GetComponent<ThisAction>() != null) discardedCard.GetComponent<ThisAction>().beInGraveyard = true;
+
+        RpcShowCard(discardedCard, "PlayerDestroyed", 0);
+
+        RpcShowCard(trapCard, "Played", 0);
+        ThisAction actionScript = trapCard.GetComponent<ThisAction>();
+        if (actionScript != null)
+        {
+            actionScript.faceup = true;
+            actionScript.beInGraveyard = true;
+        }
+        CmdPlayerDestroyCard(trapCard, 0);
+
+        if (attacker != null && defender != null)
+        {
+            attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, true, 1);
         }
     }
 }

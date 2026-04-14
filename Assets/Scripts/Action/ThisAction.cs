@@ -23,8 +23,7 @@ public class ThisAction : NetworkBehaviour
     public Text descriptionText;
     public Image artworkImage;
 
-    [Header("Card States")]
-    [SyncVar] public bool cardBack = false;
+    public bool cardBack = false;
     public bool faceup = false;
     public bool activated = false;
     [SyncVar] public bool beInGraveyard = false;
