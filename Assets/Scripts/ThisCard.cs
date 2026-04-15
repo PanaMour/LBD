@@ -255,9 +255,13 @@ public class ThisCard : NetworkBehaviour
 
         if (tag != "Unusable")
         {
-            if (summoned)
+            if (summoned && !beInGraveyard)
             {
                 canBeTributed = true;
+            }
+            else
+            {
+                canBeTributed = false;
             }
 
             bool tributeAvailable = false;
