@@ -331,6 +331,7 @@ public class ThisMagic : NetworkBehaviour
 
         if (drawX <= 0 && !activationcomplete && canBeDestroyed)
         {
+            Debug.Log("[ThisMagic] " + magicName + " starting SmoothDestruction. equip=" + equip + " drawX=" + drawX + " canBeDestroyed=" + canBeDestroyed + " beInGraveyard=" + beInGraveyard + " equippedTo=" + (equippedTo != null ? equippedTo.name : "null"));
             activationcomplete = true;
             StartCoroutine(SmoothDestruction(2));
         }
@@ -363,6 +364,10 @@ public class ThisMagic : NetworkBehaviour
                 ThisCard tc = equippedTo.GetComponent<ThisCard>();
                 if (tc != null && tc.beInGraveyard)
                 {
+                    NetworkIdentity hostNi = equippedTo.GetComponent<NetworkIdentity>();
+                    Debug.Log("[ThisMagic] " + magicName + " detected host " + equippedTo.name
+                        + " (netId=" + (hostNi != null ? hostNi.netId.ToString() : "none") + ", cardName=" + tc.cardName + ", summoned=" + tc.summoned + ")"
+                        + " is in graveyard, marking self for destruction.");
                     canBeDestroyed = true;
                     beInGraveyard = true;
                     equippedTo = null;

@@ -204,6 +204,7 @@ public class DragDrop : NetworkBehaviour
                 if (existingCard != null)
                 {
                     ThisCard targetScript = existingCard.GetComponent<ThisCard>();
+                    if (targetScript != null) Debug.Log("[Tribute] canBeTributed=" + targetScript.canBeTributed + " summoned=" + targetScript.summoned + " beInGraveyard=" + targetScript.beInGraveyard + " | " + targetScript.DebugCardBaseInfo());
                     if (targetScript != null && targetScript.canBeTributed)
                     {
                         if (PlayerManager != null)

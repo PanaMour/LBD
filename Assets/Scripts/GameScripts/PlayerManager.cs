@@ -348,6 +348,26 @@ public class PlayerManager : NetworkBehaviour
                             {
                                 Debug.Log("Invalid Target: You must select an ENEMY magic card!");
                             }
+                            continue;
+                        }
+
+                        ThisAction targetAction = hit.collider.GetComponent<ThisAction>();
+                        if (targetAction == null) targetAction = hit.collider.GetComponentInParent<ThisAction>();
+
+                        if (targetAction != null && targetAction.activated)
+                        {
+                            if (!targetAction.hasAuthority)
+                            {
+                                CmdOpponentDestroyCard(targetAction.gameObject, 0);
+                                Debug.Log("Aetherwing Butterfly destroyed an enemy action card!");
+
+                                CancelTargeting();
+                                return;
+                            }
+                            else
+                            {
+                                Debug.Log("Invalid Target: You must select an ENEMY action card!");
+                            }
                         }
                         continue;
                     }
@@ -688,6 +708,27 @@ public class PlayerManager : NetworkBehaviour
         Debug.Log("Targeting Cancelled. Spell fizzled and went to Graveyard.");
     }
 
+    bool HasValidAetherwingTarget()
+    {
+        if (EnemyActionSockets == null) return false;
+
+        foreach (GameObject slot in EnemyActionSockets)
+        {
+            if (slot == null) continue;
+
+            foreach (Transform child in slot.transform)
+            {
+                ThisMagic tm = child.GetComponent<ThisMagic>();
+                if (tm != null && tm.activated) return true;
+
+                ThisAction ta = child.GetComponent<ThisAction>();
+                if (ta != null && ta.activated) return true;
+            }
+        }
+
+        return false;
+    }
+
     [Command]
     public void CmdPlayCard(GameObject card, int index)
     {
@@ -890,10 +931,6 @@ public class PlayerManager : NetworkBehaviour
                 {
                     tc.boost += index;
                 }
-
-                tc.actualATK = tc.atk + tc.boost;
-
-                tc.decreased = tc.actualATK;
             }
         }
         else if (type == "ChangeStars")
@@ -1316,10 +1353,17 @@ public class PlayerManager : NetworkBehaviour
 
             if (tempCard.GetComponent<ThisCard>().id == 56) // Aetherwing Butterfly
             {
-                isTargeting = true;
-                activeMonsterEffectCard = tempCard;
-                pendingMonsterEffect = "Aetherwing";
-                Debug.Log("Aetherwing Butterfly: Select an Enemy Magic/Action card to destroy!");
+                if (HasValidAetherwingTarget())
+                {
+                    isTargeting = true;
+                    activeMonsterEffectCard = tempCard;
+                    pendingMonsterEffect = "Aetherwing";
+                    Debug.Log("Aetherwing Butterfly: Select an Enemy Magic/Action card to destroy!");
+                }
+                else
+                {
+                    Debug.Log("Aetherwing Butterfly: No enemy Magic/Action card to destroy.");
+                }
             }
 
             nomoresummons = true;
@@ -1711,8 +1755,15 @@ public class PlayerManager : NetworkBehaviour
                         if (thisCardScript != null)
                         {
                             thisCardScript.boost += magicScript.equipBoost;
-                            thisCardScript.actualATK = thisCardScript.atk + thisCardScript.boost;
-                            thisCardScript.decreased = thisCardScript.actualATK;
+
+                            thisCardScript.equippedTo = magicCard;
+                            magicScript.equippedTo = monsterCardObj;
+
+                            NetworkIdentity monsterNi = monsterCardObj.GetComponent<NetworkIdentity>();
+                            Debug.Log("[CmdExecuteMagicEffect] Equipped " + magicScript.magicName + " to " + monsterCardObj.name
+                                + " (netId=" + (monsterNi != null ? monsterNi.netId.ToString() : "none") + ", cardName=" + thisCardScript.cardName + ")"
+                                + " | target.summoned=" + thisCardScript.summoned + " target.beInGraveyard=" + thisCardScript.beInGraveyard
+                                + " | magicScript.canBeDestroyed=" + magicScript.canBeDestroyed + " magicScript.activated=" + magicScript.activated + " magicScript.activationcomplete=" + magicScript.activationcomplete + " ThisMagic.drawX=" + ThisMagic.drawX);
 
                             RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
                         }
@@ -1730,6 +1781,9 @@ public class PlayerManager : NetworkBehaviour
                 {
                     GameObject monsterCardObj = monsterScript.card;
                     ThisCard thisCardScript = (monsterCardObj != null) ? monsterCardObj.GetComponent<ThisCard>() : null;
+
+                    if (thisCardScript != null) thisCardScript.equippedTo = magicCard;
+                    magicScript.equippedTo = monsterCardObj;
 
                     if (magicScript.id == 18) // Mechanical Legs
                     {

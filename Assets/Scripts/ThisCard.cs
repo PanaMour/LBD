@@ -255,7 +255,7 @@ public class ThisCard : NetworkBehaviour
 
         if (tag != "Unusable")
         {
-            if (summoned && !beInGraveyard)
+            if (summoned && !beInGraveyard && IsInsideOwnCardBase())
             {
                 canBeTributed = true;
             }
@@ -321,12 +321,66 @@ public class ThisCard : NetworkBehaviour
         }
     }
 
+    bool IsInsideOwnCardBase()
+    {
+        LabyrinthObject[] allTokens = FindObjectsOfType<LabyrinthObject>();
+        LabyrinthObject myToken = null;
+
+        foreach (LabyrinthObject token in allTokens)
+        {
+            if (token.card == gameObject)
+            {
+                myToken = token;
+                break;
+            }
+        }
+
+        if (myToken == null) return true;
+
+        GridStat myTile = myToken.GetComponentInParent<GridStat>();
+        if (myTile == null) return true;
+
+        // Matches the summon-placement rule in GridBehavior.cs: the host's cards
+        // belong at row 0, the joining client's cards belong at row 15.
+        bool ownerIsHost = (hasAuthority == NetworkServer.active);
+        int homeRow = ownerIsHost ? 0 : 15;
+
+        return myTile.y == homeRow && myTile.x >= 2 && myTile.x <= 8;
+    }
+
+    public string DebugCardBaseInfo()
+    {
+        LabyrinthObject[] allTokens = FindObjectsOfType<LabyrinthObject>();
+        LabyrinthObject myToken = null;
+
+        foreach (LabyrinthObject token in allTokens)
+        {
+            if (token.card == gameObject)
+            {
+                myToken = token;
+                break;
+            }
+        }
+
+        if (myToken == null) return "no LabyrinthObject token found for " + cardName;
+
+        GridStat myTile = myToken.GetComponentInParent<GridStat>();
+        if (myTile == null) return "token found but no GridStat parent for " + cardName;
+
+        bool ownerIsHost = (hasAuthority == NetworkServer.active);
+        int homeRow = ownerIsHost ? 0 : 15;
+
+        return cardName + " tile=(" + myTile.x + "," + myTile.y + ") homeRow=" + homeRow
+            + " hasAuthority=" + hasAuthority + " NetworkServer.active=" + NetworkServer.active
+            + " ownerIsHost=" + ownerIsHost + " IsInsideOwnCardBase=" + IsInsideOwnCardBase();
+    }
+
     void HandleStatusBorders(bool isInBattleZone)
     {
         if (summoned && !beInGraveyard)
         {
             attackBorder.SetActive(canAttack && attackmode);
-            canBeTributed = true;
+            canBeTributed = IsInsideOwnCardBase();
         }
         else
         {
@@ -433,10 +487,9 @@ public class ThisCard : NetworkBehaviour
                 {
                     foreach (Transform grandChild in child)
                     {
-                        if (grandChild.GetComponent<ThisCard>().isTarget == true)
+                        ThisCard enemyCard = grandChild.GetComponent<ThisCard>();
+                        if (enemyCard != null && enemyCard.isTarget == true)
                         {
-                            ThisCard enemyCard = grandChild.GetComponent<ThisCard>();
-
                             enemyCard.decreased = actualATK;
                             decreased = enemyCard.actualATK;
                             cantAttack = true;
