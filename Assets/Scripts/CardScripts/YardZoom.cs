@@ -49,20 +49,10 @@ public class YardZoom : NetworkBehaviour
 
     public void OnYardClicked()
     {
-        Debug.Log("[YardZoom] OnYardClicked fired on " + gameObject.name);
-
-        if (NetworkClient.connection == null || NetworkClient.connection.identity == null)
-        {
-            Debug.Log("[YardZoom] OnYardClicked aborted: no local NetworkClient connection/identity yet");
-            return;
-        }
+        if (NetworkClient.connection == null || NetworkClient.connection.identity == null) return;
 
         PlayerManager localPlayerManager = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-        if (localPlayerManager == null)
-        {
-            Debug.Log("[YardZoom] OnYardClicked aborted: local identity has no PlayerManager component");
-            return;
-        }
+        if (localPlayerManager == null) return;
 
         localPlayerManager.OpenGraveyardInspector();
     }
