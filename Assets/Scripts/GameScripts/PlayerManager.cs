@@ -58,6 +58,9 @@ public class PlayerManager : NetworkBehaviour
     private GameObject tempTributeVictim;
     private GameObject activeUIBox;
 
+    public GameObject GraveyardInspectorPanelPrefab;
+    private GameObject activeGraveyardPanel;
+
     public GameObject TreasureChestPrefab;
     public Color TreasureTileColor = Color.yellow;
 
@@ -1391,7 +1394,14 @@ public class PlayerManager : NetworkBehaviour
             card.transform.localPosition = new Vector3(0, heightOffset, 0);
             card.transform.localRotation = Quaternion.Euler(90, 0, 0);
             
-            card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f); 
+            card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
+
+            Collider[] cardColliders = card.GetComponentsInChildren<Collider>(true);
+            foreach (Collider cardCollider in cardColliders)
+            {
+                cardCollider.enabled = false;
+            }
+
             LabyrinthObject[] allTokens = FindObjectsOfType<LabyrinthObject>();
             
             foreach (LabyrinthObject token in allTokens)
@@ -1415,6 +1425,122 @@ public class PlayerManager : NetworkBehaviour
     public void CmdDestroyToken(GameObject token)
     {
         NetworkServer.Destroy(token);
+    }
+
+    [System.Serializable]
+    public class GraveyardEntry
+    {
+        public string cardName;
+        public string category; // "Monster" | "Spell" | "Action"
+    }
+
+    private List<GraveyardEntry> GatherGraveyardEntries(GameObject yard)
+    {
+        List<GraveyardEntry> entries = new List<GraveyardEntry>();
+
+        if (yard == null) return entries;
+        if (yard.transform.childCount == 0) return entries;
+
+        foreach (Transform child in yard.transform)
+        {
+            if (child == null) continue;
+
+            ThisCard monster = child.GetComponent<ThisCard>();
+            if (monster != null)
+            {
+                entries.Add(new GraveyardEntry { cardName = monster.cardName, category = "Monster" });
+                continue;
+            }
+
+            ThisMagic spell = child.GetComponent<ThisMagic>();
+            if (spell != null)
+            {
+                entries.Add(new GraveyardEntry { cardName = spell.magicName, category = "Spell" });
+                continue;
+            }
+
+            ThisAction action = child.GetComponent<ThisAction>();
+            if (action != null)
+            {
+                entries.Add(new GraveyardEntry { cardName = action.cardName, category = "Action" });
+                continue;
+            }
+        }
+
+        return entries;
+    }
+
+    public void OpenGraveyardInspector()
+    {
+        Debug.Log("[PlayerManager] OpenGraveyardInspector called");
+
+        List<GraveyardEntry> myGraveyard = GatherGraveyardEntries(PlayerYard);
+        List<GraveyardEntry> enemyGraveyard = GatherGraveyardEntries(EnemyYard);
+
+        Debug.Log("[PlayerManager] Gathered " + myGraveyard.Count + " of my graveyard entries and " + enemyGraveyard.Count + " enemy graveyard entries");
+
+        DisplayGraveyardInspector(myGraveyard, enemyGraveyard);
+    }
+
+    private void DisplayGraveyardInspector(List<GraveyardEntry> mine, List<GraveyardEntry> enemy)
+    {
+        if (GraveyardInspectorPanelPrefab == null || Canvas == null)
+        {
+            Debug.Log("[PlayerManager] DisplayGraveyardInspector aborted: GraveyardInspectorPanelPrefab=" + (GraveyardInspectorPanelPrefab == null ? "NULL" : "set") + ", Canvas=" + (Canvas == null ? "NULL" : "set"));
+            return;
+        }
+
+        if (activeGraveyardPanel != null) Destroy(activeGraveyardPanel);
+
+        activeGraveyardPanel = Instantiate(GraveyardInspectorPanelPrefab, Canvas.transform);
+        activeGraveyardPanel.transform.localPosition = Vector3.zero;
+        activeGraveyardPanel.transform.localScale = Vector3.one;
+
+        RectTransform panelRect = activeGraveyardPanel.GetComponent<RectTransform>();
+        RectTransform canvasRect = Canvas.GetComponent<RectTransform>();
+        Debug.Log("[PlayerManager] Instantiated graveyard panel under " + Canvas.name
+            + " | panel active=" + activeGraveyardPanel.activeInHierarchy
+            + " localScale=" + activeGraveyardPanel.transform.localScale
+            + " lossyScale=" + activeGraveyardPanel.transform.lossyScale
+            + " rect.sizeDelta=" + (panelRect != null ? panelRect.sizeDelta.ToString() : "no RectTransform")
+            + " rect.rect=" + (panelRect != null ? panelRect.rect.ToString() : "n/a")
+            + " canvas.renderMode=" + Canvas.GetComponent<UnityEngine.Canvas>()?.renderMode
+            + " canvas.rect=" + (canvasRect != null ? canvasRect.rect.ToString() : "n/a")
+            + " canvas.activeInHierarchy=" + Canvas.activeInHierarchy);
+
+        PopulateGraveyardColumn(activeGraveyardPanel.transform.Find("PlayerColumn"), mine);
+        PopulateGraveyardColumn(activeGraveyardPanel.transform.Find("EnemyColumn"), enemy);
+
+        Button closeBtn = activeGraveyardPanel.transform.Find("CloseButton")?.GetComponent<Button>();
+        if (closeBtn != null)
+        {
+            closeBtn.onClick.RemoveAllListeners();
+            closeBtn.onClick.AddListener(() => { Destroy(activeGraveyardPanel); activeGraveyardPanel = null; });
+        }
+    }
+
+    private void PopulateGraveyardColumn(Transform column, List<GraveyardEntry> entries)
+    {
+        if (column == null) return;
+
+        Text monsterText = column.Find("MonsterListText")?.GetComponent<Text>();
+        Text spellText = column.Find("SpellListText")?.GetComponent<Text>();
+        Text actionText = column.Find("ActionListText")?.GetComponent<Text>();
+
+        string monsters = "";
+        string spells = "";
+        string actions = "";
+
+        foreach (GraveyardEntry entry in entries)
+        {
+            if (entry.category == "Monster") monsters += entry.cardName + "\n";
+            else if (entry.category == "Spell") spells += entry.cardName + "\n";
+            else if (entry.category == "Action") actions += entry.cardName + "\n";
+        }
+
+        if (monsterText != null) monsterText.text = "Monsters:\n" + (monsters.Length > 0 ? monsters : "(none)");
+        if (spellText != null) spellText.text = "Spells:\n" + (spells.Length > 0 ? spells : "(none)");
+        if (actionText != null) actionText.text = "Actions:\n" + (actions.Length > 0 ? actions : "(none)");
     }
 
     [Server]

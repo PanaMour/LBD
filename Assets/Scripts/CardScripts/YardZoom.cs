@@ -41,4 +41,29 @@ public class YardZoom : NetworkBehaviour
             }
         }*/
     }
+
+    void OnMouseDown()
+    {
+        OnYardClicked();
+    }
+
+    public void OnYardClicked()
+    {
+        Debug.Log("[YardZoom] OnYardClicked fired on " + gameObject.name);
+
+        if (NetworkClient.connection == null || NetworkClient.connection.identity == null)
+        {
+            Debug.Log("[YardZoom] OnYardClicked aborted: no local NetworkClient connection/identity yet");
+            return;
+        }
+
+        PlayerManager localPlayerManager = NetworkClient.connection.identity.GetComponent<PlayerManager>();
+        if (localPlayerManager == null)
+        {
+            Debug.Log("[YardZoom] OnYardClicked aborted: local identity has no PlayerManager component");
+            return;
+        }
+
+        localPlayerManager.OpenGraveyardInspector();
+    }
 }

@@ -48,6 +48,8 @@ MonoImporter:
       type: 3}
   - ConfirmationBoxPrefab: {fileID: 6613209675388961194, guid: 9f2a5f7986b39304d9afcada64a94781,
       type: 3}
+  - GraveyardInspectorPanelPrefab: {fileID: 1001, guid: 3473b833d3ce6854ecf6ff35dcd71cd3,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
