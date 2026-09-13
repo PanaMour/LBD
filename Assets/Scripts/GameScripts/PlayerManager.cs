@@ -519,7 +519,6 @@ public class PlayerManager : NetworkBehaviour
             }
         }
     }
-    [Server]
     public override void OnStartServer()
     {
         if (connectionToClient == NetworkServer.localConnection)
@@ -1586,9 +1585,10 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    [Server]
     public void ServerSpawnTreasure()
     {
+        if (!NetworkServer.active) return;
+
         int rX = Random.Range(0, 11);
         int rY = Random.Range(6, 10);
 

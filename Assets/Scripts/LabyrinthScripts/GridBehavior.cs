@@ -23,12 +23,10 @@ public class GridBehavior : MonoBehaviour
     public int spaces;
     public GameObject cardWaitingToSpawn;
 
+    // Generated in Start, not Awake: Mirror's editor-only OnPostProcessScene runs
+    // after Awake when entering play mode, and would flag these runtime-created
+    // tiles as scene objects with no valid sceneId.
     void Start()
-    {
-
-    }
-
-    private void Awake()
     {
         gridArray = new GameObject[columns, rows];
         if (gridPrefab) GenerateGrid();
