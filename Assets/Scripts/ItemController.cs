@@ -34,8 +34,16 @@ public class ItemController : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(1) && PlayerManager.IsMyTurn == true && gameObject.transform.parent.transform.parent == GameObject.Find("PlayerSlots").transform && gameObject.GetComponent<ThisCard>().alreadychanged == false)
         {
+            List<ContextMenuItem> items = new List<ContextMenuItem>(contextMenuItems);
+
+            if (gameObject.GetComponent<ThisCard>().id == 47) // Frost Wraith
+            {
+                Action<Image> tribute = new Action<Image>(TributeToImmobilize);
+                items.Insert(items.Count - 1, new ContextMenuItem("Tribute: Immobilize Target", sampleButton, tribute));
+            }
+
             Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
-            ContextMenu.Instance.CreateContextMenu(contextMenuItems, new Vector2(pos.x, pos.y));
+            ContextMenu.Instance.CreateContextMenu(items, new Vector2(pos.x, pos.y));
         }
 
     }
@@ -66,6 +74,15 @@ public class ItemController : MonoBehaviour
 
     void Cancel(Image contextPanel)
     {
+        Destroy(contextPanel.gameObject);
+    }
+
+    void TributeToImmobilize(Image contextPanel)
+    {
+        if (PlayerManager.IsMyTurn == true)
+        {
+            PlayerManager.StartFrostWraithTribute(gameObject);
+        }
         Destroy(contextPanel.gameObject);
     }
 }

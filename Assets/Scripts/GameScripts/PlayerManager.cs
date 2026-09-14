@@ -422,6 +422,18 @@ public class PlayerManager : NetworkBehaviour
                                     CancelTargeting();
                                 }
                             }
+                            else if (pendingMonsterEffect == "FrostWraith")
+                            {
+                                if (IsTileInAnyCardBase(targetCandidate))
+                                {
+                                    CmdTributeFrostWraith(activeMonsterEffectCard, targetCandidate.gameObject);
+                                    CancelTargeting();
+                                }
+                                else
+                                {
+                                    Debug.Log("Invalid Target: You must select a monster inside a Card Base!");
+                                }
+                            }
                             return;
                         }
                     }
@@ -707,6 +719,54 @@ public class PlayerManager : NetworkBehaviour
         Debug.Log("Targeting Cancelled. Spell fizzled and went to Graveyard.");
     }
 
+    // Frost Wraith: "You can tribute this card to target one monster in the
+    // Card Base and it gains 'Immobile' property." Entry point called from
+    // ItemController's right-click context menu on a summoned Frost Wraith.
+    public void StartFrostWraithTribute(GameObject frostWraithCard)
+    {
+        isTargeting = true;
+        activeMonsterEffectCard = frostWraithCard;
+        pendingMonsterEffect = "FrostWraith";
+        Debug.Log("Frost Wraith: Select a monster in a Card Base to make Immobile!");
+    }
+
+    // Matches the summon/tribute-zone rule elsewhere (GridBehavior.cs,
+    // ThisCard.IsInsideOwnCardBase()): a Card Base tile is row 0 or row 15,
+    // columns 2-8. Frost Wraith's target can be in either player's Card Base.
+    bool IsTileInAnyCardBase(LabyrinthObject target)
+    {
+        if (target == null) return false;
+        GridStat tile = target.GetComponentInParent<GridStat>();
+        if (tile == null) return false;
+        return (tile.y == 0 || tile.y == 15) && tile.x >= 2 && tile.x <= 8;
+    }
+
+    [Command]
+    public void CmdTributeFrostWraith(GameObject frostWraithCard, GameObject targetMonsterObj)
+    {
+        LabyrinthObject targetMonster = targetMonsterObj.GetComponent<LabyrinthObject>();
+        if (targetMonster == null) return;
+
+        targetMonster.isImmobile = true;
+        ThisCard targetCardScript = targetMonster.card != null ? targetMonster.card.GetComponent<ThisCard>() : null;
+        if (targetCardScript != null) targetCardScript.isImmobile = true;
+        if (targetMonster.card != null) RpcShowCard(targetMonster.card, "SetImmobile", 0);
+
+        Debug.Log("Frost Wraith tributed! " + (targetCardScript != null ? targetCardScript.cardName : targetMonsterObj.name) + " is now Immobile.");
+
+        LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
+        foreach (LabyrinthObject lo in allMonsters)
+        {
+            if (lo.card == frostWraithCard)
+            {
+                NetworkServer.Destroy(lo.gameObject);
+                break;
+            }
+        }
+
+        CmdPlayerDestroyCard(frostWraithCard, 0);
+    }
+
     bool HasValidAetherwingTarget()
     {
         if (EnemyActionSockets == null) return false;
@@ -950,6 +1010,14 @@ public class PlayerManager : NetworkBehaviour
             if (tc != null)
             {
                 tc.isImmobile = false;
+            }
+        }
+        else if (type == "SetImmobile")
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                tc.isImmobile = true;
             }
         }
 
@@ -1207,8 +1275,19 @@ public class PlayerManager : NetworkBehaviour
 
         script.isImmobile = cardScript.isImmobile;
 
+        // A card whose own base property is Immobile (e.g. Labyrinth Shield,
+        // Frost Wraith) is bound the instant it's summoned, not just when some
+        // other effect grants it the property.
+        if (cardScript.cardProperty == Property.Immobile)
+        {
+            script.isImmobile = true;
+            cardScript.isImmobile = true;
+        }
+
         NetworkServer.Spawn(monster, connectionToClient);
         RpcLinkMonsterToCard(monster, cardNetId.gameObject);
+
+        if (script.isImmobile) RpcShowCard(cardNetId.gameObject, "SetImmobile", 0);
     }
 
     [ClientRpc]

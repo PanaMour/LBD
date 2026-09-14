@@ -430,6 +430,12 @@ public class LabyrinthObject : NetworkBehaviour
                 if (trapActivated && trapId == 2) // Phantom Binding
                 {
                     this.isImmobile = true;
+                    if (this.card != null)
+                    {
+                        ThisCard atkCardScript = this.card.GetComponent<ThisCard>();
+                        if (atkCardScript != null) atkCardScript.isImmobile = true;
+                        pm.RpcShowCard(this.card, "SetImmobile", 0);
+                    }
                     Debug.Log("Phantom Binding triggered! The attacker is now Immobile.");
                 }
 
@@ -472,6 +478,12 @@ public class LabyrinthObject : NetworkBehaviour
                 if (trapActivated && trapId == 2) // Phantom Binding
                 {
                     this.isImmobile = true;
+                    if (this.card != null)
+                    {
+                        ThisCard atkCardScript = this.card.GetComponent<ThisCard>();
+                        if (atkCardScript != null) atkCardScript.isImmobile = true;
+                        pm.RpcShowCard(this.card, "SetImmobile", 0);
+                    }
                     Debug.Log("Phantom Binding triggered! The attacker is now Immobile.");
                 }
 
