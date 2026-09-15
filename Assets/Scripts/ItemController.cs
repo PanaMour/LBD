@@ -32,14 +32,31 @@ public class ItemController : MonoBehaviour
 
     public void RightClickForContextMenu()
     {
-        if (Input.GetMouseButtonDown(1) && PlayerManager.IsMyTurn == true && gameObject.transform.parent.transform.parent == GameObject.Find("PlayerSlots").transform && gameObject.GetComponent<ThisCard>().alreadychanged == false)
+        // Note: alreadychanged (battle position already switched this turn)
+        // deliberately does NOT gate the menu itself -- it only removes the
+        // Attack/Defense options below. A monster's own activated ability
+        // (Frost Wraith's tribute, Shy Magician's swap, etc.) is independent
+        // of whether its battle position was already changed this turn, and
+        // must stay reachable even then.
+        if (Input.GetMouseButtonDown(1) && PlayerManager.IsMyTurn == true && gameObject.transform.parent.transform.parent == GameObject.Find("PlayerSlots").transform)
         {
-            List<ContextMenuItem> items = new List<ContextMenuItem>(contextMenuItems);
+            List<ContextMenuItem> items = new List<ContextMenuItem>();
+            if (!gameObject.GetComponent<ThisCard>().alreadychanged)
+            {
+                items.AddRange(contextMenuItems.GetRange(0, contextMenuItems.Count - 1)); // Attack Mode, Defense Mode
+            }
+            items.Add(contextMenuItems[contextMenuItems.Count - 1]); // Cancel
 
             if (gameObject.GetComponent<ThisCard>().id == 47) // Frost Wraith
             {
                 Action<Image> tribute = new Action<Image>(TributeToImmobilize);
                 items.Insert(items.Count - 1, new ContextMenuItem("Tribute: Immobilize Target", sampleButton, tribute));
+            }
+
+            if (gameObject.GetComponent<ThisCard>().id == 48 && !gameObject.GetComponent<ThisCard>().abilityUsed) // Shy Magician
+            {
+                Action<Image> swap = new Action<Image>(ExchangePositions);
+                items.Insert(items.Count - 1, new ContextMenuItem("Exchange Positions", sampleButton, swap));
             }
 
             Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
@@ -57,7 +74,7 @@ public class ItemController : MonoBehaviour
             PlayerManager.CmdChangeBattlePosition(gameObject, true);
             Debug.Log("Switched " + gameObject.GetComponent<ThisCard>().cardName + " to Attack");
         }
-        Destroy(contextPanel.gameObject);
+        ContextMenu.Instance.CloseActiveMenu();
     }
 
     void ChangeDefense(Image contextPanel)
@@ -69,12 +86,12 @@ public class ItemController : MonoBehaviour
             PlayerManager.CmdChangeBattlePosition(gameObject, false);
             Debug.Log("Switched " + gameObject.GetComponent<ThisCard>().cardName + " to Defense");
         }
-        Destroy(contextPanel.gameObject);
+        ContextMenu.Instance.CloseActiveMenu();
     }
 
     void Cancel(Image contextPanel)
     {
-        Destroy(contextPanel.gameObject);
+        ContextMenu.Instance.CloseActiveMenu();
     }
 
     void TributeToImmobilize(Image contextPanel)
@@ -83,6 +100,15 @@ public class ItemController : MonoBehaviour
         {
             PlayerManager.StartFrostWraithTribute(gameObject);
         }
-        Destroy(contextPanel.gameObject);
+        ContextMenu.Instance.CloseActiveMenu();
+    }
+
+    void ExchangePositions(Image contextPanel)
+    {
+        if (PlayerManager.IsMyTurn == true)
+        {
+            PlayerManager.StartShyMagicianSwap(gameObject);
+        }
+        ContextMenu.Instance.CloseActiveMenu();
     }
 }

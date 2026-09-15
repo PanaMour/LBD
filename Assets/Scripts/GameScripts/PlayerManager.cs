@@ -75,6 +75,7 @@ public class PlayerManager : NetworkBehaviour
     public int pendingSlotIndex;
     public GameObject activeMonsterEffectCard;
     public string pendingMonsterEffect;
+    private LabyrinthObject pendingSwapFirst; // Shy Magician: first of the two monsters picked to swap
     [SyncVar] public bool honeySnareActive = false;
     public bool isTargetingDiscard = false;
     public GameObject pendingAttacker;
@@ -434,6 +435,31 @@ public class PlayerManager : NetworkBehaviour
                                     Debug.Log("Invalid Target: You must select a monster inside a Card Base!");
                                 }
                             }
+                            else if (pendingMonsterEffect == "ShyMagician")
+                            {
+                                ThisCard targetCard = targetCandidate.card != null ? targetCandidate.card.GetComponent<ThisCard>() : null;
+                                bool isValidMageAlly = targetCandidate.hasAuthority && targetCard != null && targetCard.currentTypes.Contains(Type.Mage);
+
+                                if (!isValidMageAlly)
+                                {
+                                    Debug.Log("Invalid Target: You must select one of YOUR Mage-type monsters!");
+                                }
+                                else if (pendingSwapFirst == null)
+                                {
+                                    pendingSwapFirst = targetCandidate;
+                                    Debug.Log("Shy Magician: Select the second Mage-type monster to swap with!");
+                                }
+                                else if (pendingSwapFirst == targetCandidate)
+                                {
+                                    Debug.Log("Invalid Target: Select a DIFFERENT monster for the second target!");
+                                }
+                                else
+                                {
+                                    CmdSwapMonsterPositions(activeMonsterEffectCard, pendingSwapFirst.gameObject, targetCandidate.gameObject);
+                                    pendingSwapFirst = null;
+                                    CancelTargeting();
+                                }
+                            }
                             return;
                         }
                     }
@@ -716,6 +742,7 @@ public class PlayerManager : NetworkBehaviour
         activeMagicCard = null;
         activeMonsterEffectCard = null;
         pendingMonsterEffect = "";
+        pendingSwapFirst = null;
         Debug.Log("Targeting Cancelled. Spell fizzled and went to Graveyard.");
     }
 
@@ -765,6 +792,45 @@ public class PlayerManager : NetworkBehaviour
         }
 
         CmdPlayerDestroyCard(frostWraithCard, 0);
+    }
+
+    // Shy Magician: "Once per duel, you can select two of your Mage-type
+    // monsters and those monsters exchange positions on the labyrinth."
+    // Entry point called from ItemController's right-click context menu on
+    // a summoned, not-yet-used Shy Magician.
+    public void StartShyMagicianSwap(GameObject shyMagicianCard)
+    {
+        isTargeting = true;
+        activeMonsterEffectCard = shyMagicianCard;
+        pendingMonsterEffect = "ShyMagician";
+        pendingSwapFirst = null;
+        Debug.Log("Shy Magician: Select the first Mage-type monster to swap!");
+    }
+
+    [Command]
+    public void CmdSwapMonsterPositions(GameObject shyMagicianCard, GameObject monsterAObj, GameObject monsterBObj)
+    {
+        ThisCard shyCard = shyMagicianCard != null ? shyMagicianCard.GetComponent<ThisCard>() : null;
+        if (shyCard == null || shyCard.abilityUsed) return;
+
+        LabyrinthObject a = monsterAObj != null ? monsterAObj.GetComponent<LabyrinthObject>() : null;
+        LabyrinthObject b = monsterBObj != null ? monsterBObj.GetComponent<LabyrinthObject>() : null;
+        if (a == null || b == null || a == b) return;
+
+        // currentTileName is a SyncVar with a hook (OnTileNameChanged) that
+        // reparents/snaps the monster to its new tile on every client, so
+        // swapping the strings alone is enough -- no manual reparenting here.
+        string tileA = a.currentTileName;
+        string tileB = b.currentTileName;
+        a.currentTileName = tileB;
+        b.currentTileName = tileA;
+
+        shyCard.abilityUsed = true;
+        RpcShowCard(shyMagicianCard, "MarkAbilityUsed", 0);
+
+        Debug.Log("Shy Magician: swapped positions of "
+            + (a.card != null ? a.card.GetComponent<ThisCard>().cardName : a.name) + " and "
+            + (b.card != null ? b.card.GetComponent<ThisCard>().cardName : b.name) + ".");
     }
 
     bool HasValidAetherwingTarget()
@@ -1018,6 +1084,14 @@ public class PlayerManager : NetworkBehaviour
             if (tc != null)
             {
                 tc.isImmobile = true;
+            }
+        }
+        else if (type == "MarkAbilityUsed")
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                tc.abilityUsed = true;
             }
         }
 

@@ -97,6 +97,12 @@ public class ThisCard : NetworkBehaviour
     public bool changemode = false;
     public bool alreadychanged = false;
 
+    // Generic "once per duel" flag for a monster's own activated ability
+    // (e.g. Shy Magician's position exchange). Not synced to non-owning
+    // clients automatically -- effects that set it should RPC the change
+    // the same way SetImmobile/RemoveImmobile do.
+    public bool abilityUsed = false;
+
     public bool faceup = false;
     public int boost = 0;
     public bool boosted = false;

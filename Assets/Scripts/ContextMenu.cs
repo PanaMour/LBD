@@ -43,13 +43,37 @@ public class ContextMenu : MonoBehaviour
         }
     }
 
-    public void CreateContextMenu(List<ContextMenuItem> items, Vector2 position)
-    {
+    // Tracks the single open menu so a second right-click replaces it
+    // instead of stacking another one on top.
+    private Image activeMenu;
 
-        Image panel = Instantiate(contentPanel, new Vector3(position.x, position.y, 0), Quaternion.identity) as Image;
-        panel.transform.SetParent(canvas.transform);
+    public void CreateContextMenu(List<ContextMenuItem> items, Vector2 screenPosition)
+    {
+        CloseActiveMenu();
+
+        Image panel = Instantiate(contentPanel) as Image;
+
+        // screenPosition comes from Camera.WorldToScreenPoint, i.e. real
+        // screen pixels, which only line up 1:1 with the canvas's local
+        // space when the CanvasScaler's scaleFactor is exactly 1 (Main
+        // Canvas uses ScaleWithScreenSize, so that's only true at exactly
+        // its 1920x1080 reference resolution). Resolve the actual world
+        // point for that screen position first, then reparent onto the
+        // canvas with worldPositionStays=true so Unity solves the panel's
+        // own anchoredPosition for us -- this is correct regardless of the
+        // panel's anchor settings (this prefab anchors at its own bottom-left
+        // corner, not the canvas's center, so computing a canvas-local point
+        // directly and assigning it to anchoredPosition would be off by the
+        // gap between those two anchor origins).
+        UnityEngine.Camera cam = canvas.renderMode == RenderMode.ScreenSpaceOverlay ? null : canvas.worldCamera;
+        RectTransformUtility.ScreenPointToWorldPointInRectangle(
+            canvas.transform as RectTransform, screenPosition, cam, out Vector3 worldPoint);
+        panel.transform.position = worldPoint;
+
+        panel.transform.SetParent(canvas.transform, true);
         panel.transform.SetAsLastSibling();
-        panel.rectTransform.anchoredPosition = position;
+
+        activeMenu = panel;
 
         foreach (var item in items)
         {
@@ -58,7 +82,16 @@ public class ContextMenu : MonoBehaviour
             Text buttonText = button.GetComponentInChildren(typeof(Text)) as Text;
             buttonText.text = item.text;
             button.onClick.AddListener(delegate { tempReference.action(panel); });
-            button.transform.SetParent(panel.transform);
+            button.transform.SetParent(panel.transform, false);
+        }
+    }
+
+    public void CloseActiveMenu()
+    {
+        if (activeMenu != null)
+        {
+            Destroy(activeMenu.gameObject);
+            activeMenu = null;
         }
     }
 }
