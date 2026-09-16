@@ -833,6 +833,91 @@ public class PlayerManager : NetworkBehaviour
             + (b.card != null ? b.card.GetComponent<ThisCard>().cardName : b.name) + ".");
     }
 
+    // Spooky Man: "When this card is destroyed by battle you can revive one
+    // Undead-type monster with less squares than this card from your
+    // Graveyard to the same square as this card." Called by
+    // LabyrinthObject.CheckSpookyManRevival on the dead monster's OWN
+    // PlayerManager, right before it's destroyed.
+    // Not [Server]-attributed: Mirror's weaver produces invalid IL for this
+    // method signature on this Unity/Mirror combo (same issue hit earlier
+    // with OnStartServer/ServerSpawnTreasure after the 2022.3 upgrade), so
+    // this guards manually instead.
+    public void ServerOfferSpookyManRevival(string deathTileName, int spookyStars)
+    {
+        if (!Mirror.NetworkServer.active) return;
+
+        bool anyEligible = false;
+        foreach (ThisCard c in FindObjectsOfType<ThisCard>())
+        {
+            if (c.connectionToClient != connectionToClient) continue;
+            if (!c.beInGraveyard) continue;
+            if (!c.currentTypes.Contains(Type.Undead)) continue;
+            if (c.stars >= spookyStars) continue;
+            anyEligible = true;
+            break;
+        }
+        if (!anyEligible) return; // nothing to choose from -- no prompt
+
+        TargetChooseSpookyManRevival(connectionToClient, deathTileName, spookyStars);
+    }
+
+    // Tells the owning client which death square and star ceiling to offer,
+    // then opens their own Graveyard inspector so they can pick exactly
+    // which eligible Undead monster to revive (see PopulateGraveyardColumn).
+    [TargetRpc]
+    void TargetChooseSpookyManRevival(NetworkConnection target, string deathTileName, int spookyStars)
+    {
+        pendingRevivalTile = deathTileName;
+        pendingRevivalMinStars = spookyStars;
+        OpenGraveyardInspector();
+    }
+
+    [Command]
+    public void CmdResolveSpookyManRevival(GameObject reviveCard, string tileName)
+    {
+        ThisCard cardScript = reviveCard != null ? reviveCard.GetComponent<ThisCard>() : null;
+        if (cardScript == null || !cardScript.beInGraveyard) return; // already resolved or invalid
+
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+        Transform tile = gridGen != null ? gridGen.transform.Find(tileName) : null;
+        if (tile != null && tile.GetComponentInChildren<LabyrinthObject>() != null)
+        {
+            Debug.Log("Spooky Man revival failed: the square is no longer empty.");
+            return;
+        }
+
+        int freeIndex = -1;
+        for (int i = 0; i < PlayerSockets.Count; i++)
+        {
+            if (PlayerSockets[i] == null) continue;
+            bool occupied = false;
+            foreach (Transform child in PlayerSockets[i].transform)
+            {
+                if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null || child.GetComponent<ThisAction>() != null)
+                { occupied = true; break; }
+            }
+            if (!occupied) { freeIndex = i; break; }
+        }
+        if (freeIndex == -1)
+        {
+            Debug.Log("Spooky Man revival failed: no free monster slot.");
+            return;
+        }
+
+        cardScript.beInGraveyard = false;
+        cardScript.summoned = true;
+        cardScript.attackmode = true;
+
+        // Reuses the same cross-client reparent-into-socket logic a normal
+        // summon uses, so the revived card appears correctly on both
+        // players' screens.
+        RpcShowCard(reviveCard, "Played", freeIndex);
+
+        CmdSpawnMonster(cardScript.thisId, tileName, reviveCard.GetComponent<NetworkIdentity>());
+
+        Debug.Log("Spooky Man revived " + cardScript.cardName + "!");
+    }
+
     bool HasValidAetherwingTarget()
     {
         if (EnemyActionSockets == null) return false;
@@ -1630,7 +1715,15 @@ public class PlayerManager : NetworkBehaviour
         public string cardName;
         public string category; // "Monster" | "Spell" | "Action"
         public Sprite icon;
+        public GameObject cardObject; // needed so a tile click can resolve back to the actual card (e.g. Spooky Man's revival choice)
     }
+
+    // Spooky Man: which death square is awaiting a revival pick, and the
+    // star ceiling a graveyard monster must be under to qualify. Non-null
+    // means the graveyard inspector's PlayerColumn is currently offering a
+    // revival choice instead of just being a read-only view.
+    private string pendingRevivalTile;
+    private int pendingRevivalMinStars;
 
     private List<GraveyardEntry> GatherGraveyardEntries(GameObject yard)
     {
@@ -1646,21 +1739,21 @@ public class PlayerManager : NetworkBehaviour
             ThisCard monster = child.GetComponent<ThisCard>();
             if (monster != null)
             {
-                entries.Add(new GraveyardEntry { cardName = monster.cardName, category = "Monster", icon = monster.thisSprite });
+                entries.Add(new GraveyardEntry { cardName = monster.cardName, category = "Monster", icon = monster.thisSprite, cardObject = child.gameObject });
                 continue;
             }
 
             ThisMagic spell = child.GetComponent<ThisMagic>();
             if (spell != null)
             {
-                entries.Add(new GraveyardEntry { cardName = spell.magicName, category = "Spell", icon = spell.thisSprite });
+                entries.Add(new GraveyardEntry { cardName = spell.magicName, category = "Spell", icon = spell.thisSprite, cardObject = child.gameObject });
                 continue;
             }
 
             ThisAction action = child.GetComponent<ThisAction>();
             if (action != null)
             {
-                entries.Add(new GraveyardEntry { cardName = action.cardName, category = "Action", icon = action.thisImage });
+                entries.Add(new GraveyardEntry { cardName = action.cardName, category = "Action", icon = action.thisImage, cardObject = child.gameObject });
                 continue;
             }
         }
@@ -1686,14 +1779,22 @@ public class PlayerManager : NetworkBehaviour
         activeGraveyardPanel.transform.localPosition = Vector3.zero;
         activeGraveyardPanel.transform.localScale = Vector3.one;
 
-        PopulateGraveyardColumn(activeGraveyardPanel.transform.Find("PlayerColumn"), mine);
-        PopulateGraveyardColumn(activeGraveyardPanel.transform.Find("EnemyColumn"), enemy);
+        Text playerHeader = activeGraveyardPanel.transform.Find("PlayerColumn/PlayerHeaderText")?.GetComponent<Text>();
+        if (playerHeader != null) playerHeader.text = pendingRevivalTile != null ? "Select an Undead monster to revive!" : "Your Graveyard";
+
+        PopulateGraveyardColumn(activeGraveyardPanel.transform.Find("PlayerColumn"), mine, true);
+        PopulateGraveyardColumn(activeGraveyardPanel.transform.Find("EnemyColumn"), enemy, false);
 
         Button closeBtn = activeGraveyardPanel.transform.Find("CloseButton")?.GetComponent<Button>();
         if (closeBtn != null)
         {
             closeBtn.onClick.RemoveAllListeners();
-            closeBtn.onClick.AddListener(() => { Destroy(activeGraveyardPanel); activeGraveyardPanel = null; });
+            closeBtn.onClick.AddListener(() =>
+            {
+                pendingRevivalTile = null; // closing while a revival choice is pending declines it
+                Destroy(activeGraveyardPanel);
+                activeGraveyardPanel = null;
+            });
         }
     }
 
@@ -1705,7 +1806,7 @@ public class PlayerManager : NetworkBehaviour
         return Color.white;
     }
 
-    private void PopulateGraveyardColumn(Transform column, List<GraveyardEntry> entries)
+    private void PopulateGraveyardColumn(Transform column, List<GraveyardEntry> entries, bool isPlayerColumn)
     {
         if (column == null) return;
 
@@ -1722,6 +1823,8 @@ public class PlayerManager : NetworkBehaviour
 
         if (GraveyardCardTilePrefab == null) return;
 
+        bool revivalPending = isPlayerColumn && pendingRevivalTile != null;
+
         foreach (GraveyardEntry entry in entries)
         {
             GameObject tile = Instantiate(GraveyardCardTilePrefab, content);
@@ -1735,6 +1838,34 @@ public class PlayerManager : NetworkBehaviour
 
             Text label = tile.transform.Find("NameLabel")?.GetComponent<Text>();
             if (label != null) label.text = entry.cardName;
+
+            if (!revivalPending) continue;
+
+            ThisCard tc = entry.cardObject != null ? entry.cardObject.GetComponent<ThisCard>() : null;
+            bool eligible = tc != null && tc.currentTypes.Contains(Type.Undead) && tc.stars < pendingRevivalMinStars;
+
+            if (eligible)
+            {
+                GameObject capturedCard = entry.cardObject;
+                Button btn = tile.GetComponent<Button>();
+                if (btn == null) btn = tile.AddComponent<Button>();
+                btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() =>
+                {
+                    string tileName = pendingRevivalTile;
+                    pendingRevivalTile = null;
+                    CmdResolveSpookyManRevival(capturedCard, tileName);
+                    Destroy(activeGraveyardPanel);
+                    activeGraveyardPanel = null;
+                });
+            }
+            else
+            {
+                // Dim tiles that don't qualify so the eligible ones read as clickable.
+                if (border != null) { Color c = border.color; c.a *= 0.3f; border.color = c; }
+                if (icon != null) { Color c = icon.color; c.a *= 0.35f; icon.color = c; }
+                if (label != null) { Color c = label.color; c.a *= 0.4f; label.color = c; }
+            }
         }
     }
 

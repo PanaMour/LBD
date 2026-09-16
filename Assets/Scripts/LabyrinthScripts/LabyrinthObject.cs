@@ -441,6 +441,7 @@ public class LabyrinthObject : NetworkBehaviour
 
                 if (enemyCard.cardProperty == Property.Plague) pm.RpcApplyPlagueDebuff(this.card);
 
+                CheckSpookyManRevival(targetScript);
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
 
@@ -457,6 +458,7 @@ public class LabyrinthObject : NetworkBehaviour
             {
                 if (myCard.cardProperty == Property.Plague) pm.RpcApplyPlagueDebuff(targetScript.card);
 
+                CheckSpookyManRevival(this);
                 NetworkServer.Destroy(this.gameObject);
                 pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
 
@@ -465,6 +467,8 @@ public class LabyrinthObject : NetworkBehaviour
             }
             else
             {
+                CheckSpookyManRevival(this);
+                CheckSpookyManRevival(targetScript);
                 NetworkServer.Destroy(this.gameObject);
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
@@ -489,6 +493,7 @@ public class LabyrinthObject : NetworkBehaviour
 
                 if (enemyCard.cardProperty == Property.Plague) pm.RpcApplyPlagueDebuff(this.card);
 
+                CheckSpookyManRevival(targetScript);
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
 
@@ -509,6 +514,23 @@ public class LabyrinthObject : NetworkBehaviour
         enemyCard.RecalculateStats();
         pm.RpcResetDemonLadyShred(targetScript.card);
     }
+
+    // Spooky Man: "When this card is destroyed by battle you can revive one
+    // Undead-type monster with less squares than this card from your
+    // Graveyard to the same square as this card." Called right before each
+    // battle-death NetworkServer.Destroy() call, for whichever side died.
+    void CheckSpookyManRevival(LabyrinthObject deadMonster)
+    {
+        if (deadMonster == null || deadMonster.monsterID != 52) return; // Spooky Man
+        if (deadMonster.card == null) return;
+        ThisCard deadCard = deadMonster.card.GetComponent<ThisCard>();
+        if (deadCard == null) return;
+        if (deadMonster.connectionToClient == null || deadMonster.connectionToClient.identity == null) return;
+
+        PlayerManager ownerPM = deadMonster.connectionToClient.identity.GetComponent<PlayerManager>();
+        if (ownerPM != null) ownerPM.ServerOfferSpookyManRevival(deadMonster.currentTileName, deadCard.stars);
+    }
+
     [Command]
     public void CmdDirectAttack()
     {
