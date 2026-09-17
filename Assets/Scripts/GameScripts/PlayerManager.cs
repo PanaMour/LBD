@@ -460,6 +460,28 @@ public class PlayerManager : NetworkBehaviour
                                     CancelTargeting();
                                 }
                             }
+                            else if (pendingMonsterEffect == "SpiritTribute")
+                            {
+                                ThisCard spiritCard = activeMonsterEffectCard.GetComponent<ThisCard>();
+                                ThisCard targetCard = targetCandidate.card != null ? targetCandidate.card.GetComponent<ThisCard>() : null;
+
+                                bool isLabyrinthSpirit = spiritCard.id == 35;
+                                bool attributeMatches = isLabyrinthSpirit
+                                    || (targetCard != null && spiritCard.currentAttributes.Count > 0 && targetCard.currentAttributes.Contains(spiritCard.currentAttributes[0]));
+                                bool isNotSelf = targetCandidate.card != activeMonsterEffectCard;
+                                bool isValidTarget = targetCandidate.hasAuthority && targetCard != null && isNotSelf && attributeMatches;
+
+                                if (!isValidTarget)
+                                {
+                                    string need = isLabyrinthSpirit ? "one of YOUR monsters" : "one of YOUR matching-attribute monsters";
+                                    Debug.Log("Invalid Target: You must select " + need + "!");
+                                }
+                                else
+                                {
+                                    CmdGrantWallwalk(activeMonsterEffectCard, targetCandidate.gameObject);
+                                    CancelTargeting();
+                                }
+                            }
                             return;
                         }
                     }
@@ -792,6 +814,47 @@ public class PlayerManager : NetworkBehaviour
         }
 
         CmdPlayerDestroyCard(frostWraithCard, 0);
+    }
+
+    // Water/Fire/Nature/Wind/Labyrinth Spirit: "You can tribute this card to
+    // grant another [attribute] monster you control this card's
+    // properties." All five share this one implementation -- the elemental
+    // four restrict the target to their own attribute (read dynamically off
+    // the spirit's own card data), Labyrinth Spirit (id 35) allows any
+    // monster. Entry point called from ItemController's right-click context
+    // menu on a summoned Spirit.
+    public void StartSpiritTribute(GameObject spiritCard)
+    {
+        isTargeting = true;
+        activeMonsterEffectCard = spiritCard;
+        pendingMonsterEffect = "SpiritTribute";
+        Debug.Log("Select one of your monsters to grant Wallwalk!");
+    }
+
+    [Command]
+    public void CmdGrantWallwalk(GameObject spiritCard, GameObject targetMonsterObj)
+    {
+        ThisCard spirit = spiritCard != null ? spiritCard.GetComponent<ThisCard>() : null;
+        LabyrinthObject targetMonster = targetMonsterObj != null ? targetMonsterObj.GetComponent<LabyrinthObject>() : null;
+        if (spirit == null || targetMonster == null || targetMonster.card == spiritCard) return;
+
+        ThisCard targetCardScript = targetMonster.card != null ? targetMonster.card.GetComponent<ThisCard>() : null;
+        if (targetCardScript != null) targetCardScript.grantedWallwalk = true;
+        if (targetMonster.card != null) RpcShowCard(targetMonster.card, "GrantWallwalk", 0);
+
+        Debug.Log(spirit.cardName + " tributed! " + (targetCardScript != null ? targetCardScript.cardName : targetMonsterObj.name) + " gained Wallwalk.");
+
+        LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
+        foreach (LabyrinthObject lo in allMonsters)
+        {
+            if (lo.card == spiritCard)
+            {
+                NetworkServer.Destroy(lo.gameObject);
+                break;
+            }
+        }
+
+        CmdPlayerDestroyCard(spiritCard, 0);
     }
 
     // Shy Magician: "Once per duel, you can select two of your Mage-type
@@ -1177,6 +1240,14 @@ public class PlayerManager : NetworkBehaviour
             if (tc != null)
             {
                 tc.abilityUsed = true;
+            }
+        }
+        else if (type == "GrantWallwalk")
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                tc.grantedWallwalk = true;
             }
         }
 
@@ -1910,9 +1981,15 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
-    [Server]
+    // Not [Server]-attributed: Mirror's weaver produces invalid IL for this
+    // method on this Unity/Mirror combo once its body references the new
+    // SpecialSummonOrDrawLabyrinthMonster coroutine (same class of issue hit
+    // earlier with OnStartServer/ServerSpawnTreasure and
+    // ServerOfferSpookyManRevival), so this guards manually instead.
     public void ServerCollectTreasure(GameObject chest)
     {
+        if (!NetworkServer.active) return;
+
         GridStat tileStat = chest.GetComponentInParent<GridStat>();
         LabyrinthObject collector = (tileStat != null) ? tileStat.GetComponentInChildren<LabyrinthObject>() : null;
 
@@ -1935,21 +2012,84 @@ public class PlayerManager : NetworkBehaviour
                 return;
             }
 
-            if (choice.Key == "Monster") StartCoroutine(DrawSpecificCard(choice.Value));
+            if (choice.Key == "Monster") StartCoroutine(SpecialSummonOrDrawLabyrinthMonster(choice.Value));
             else StartCoroutine(DrawSpecificMagic(choice.Value));
         }
     }
-    IEnumerator DrawSpecificCard(int cardId)
+    // Every Type.Labyrinth monster (Labyrinth Minotaur, Labyrinth Shield, ...)
+    // shares this same printed effect: "Once picked up: Special Summon this
+    // card to your base. If you do not have an open zone add it to your
+    // hand instead." Picked up here means drawn from the treasure-chest
+    // labyrinthPool above, not a normal draw.
+    IEnumerator SpecialSummonOrDrawLabyrinthMonster(int cardId)
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.5f); // matches DrawSpecificMagic's pacing
 
         GameObject cardObj = Instantiate(Card, Vector2.zero, Quaternion.identity);
-
-        cardObj.GetComponent<ThisCard>().thisId = cardId;
-
+        ThisCard cardScript = cardObj.GetComponent<ThisCard>();
+        cardScript.thisId = cardId;
         NetworkServer.Spawn(cardObj, connectionToClient);
 
-        RpcShowCard(cardObj, "Dealt", 0);
+        // ThisCard.Update() populates stars/cardProperty/etc. from thisId on
+        // its own next Update() tick, not synchronously -- CmdSpawnMonster
+        // reads those fields, so give it a moment before using them.
+        yield return new WaitForSeconds(0.1f);
+
+        // Card Base row matches the summon-placement/tribute rule used
+        // elsewhere (GridBehavior.cs, ThisCard.IsInsideOwnCardBase()): the
+        // host's own base is row 0, the joining client's is row 15.
+        bool ownerIsHost = (hasAuthority == NetworkServer.active);
+        int homeRow = ownerIsHost ? 0 : 15;
+
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+        string openTileName = null;
+        if (gridGen != null)
+        {
+            for (int col = 2; col <= 8 && openTileName == null; col++)
+            {
+                foreach (Transform child in gridGen.transform)
+                {
+                    GridStat stat = child.GetComponent<GridStat>();
+                    if (stat != null && stat.x == col && stat.y == homeRow && child.GetComponentInChildren<LabyrinthObject>() == null)
+                    {
+                        openTileName = child.name;
+                        break;
+                    }
+                }
+            }
+        }
+
+        int freeSlotIndex = -1;
+        if (openTileName != null)
+        {
+            for (int i = 0; i < PlayerSockets.Count; i++)
+            {
+                if (PlayerSockets[i] == null) continue;
+                bool occupied = false;
+                foreach (Transform child in PlayerSockets[i].transform)
+                {
+                    if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null || child.GetComponent<ThisAction>() != null)
+                    { occupied = true; break; }
+                }
+                if (!occupied) { freeSlotIndex = i; break; }
+            }
+        }
+
+        if (openTileName != null && freeSlotIndex != -1)
+        {
+            cardScript.summoned = true;
+            cardScript.attackmode = true;
+
+            RpcShowCard(cardObj, "Played", freeSlotIndex);
+            CmdSpawnMonster(cardId, openTileName, cardObj.GetComponent<NetworkIdentity>());
+
+            Debug.Log("Labyrinth pickup: Special Summoned " + cardScript.cardName + " to the Card Base!");
+        }
+        else
+        {
+            RpcShowCard(cardObj, "Dealt", 0);
+            Debug.Log("Labyrinth pickup: No open zone, added " + cardScript.cardName + " to hand.");
+        }
     }
 
     IEnumerator DrawSpecificMagic(int magicId)

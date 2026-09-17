@@ -59,6 +59,13 @@ public class ItemController : MonoBehaviour
                 items.Insert(items.Count - 1, new ContextMenuItem("Exchange Positions", sampleButton, swap));
             }
 
+            int cardId = gameObject.GetComponent<ThisCard>().id;
+            if (cardId == 29 || cardId == 30 || cardId == 31 || cardId == 32 || cardId == 35) // Water/Fire/Nature/Wind/Labyrinth Spirit
+            {
+                Action<Image> tribute = new Action<Image>(TributeForWallwalk);
+                items.Insert(items.Count - 1, new ContextMenuItem("Tribute: Grant Wallwalk", sampleButton, tribute));
+            }
+
             Vector3 pos = Camera.main.WorldToScreenPoint(transform.position);
             ContextMenu.Instance.CreateContextMenu(items, new Vector2(pos.x, pos.y));
         }
@@ -108,6 +115,15 @@ public class ItemController : MonoBehaviour
         if (PlayerManager.IsMyTurn == true)
         {
             PlayerManager.StartShyMagicianSwap(gameObject);
+        }
+        ContextMenu.Instance.CloseActiveMenu();
+    }
+
+    void TributeForWallwalk(Image contextPanel)
+    {
+        if (PlayerManager.IsMyTurn == true)
+        {
+            PlayerManager.StartSpiritTribute(gameObject);
         }
         ContextMenu.Instance.CloseActiveMenu();
     }

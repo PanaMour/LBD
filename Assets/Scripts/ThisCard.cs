@@ -103,6 +103,14 @@ public class ThisCard : NetworkBehaviour
     // the same way SetImmobile/RemoveImmobile do.
     public bool abilityUsed = false;
 
+    // Set by the elemental/Labyrinth Spirits' tribute ability ("grant
+    // another monster you control this card's properties"). Kept separate
+    // from cardProperty (rather than overwriting it) so a monster that
+    // already has its own property -- Plague, say -- doesn't lose it just
+    // because it was also granted Wallwalk. GridBehavior's wall-crossing
+    // checks treat this the same as cardProperty == Property.Wallwalk.
+    public bool grantedWallwalk = false;
+
     public bool faceup = false;
     public int boost = 0;
     public bool boosted = false;

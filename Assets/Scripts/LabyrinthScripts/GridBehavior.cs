@@ -326,7 +326,7 @@ public class GridBehavior : MonoBehaviour
             if (labScript != null && labScript.card != null)
             {
                 ThisCard cardData = labScript.card.GetComponent<ThisCard>();
-                if (cardData != null && cardData.cardProperty == Property.Wallwalk)
+                if (cardData != null && (cardData.cardProperty == Property.Wallwalk || cardData.grantedWallwalk))
                 {
                     hasWallwalk = true;
                 }
@@ -544,7 +544,7 @@ public class GridBehavior : MonoBehaviour
         LabyrinthObject attacker = objectToMove.GetComponent<LabyrinthObject>();
         ThisCard attackerCard = attacker.card.GetComponent<ThisCard>();
 
-        if (attackerCard.cardProperty != Property.Wallwalk)
+        if (attackerCard.cardProperty != Property.Wallwalk && !attackerCard.grantedWallwalk)
         {
             if (BlocksDirection(sourceX, sourceY, direction) || BlocksDirection(targetX, targetY, opposite))
             {
