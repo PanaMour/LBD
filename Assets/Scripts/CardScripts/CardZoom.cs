@@ -36,6 +36,9 @@ public class CardZoom : NetworkBehaviour
     public Image zoomBackground;
     public Image zoomCanvas;
     public Image zoomCardBack;
+    public GameObject zoomTypeLine;
+    public Text zoomTypeLineText;
+    public RectTransform zoomTypeLinePlate;
 
     public void Awake()
     {
@@ -52,6 +55,14 @@ public class CardZoom : NetworkBehaviour
         zoomBackground = GameObject.Find("ZoomBackground").GetComponent<Image>();
         zoomCanvas = GameObject.Find("ZoomCardCanvas").GetComponent<Image>();
         zoomCardBack = GameObject.Find("ZoomCardBack").GetComponent<Image>();
+
+        zoomTypeLine = GameObject.Find("ZoomTypeLine");
+        if (zoomTypeLine != null)
+        {
+            zoomTypeLinePlate = zoomTypeLine.GetComponent<RectTransform>();
+            Transform inner = zoomTypeLine.transform.Find("ZoomTypeLineText");
+            if (inner != null) zoomTypeLineText = inner.GetComponent<Text>();
+        }
 
         if (zoomBackground != null)
         {
@@ -101,10 +112,32 @@ public class CardZoom : NetworkBehaviour
             zoomBackground.color = Background.color;
             zoomText.text = Card.GetComponent<ThisCard>().descriptionText.text;
             zoomCanvas.color = CardCanvas.color;
+
+            // Mirrors the small card's Type/Attribute/Property bar. The text is
+            // copied from the card itself rather than rebuilt, so granted
+            // properties stay in sync with what the card face already shows.
+            if (zoomTypeLine != null)
+            {
+                zoomTypeLine.transform.localScale = new Vector3(1, 1, 1);
+
+                Text sourceLine = Card.GetComponent<ThisCard>().typeLineText;
+                if (zoomTypeLineText != null && sourceLine != null)
+                {
+                    zoomTypeLineText.text = sourceLine.text;
+
+                    if (zoomTypeLinePlate != null)
+                    {
+                        float needed = zoomTypeLineText.preferredHeight + 6f;
+                        if (needed < 30f) needed = 30f;
+                        zoomTypeLinePlate.sizeDelta = new Vector2(zoomTypeLinePlate.sizeDelta.x, needed);
+                    }
+                }
+            }
         }
         else if (!hasAuthority)
         {
             zoomCardBack.transform.localScale = new Vector3(1, 1, 1);
+            if (zoomTypeLine != null) zoomTypeLine.transform.localScale = new Vector3(0, 0, 0);
             zoomText.text = "Opponent's Card.";
             Debug.Log("NO AUTHORITY!");
         }

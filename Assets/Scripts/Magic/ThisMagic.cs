@@ -18,6 +18,7 @@ public class ThisMagic : NetworkBehaviour
     public string magicDescription;
     public Text magicnameText;
     public Text magicdescriptionText;
+    public Text magicTypeLineText;
     public Sprite thisSprite;
     public Image thatImage;
     public Image frame;
@@ -89,6 +90,9 @@ public class ThisMagic : NetworkBehaviour
 
             if (bg.Find("MagicDescription/MagicDescriptionText"))
                 magicdescriptionText = bg.Find("MagicDescription/MagicDescriptionText").GetComponent<Text>();
+
+            if (bg.Find("MagicTypeLine/MagicTypeLineText"))
+                magicTypeLineText = bg.Find("MagicTypeLine/MagicTypeLineText").GetComponent<Text>();
 
             if (bg.Find("MagicImage"))
                 thatImage = bg.Find("MagicImage").GetComponent<Image>();
@@ -168,6 +172,7 @@ public class ThisMagic : NetworkBehaviour
         {
             if (magicnameText) magicnameText.text = "" + magicName;
             if (magicdescriptionText) magicdescriptionText.text = "" + magicDescription;
+            if (magicTypeLineText) magicTypeLineText.text = BuildMagicTypeLine();
 
             if (thatImage != null && thisSprite != null)
             {
@@ -412,4 +417,15 @@ public class ThisMagic : NetworkBehaviour
     }
 
     public void TargetMonster() { }
+
+    // magicType is only carried on the database entry, not mirrored onto this
+    // component, so the label is read straight from thisMagic[0].
+    public string BuildMagicTypeLine()
+    {
+        if (thisMagic.Count == 0 || thisMagic[0] == null) return "Magic";
+
+        if (thisMagic[0].magicType == MagicType.Armor) return "Armor Magic";
+        if (thisMagic[0].magicType == MagicType.Labyrinth) return "Labyrinth Magic";
+        return "Magic";
+    }
 }

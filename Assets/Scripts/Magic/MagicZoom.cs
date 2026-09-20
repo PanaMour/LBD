@@ -33,6 +33,9 @@ public class MagicZoom : NetworkBehaviour
     public GameObject zoomStars;
     public GameObject zoomATK;
     public GameObject zoomDEF;
+    public GameObject zoomTypeLine;
+    public Text zoomTypeLineText;
+    public RectTransform zoomTypeLinePlate;
     public Image zoomBackground;
     public Image zoomCanvas;
     public Image zoomCardBack;
@@ -49,6 +52,13 @@ public class MagicZoom : NetworkBehaviour
         zoomStars = GameObject.Find("ZoomStars");
         zoomATK = GameObject.Find("ZoomATK");
         zoomDEF = GameObject.Find("ZoomDEF");
+        zoomTypeLine = GameObject.Find("ZoomTypeLine");
+        if (zoomTypeLine != null)
+        {
+            zoomTypeLinePlate = zoomTypeLine.GetComponent<RectTransform>();
+            Transform inner = zoomTypeLine.transform.Find("ZoomTypeLineText");
+            if (inner != null) zoomTypeLineText = inner.GetComponent<Text>();
+        }
         zoomBackground = GameObject.Find("ZoomBackground").GetComponent<Image>();
         zoomCanvas = GameObject.Find("ZoomCardCanvas").GetComponent<Image>();
         zoomCardBack = GameObject.Find("ZoomCardBack").GetComponent<Image>();
@@ -83,6 +93,9 @@ public class MagicZoom : NetworkBehaviour
             zoomATK.transform.localScale = new Vector3(0, 0, 0);
             zoomDEF.transform.localScale = new Vector3(0, 0, 0);
             zoomStars.transform.localScale = new Vector3(0, 0, 0);
+            // Magic cards carry no Type/Attribute/Property, so hide the bar a
+            // previously hovered monster left behind.
+            if (zoomTypeLine != null) zoomTypeLine.transform.localScale = new Vector3(0, 0, 0);
             zoomCardNameText.text = NameText.text;
             zoomImage.sprite = Image.sprite;
 

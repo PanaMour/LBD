@@ -30,6 +30,7 @@ public class ActionZoom : NetworkBehaviour
     public GameObject zoomStars;
     public GameObject zoomATK;
     public GameObject zoomDEF;
+    public GameObject zoomTypeLine;
     public Image zoomCardBack;
 
     public Image zoomBackground;
@@ -46,6 +47,7 @@ public class ActionZoom : NetworkBehaviour
         zoomStars = GameObject.Find("ZoomStars");
         zoomATK = GameObject.Find("ZoomATK");
         zoomDEF = GameObject.Find("ZoomDEF");
+        zoomTypeLine = GameObject.Find("ZoomTypeLine");
         zoomCardBack = GameObject.Find("ZoomCardBack")?.GetComponent<Image>();
 
         zoomBackground = GameObject.Find("ZoomBackground")?.GetComponent<Image>();
@@ -80,6 +82,9 @@ public class ActionZoom : NetworkBehaviour
             if (zoomATK != null) zoomATK.transform.localScale = new Vector3(0, 0, 0);
             if (zoomDEF != null) zoomDEF.transform.localScale = new Vector3(0, 0, 0);
             if (zoomStars != null) zoomStars.transform.localScale = new Vector3(0, 0, 0);
+            // Action cards carry no Type/Attribute/Property, so hide the bar a
+            // previously hovered monster left behind.
+            if (zoomTypeLine != null) zoomTypeLine.transform.localScale = new Vector3(0, 0, 0);
 
             if (zoomCardNameText != null) zoomCardNameText.text = actionCardData.cardName;
             if (zoomImage != null) zoomImage.sprite = actionCardData.thisImage;

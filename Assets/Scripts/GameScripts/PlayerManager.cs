@@ -1383,6 +1383,7 @@ public class PlayerManager : NetworkBehaviour
         foreach (ThisCard c in allCardsOnBoard)
         {
             c.tempAtk = 0;
+            c.tempDef = 0;
         }
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
         pm.IsMyTurn = !pm.IsMyTurn;
@@ -2462,6 +2463,27 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    // Takes the new ABSOLUTE tempDef value, not a delta -- ClientRpc delivery
+    // (even to the host's own local client) is queued to the next network
+    // tick, not synchronous, so the caller already applies this same value
+    // directly on the server's own object first (RpcApplyDemonLadyShred's
+    // battleDefPenalty follows the same idempotent-absolute-set pattern for
+    // the same reason). Using a delta here would double-count once this
+    // eventually runs redundantly against that already-updated object.
+    [ClientRpc]
+    public void RpcApplyTempDef(GameObject card, int newTempDef)
+    {
+        if (card != null)
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null)
+            {
+                tc.tempDef = newTempDef;
+                tc.RecalculateStats();
+            }
+        }
+    }
+
     [Command]
     public void CmdApplyPlagueDebuff(GameObject targetCard)
     {
@@ -2578,25 +2600,52 @@ public class PlayerManager : NetworkBehaviour
     {
         if (wantsToActivate)
         {
-            RpcShowCard(trapCard, "Played", 0);
-
             ThisAction actionScript = trapCard.GetComponent<ThisAction>();
+
+            // Echo of Silence's cost (discard 1 card) hasn't been paid yet at
+            // this point -- CmdResolveEchoOfSilence reveals/plays the trap
+            // once the discard is actually chosen. Doing it here too would
+            // fire RpcShowCard("Played")/CmdGMCardPlayed() twice for a single
+            // activation, double-incrementing GameManager.TurnOrder, and
+            // would leave the trap stuck marked as played/beInGraveyard if
+            // the player cancels the discard prompt instead of completing it.
+            if (actionScript.id == 1) // Echo of Silence
+            {
+                TargetStartDiscardForEcho(connectionToClient, trapCard, attacker, defender);
+                return;
+            }
+
+            RpcShowCard(trapCard, "Played", 0);
             actionScript.faceup = true;
             actionScript.beInGraveyard = true;
 
             if (actionScript.id == 4) // Last Stand Barrier
             {
-                RpcGMChangeBattlePosition(defender.GetComponent<LabyrinthObject>().card, false);
+                GameObject defenderCardObj = defender.GetComponent<LabyrinthObject>().card;
+                ThisCard defenderCard = defenderCardObj.GetComponent<ThisCard>();
+                RpcGMChangeBattlePosition(defenderCardObj, false);
+
+                // "...gains DEF equal to its ATK until the end of this turn"
+                // -- tempDef persists (reset alongside tempAtk in
+                // RpcGMChangeTurn) so a second attack against this same
+                // monster later in the turn still sees the DEF boost, not
+                // just the single battle that triggered the trap.
+                //
+                // Applied directly on the server's own object (not just via
+                // the RPC below) because the ServerResolveAttack call right
+                // after this needs actualDEF to already reflect the boost --
+                // ClientRpc delivery is queued to the next network tick even
+                // for the host's own local client, so it wouldn't be visible
+                // in time for this same battle.
+                int newTempDef = defenderCard.tempDef + defenderCard.actualATK;
+                defenderCard.tempDef = newTempDef;
+                defenderCard.RecalculateStats();
+                RpcApplyTempDef(defenderCardObj, newTempDef);
             }
             else if (actionScript.id == 3) // Honey Snare
             {
                 Debug.Log("Honey Snare Activated! Locking down the board.");
                 this.honeySnareActive = true;
-            }
-            else if (actionScript.id == 1) // Echo of Silence
-            {
-                TargetStartDiscardForEcho(connectionToClient, trapCard, attacker, defender);
-                return;
             }
 
             if (attacker != null && defender != null)

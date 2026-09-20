@@ -29,6 +29,8 @@ public class ThisCard : NetworkBehaviour
     public Text ATKText;
     public Text DEFText;
     public Text descriptionText;
+    public Text typeLineText;
+    public RectTransform typeLinePlate;
 
     public Sprite thisSprite;
     public Image thatImage;
@@ -240,6 +242,32 @@ public class ThisCard : NetworkBehaviour
             else if (thisCard[0].color == "Brown") frame.color = new Color32(156, 73, 0, 255);
             else if (thisCard[0].color == "Red") frame.color = new Color32(255, 0, 0, 255);
             else if (thisCard[0].color == "Magic") frame.color = new Color32(19, 138, 102, 255);
+
+            if (typeLineText == null)
+            {
+                Transform typeLine = transform.Find("CardCanvas/Background/TypeLine");
+                if (typeLine != null)
+                {
+                    typeLinePlate = typeLine.GetComponent<RectTransform>();
+                    Transform inner = typeLine.Find("TypeLineText");
+                    if (inner != null) typeLineText = inner.GetComponent<Text>();
+                }
+            }
+            if (typeLineText != null)
+            {
+                typeLineText.text = BuildTypeLine();
+
+                // The bar is top-pivoted and the artwork leaves room for two
+                // lines, so a long type line wraps instead of shrinking the
+                // font and making cards inconsistent with each other.
+                if (typeLinePlate != null)
+                {
+                    float needed = typeLineText.preferredHeight + 2f;
+                    if (needed < 9f) needed = 9f;
+                    if (typeLinePlate.sizeDelta.y != needed)
+                        typeLinePlate.sizeDelta = new Vector2(typeLinePlate.sizeDelta.x, needed);
+                }
+            }
         }
 
         if (summoned && transform.parent != null)
@@ -663,10 +691,45 @@ public class ThisCard : NetworkBehaviour
         useReturn = false;
     }
 
+    // Reads the live currentTypes/currentAttributes lists rather than the base
+    // card, so runtime additions (Cyber Ninja gaining Robot once summoned) show
+    // up. Granted properties live in their own fields instead of overwriting
+    // cardProperty -- the Spirits' tribute sets grantedWallwalk, Frost Wraith
+    // and Honey Snare set isImmobile -- so they are folded in here, otherwise
+    // the card would keep advertising its printed property after an ability
+    // changed what it actually does.
+    string BuildTypeLine()
+    {
+        string types = "";
+        for (int i = 0; i < currentTypes.Count; i++)
+            types += (i > 0 ? "/" : "") + currentTypes[i];
+
+        string attributes = "";
+        for (int i = 0; i < currentAttributes.Count; i++)
+            attributes += (i > 0 ? "/" : "") + currentAttributes[i];
+
+        // The Labyrinth cards are Type.Labyrinth AND Attribute.Labyrinth, which
+        // would otherwise print as a redundant "Labyrinth / Labyrinth".
+        string line = (types == attributes) ? types : types + " / " + attributes;
+
+        string props = "";
+        if (cardProperty != Property.None) props += cardProperty.ToString();
+        if (grantedWallwalk && cardProperty != Property.Wallwalk)
+            props += (props.Length > 0 ? ", " : "") + Property.Wallwalk;
+        if (isImmobile && cardProperty != Property.Immobile)
+            props += (props.Length > 0 ? ", " : "") + Property.Immobile;
+
+        if (props.Length > 0) line += " [" + props + "]";
+        return line;
+    }
+
     public void RecalculateStats()
     {
         actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss - decreased;
-        actualDEF = def + auraDef - plagueDefLoss - battleDefPenalty;
+        // Must match Update()'s formula below -- this omitted tempDef, so any
+        // effect that needs a temp DEF boost reflected synchronously (Last
+        // Stand Barrier) would see it silently vanish whenever this ran.
+        actualDEF = def + tempDef + auraDef - plagueDefLoss - battleDefPenalty;
 
         if (actualATK < 0) actualATK = 0;
         if (actualDEF < 0) actualDEF = 0;

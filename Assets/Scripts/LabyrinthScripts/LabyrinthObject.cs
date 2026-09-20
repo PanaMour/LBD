@@ -348,9 +348,15 @@ public class LabyrinthObject : NetworkBehaviour
             ServerResolveAttack(targetObj, false, 0);
         }
     }
-    [Server]
+    // Not [Server]-attributed: Mirror's weaver produces invalid IL for this
+    // method on this Unity/Mirror combo once its body changes past some size
+    // threshold (same recurring issue as OnStartServer/ServerSpawnTreasure,
+    // ServerOfferSpookyManRevival and ServerCollectTreasure), so this guards
+    // manually instead.
     public void ServerResolveAttack(GameObject targetObj, bool trapActivated, int trapId)
     {
+        if (!NetworkServer.active) return;
+
         LabyrinthObject targetScript = targetObj.GetComponent<LabyrinthObject>();
         if (targetScript == null) return;
 
@@ -399,8 +405,11 @@ public class LabyrinthObject : NetworkBehaviour
             }
             else if (trapId == 4) // Last Stand Barrier
             {
+                // The DEF boost itself was already applied to enemyCard via
+                // PlayerManager.RpcApplyTempDef before this call (as tempDef,
+                // persisting until end of turn), so enemyDef above already
+                // reflects it -- adding enemyAtk again here would double it.
                 enemyIsAttackMode = false;
-                enemyDef += enemyAtk;
                 Debug.Log($"Last Stand Barrier activated! {enemyCard.cardName} DEF is boosted to {enemyDef} for this battle!");
             }
             else if (trapId == 5) // Intercept
