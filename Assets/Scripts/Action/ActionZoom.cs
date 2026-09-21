@@ -31,6 +31,9 @@ public class ActionZoom : NetworkBehaviour
     public GameObject zoomATK;
     public GameObject zoomDEF;
     public GameObject zoomTypeLine;
+    public Text zoomTypeLineText;
+    public RectTransform zoomTypeLinePlate;
+    public Image zoomTypeLinePlateImage;
     public Image zoomCardBack;
 
     public Image zoomBackground;
@@ -48,6 +51,13 @@ public class ActionZoom : NetworkBehaviour
         zoomATK = GameObject.Find("ZoomATK");
         zoomDEF = GameObject.Find("ZoomDEF");
         zoomTypeLine = GameObject.Find("ZoomTypeLine");
+        if (zoomTypeLine != null)
+        {
+            zoomTypeLinePlate = zoomTypeLine.GetComponent<RectTransform>();
+            zoomTypeLinePlateImage = zoomTypeLine.GetComponent<Image>();
+            Transform inner = zoomTypeLine.transform.Find("ZoomTypeLineText");
+            if (inner != null) zoomTypeLineText = inner.GetComponent<Text>();
+        }
         zoomCardBack = GameObject.Find("ZoomCardBack")?.GetComponent<Image>();
 
         zoomBackground = GameObject.Find("ZoomBackground")?.GetComponent<Image>();
@@ -82,9 +92,14 @@ public class ActionZoom : NetworkBehaviour
             if (zoomATK != null) zoomATK.transform.localScale = new Vector3(0, 0, 0);
             if (zoomDEF != null) zoomDEF.transform.localScale = new Vector3(0, 0, 0);
             if (zoomStars != null) zoomStars.transform.localScale = new Vector3(0, 0, 0);
-            // Action cards carry no Type/Attribute/Property, so hide the bar a
-            // previously hovered monster left behind.
-            if (zoomTypeLine != null) zoomTypeLine.transform.localScale = new Vector3(0, 0, 0);
+            if (zoomTypeLine != null)
+            {
+                zoomTypeLine.transform.localScale = new Vector3(1, 1, 1);
+                if (zoomTypeLineText != null) zoomTypeLineText.text = "Action";
+                if (zoomTypeLinePlateImage != null) zoomTypeLinePlateImage.color = ThisAction.ActionBarColor;
+                if (zoomTypeLinePlate != null)
+                    zoomTypeLinePlate.sizeDelta = new Vector2(zoomTypeLinePlate.sizeDelta.x, 30f);
+            }
 
             if (zoomCardNameText != null) zoomCardNameText.text = actionCardData.cardName;
             if (zoomImage != null) zoomImage.sprite = actionCardData.thisImage;
@@ -102,11 +117,20 @@ public class ActionZoom : NetworkBehaviour
             {
                 zoomBackground.sprite = localBackground.sprite;
                 zoomBackground.color = localBackground.color;
+                // type/pixelsPerUnitMultiplier weren't copied, so the card's
+                // Sliced rounded-corner sprite rendered as Simple (stretched)
+                // in the much larger zoom panel -- that leaves most of the
+                // panel transparent and exposes the white ZoomCardImage layer
+                // underneath.
+                zoomBackground.type = localBackground.type;
+                zoomBackground.pixelsPerUnitMultiplier = localBackground.pixelsPerUnitMultiplier;
             }
             if (zoomCanvas != null && localCanvas != null)
             {
                 zoomCanvas.sprite = localCanvas.sprite;
                 zoomCanvas.color = localCanvas.color;
+                zoomCanvas.type = localCanvas.type;
+                zoomCanvas.pixelsPerUnitMultiplier = localCanvas.pixelsPerUnitMultiplier;
             }
         }
         else

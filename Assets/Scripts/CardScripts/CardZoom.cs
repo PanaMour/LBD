@@ -39,6 +39,7 @@ public class CardZoom : NetworkBehaviour
     public GameObject zoomTypeLine;
     public Text zoomTypeLineText;
     public RectTransform zoomTypeLinePlate;
+    public Image zoomTypeLinePlateImage;
 
     public void Awake()
     {
@@ -60,6 +61,7 @@ public class CardZoom : NetworkBehaviour
         if (zoomTypeLine != null)
         {
             zoomTypeLinePlate = zoomTypeLine.GetComponent<RectTransform>();
+            zoomTypeLinePlateImage = zoomTypeLine.GetComponent<Image>();
             Transform inner = zoomTypeLine.transform.Find("ZoomTypeLineText");
             if (inner != null) zoomTypeLineText = inner.GetComponent<Text>();
         }
@@ -109,28 +111,49 @@ public class CardZoom : NetworkBehaviour
             zoomATKtext.text = ATKtext.text;
             zoomDEFtext.text = DEFtext.text;
             zoomStarstext.text = StarsText.text;
-            zoomBackground.color = Background.color;
             zoomText.text = Card.GetComponent<ThisCard>().descriptionText.text;
+
+            // sprite/type must be copied too, not just color -- otherwise a
+            // stale sprite+type left behind by whichever card kind was hovered
+            // previously (Action/Magic panels use a Sliced rounded sprite)
+            // renders wrong here and can expose the white ZoomCardImage layer
+            // underneath.
+            zoomBackground.sprite = Background.sprite;
+            zoomBackground.color = Background.color;
+            zoomBackground.type = Background.type;
+            zoomBackground.pixelsPerUnitMultiplier = Background.pixelsPerUnitMultiplier;
+
+            zoomCanvas.sprite = CardCanvas.sprite;
             zoomCanvas.color = CardCanvas.color;
+            zoomCanvas.type = CardCanvas.type;
+            zoomCanvas.pixelsPerUnitMultiplier = CardCanvas.pixelsPerUnitMultiplier;
 
             // Mirrors the small card's Type/Attribute/Property bar. The text is
             // copied from the card itself rather than rebuilt, so granted
             // properties stay in sync with what the card face already shows.
             if (zoomTypeLine != null)
             {
-                zoomTypeLine.transform.localScale = new Vector3(1, 1, 1);
-
                 Text sourceLine = Card.GetComponent<ThisCard>().typeLineText;
+
+                // typeLineText is resolved lazily on the card's first Update, so
+                // hide the bar rather than leave the previously hovered card's
+                // line sitting there if it isn't ready yet.
+                zoomTypeLine.transform.localScale = (sourceLine != null) ? Vector3.one : Vector3.zero;
+
                 if (zoomTypeLineText != null && sourceLine != null)
                 {
                     zoomTypeLineText.text = sourceLine.text;
 
+                    // carry the card's attribute tint across to the zoom bar
+                    Image sourcePlate = Card.GetComponent<ThisCard>().typeLinePlateImage;
+                    if (zoomTypeLinePlateImage != null && sourcePlate != null)
+                        zoomTypeLinePlateImage.color = sourcePlate.color;
+
+                    // Fixed height: the zoom bar is wide enough to keep any line
+                    // on one row (the text shrinks slightly if needed). Growing
+                    // it instead pushed the bar down over the artwork.
                     if (zoomTypeLinePlate != null)
-                    {
-                        float needed = zoomTypeLineText.preferredHeight + 6f;
-                        if (needed < 30f) needed = 30f;
-                        zoomTypeLinePlate.sizeDelta = new Vector2(zoomTypeLinePlate.sizeDelta.x, needed);
-                    }
+                        zoomTypeLinePlate.sizeDelta = new Vector2(zoomTypeLinePlate.sizeDelta.x, 30f);
                 }
             }
         }

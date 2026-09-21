@@ -36,6 +36,7 @@ public class MagicZoom : NetworkBehaviour
     public GameObject zoomTypeLine;
     public Text zoomTypeLineText;
     public RectTransform zoomTypeLinePlate;
+    public Image zoomTypeLinePlateImage;
     public Image zoomBackground;
     public Image zoomCanvas;
     public Image zoomCardBack;
@@ -56,6 +57,7 @@ public class MagicZoom : NetworkBehaviour
         if (zoomTypeLine != null)
         {
             zoomTypeLinePlate = zoomTypeLine.GetComponent<RectTransform>();
+            zoomTypeLinePlateImage = zoomTypeLine.GetComponent<Image>();
             Transform inner = zoomTypeLine.transform.Find("ZoomTypeLineText");
             if (inner != null) zoomTypeLineText = inner.GetComponent<Text>();
         }
@@ -93,9 +95,20 @@ public class MagicZoom : NetworkBehaviour
             zoomATK.transform.localScale = new Vector3(0, 0, 0);
             zoomDEF.transform.localScale = new Vector3(0, 0, 0);
             zoomStars.transform.localScale = new Vector3(0, 0, 0);
-            // Magic cards carry no Type/Attribute/Property, so hide the bar a
-            // previously hovered monster left behind.
-            if (zoomTypeLine != null) zoomTypeLine.transform.localScale = new Vector3(0, 0, 0);
+            // Magic cards show their own kind here (Magic / Armor Magic /
+            // Labyrinth Magic) in place of a monster's Type/Attribute line.
+            if (zoomTypeLine != null)
+            {
+                zoomTypeLine.transform.localScale = new Vector3(1, 1, 1);
+                if (zoomTypeLineText != null)
+                {
+                    zoomTypeLineText.text = Magic.GetComponent<ThisMagic>().BuildMagicTypeLine();
+                    if (zoomTypeLinePlateImage != null)
+                        zoomTypeLinePlateImage.color = Magic.GetComponent<ThisMagic>().MagicTypeColor();
+                    if (zoomTypeLinePlate != null)
+                        zoomTypeLinePlate.sizeDelta = new Vector2(zoomTypeLinePlate.sizeDelta.x, 30f);
+                }
+            }
             zoomCardNameText.text = NameText.text;
             zoomImage.sprite = Image.sprite;
 
@@ -105,8 +118,20 @@ public class MagicZoom : NetworkBehaviour
 
             if (zoomDescriptionText != null) zoomDescriptionText.text = DescriptionText.text;
 
+            // sprite/type must be copied too, not just color -- otherwise a
+            // stale sprite+type left behind by whichever card kind was hovered
+            // previously renders wrong here and can expose the white
+            // ZoomCardImage layer underneath.
+            zoomBackground.sprite = Background.sprite;
             zoomBackground.color = Background.color;
+            zoomBackground.type = Background.type;
+            zoomBackground.pixelsPerUnitMultiplier = Background.pixelsPerUnitMultiplier;
+
+            zoomCanvas.sprite = MagicCanvas.sprite;
             zoomCanvas.color = MagicCanvas.color;
+            zoomCanvas.type = MagicCanvas.type;
+            zoomCanvas.pixelsPerUnitMultiplier = MagicCanvas.pixelsPerUnitMultiplier;
+
             zoomText.text = Magic.GetComponent<ThisMagic>().magicdescriptionText.text;
         }
         else

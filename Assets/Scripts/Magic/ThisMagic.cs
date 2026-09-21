@@ -19,6 +19,7 @@ public class ThisMagic : NetworkBehaviour
     public Text magicnameText;
     public Text magicdescriptionText;
     public Text magicTypeLineText;
+    public Image magicTypeLinePlate;
     public Sprite thisSprite;
     public Image thatImage;
     public Image frame;
@@ -93,6 +94,9 @@ public class ThisMagic : NetworkBehaviour
 
             if (bg.Find("MagicTypeLine/MagicTypeLineText"))
                 magicTypeLineText = bg.Find("MagicTypeLine/MagicTypeLineText").GetComponent<Text>();
+
+            if (bg.Find("MagicTypeLine"))
+                magicTypeLinePlate = bg.Find("MagicTypeLine").GetComponent<Image>();
 
             if (bg.Find("MagicImage"))
                 thatImage = bg.Find("MagicImage").GetComponent<Image>();
@@ -173,6 +177,7 @@ public class ThisMagic : NetworkBehaviour
             if (magicnameText) magicnameText.text = "" + magicName;
             if (magicdescriptionText) magicdescriptionText.text = "" + magicDescription;
             if (magicTypeLineText) magicTypeLineText.text = BuildMagicTypeLine();
+            if (magicTypeLinePlate) magicTypeLinePlate.color = MagicTypeColor();
 
             if (thatImage != null && thisSprite != null)
             {
@@ -417,6 +422,18 @@ public class ThisMagic : NetworkBehaviour
     }
 
     public void TargetMonster() { }
+
+    // Labyrinth magic shares the sandy tone ThisCard.AttributeColor gives the
+    // Labyrinth attribute, so the two read as the same family.
+    public Color MagicTypeColor()
+    {
+        if (thisMagic.Count > 0 && thisMagic[0] != null)
+        {
+            if (thisMagic[0].magicType == MagicType.Armor) return new Color(0.62f, 0.66f, 0.72f);
+            if (thisMagic[0].magicType == MagicType.Labyrinth) return new Color(0.80f, 0.72f, 0.55f);
+        }
+        return new Color(0.40f, 0.78f, 0.65f);
+    }
 
     // magicType is only carried on the database entry, not mirrored onto this
     // component, so the label is read straight from thisMagic[0].

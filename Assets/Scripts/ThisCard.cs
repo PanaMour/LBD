@@ -31,6 +31,7 @@ public class ThisCard : NetworkBehaviour
     public Text descriptionText;
     public Text typeLineText;
     public RectTransform typeLinePlate;
+    public Image typeLinePlateImage;
 
     public Sprite thisSprite;
     public Image thatImage;
@@ -249,6 +250,7 @@ public class ThisCard : NetworkBehaviour
                 if (typeLine != null)
                 {
                     typeLinePlate = typeLine.GetComponent<RectTransform>();
+                    typeLinePlateImage = typeLine.GetComponent<Image>();
                     Transform inner = typeLine.Find("TypeLineText");
                     if (inner != null) typeLineText = inner.GetComponent<Text>();
                 }
@@ -256,6 +258,9 @@ public class ThisCard : NetworkBehaviour
             if (typeLineText != null)
             {
                 typeLineText.text = BuildTypeLine();
+
+                if (typeLinePlateImage != null && currentAttributes.Count > 0)
+                    typeLinePlateImage.color = AttributeColor(currentAttributes[0]);
 
                 // The bar is top-pivoted and the artwork leaves room for two
                 // lines, so a long type line wraps instead of shrinking the
@@ -691,6 +696,26 @@ public class ThisCard : NetworkBehaviour
         useReturn = false;
     }
 
+    // Tints the type bar by attribute so a card is identifiable at a glance in
+    // hand, where the text is too small to read. All values are mid-to-light so
+    // the near-black label stays legible on top of them.
+    public static Color AttributeColor(Attribute a)
+    {
+        switch (a)
+        {
+            case Attribute.Fire: return new Color(0.92f, 0.45f, 0.30f);
+            case Attribute.Water: return new Color(0.45f, 0.68f, 0.90f);
+            case Attribute.Ice: return new Color(0.66f, 0.88f, 0.94f);
+            case Attribute.Nature: return new Color(0.48f, 0.75f, 0.38f);
+            case Attribute.Toxic: return new Color(0.70f, 0.85f, 0.30f);
+            case Attribute.Dark: return new Color(0.58f, 0.52f, 0.68f);
+            case Attribute.Radiant: return new Color(0.97f, 0.85f, 0.40f);
+            case Attribute.Aerial: return new Color(0.72f, 0.85f, 0.95f);
+            case Attribute.Labyrinth: return new Color(0.80f, 0.72f, 0.55f);
+        }
+        return new Color(0.594f, 0.594f, 0.594f);
+    }
+
     // Reads the live currentTypes/currentAttributes lists rather than the base
     // card, so runtime additions (Cyber Ninja gaining Robot once summoned) show
     // up. Granted properties live in their own fields instead of overwriting
@@ -712,12 +737,15 @@ public class ThisCard : NetworkBehaviour
         // would otherwise print as a redundant "Labyrinth / Labyrinth".
         string line = (types == attributes) ? types : types + " / " + attributes;
 
+        // Gained properties are prefixed with "+" so a player can tell them
+        // apart from the card's printed one -- "[Plague, +Immobile]" reads as
+        // Plague printed, Immobile granted by some effect.
         string props = "";
         if (cardProperty != Property.None) props += cardProperty.ToString();
         if (grantedWallwalk && cardProperty != Property.Wallwalk)
-            props += (props.Length > 0 ? ", " : "") + Property.Wallwalk;
+            props += (props.Length > 0 ? ", " : "") + "+" + Property.Wallwalk;
         if (isImmobile && cardProperty != Property.Immobile)
-            props += (props.Length > 0 ? ", " : "") + Property.Immobile;
+            props += (props.Length > 0 ? ", " : "") + "+" + Property.Immobile;
 
         if (props.Length > 0) line += " [" + props + "]";
         return line;

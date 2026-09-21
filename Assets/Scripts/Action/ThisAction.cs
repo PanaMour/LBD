@@ -23,6 +23,10 @@ public class ThisAction : NetworkBehaviour
     public Text descriptionText;
     public Image artworkImage;
 
+    public Text typeLineText;
+    public Image typeLinePlate;
+    public static readonly Color ActionBarColor = new Color(0.88f, 0.60f, 0.75f);
+
     public bool cardBack = false;
     public bool faceup = false;
     public bool activated = false;
@@ -40,6 +44,12 @@ public class ThisAction : NetworkBehaviour
         requirementText = transform.Find("ActionCanvas").Find("ActionBackground").Find("ActionRequirement").Find("ActionRequirementText").GetComponent<Text>();
 
         descriptionText = transform.Find("ActionCanvas").Find("ActionBackground").Find("ActionDescription").Find("ActionDescriptionText").GetComponent<Text>();
+
+        Transform typeLine = transform.Find("ActionCanvas")?.Find("ActionBackground").Find("ActionTypeLine/ActionTypeLineText");
+        if (typeLine != null) typeLineText = typeLine.GetComponent<Text>();
+
+        Transform typeLinePlateTrans = transform.Find("ActionCanvas")?.Find("ActionBackground").Find("ActionTypeLine");
+        if (typeLinePlateTrans != null) typeLinePlate = typeLinePlateTrans.GetComponent<Image>();
 
         Transform backTrans = transform.Find("ActionCanvas")?.Find("ActionBackground").Find("ActionCardBack");
         if (backTrans != null)
@@ -75,6 +85,8 @@ public class ThisAction : NetworkBehaviour
         color = thisCard[0].color;
 
         if (nameText != null) nameText.text = cardName;
+        if (typeLineText != null) typeLineText.text = "Action";
+        if (typeLinePlate != null) typeLinePlate.color = ActionBarColor;
         if (requirementText != null) requirementText.text = cardRequirement;
         if (descriptionText != null) descriptionText.text = cardDescription;
         if (artworkImage != null && thisImage != null) artworkImage.sprite = thisImage;

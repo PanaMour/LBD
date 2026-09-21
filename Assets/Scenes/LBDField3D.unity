@@ -40647,14 +40647,14 @@ MonoBehaviour:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 22
     m_FontStyle: 1
-    m_BestFit: 0
+    m_BestFit: 1
     m_MinSize: 10
-    m_MaxSize: 40
+    m_MaxSize: 22
     m_Alignment: 4
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
-    m_VerticalOverflow: 1
+    m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: Human / Fire
 --- !u!222 &824036072
@@ -100976,7 +100976,7 @@ PrefabInstance:
     - target: {fileID: 4408213030864402217, guid: e0e260de2db7298488f2d1766ffb4266,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 180.5
+      value: 186.5
       objectReference: {fileID: 0}
     - target: {fileID: 4408213030864402217, guid: e0e260de2db7298488f2d1766ffb4266,
         type: 3}
@@ -100986,7 +100986,7 @@ PrefabInstance:
     - target: {fileID: 4408213030864402217, guid: e0e260de2db7298488f2d1766ffb4266,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 37.75
+      value: 40.75
       objectReference: {fileID: 0}
     - target: {fileID: 4532561141709830214, guid: e0e260de2db7298488f2d1766ffb4266,
         type: 3}
