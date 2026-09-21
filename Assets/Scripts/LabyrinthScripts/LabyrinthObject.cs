@@ -506,6 +506,15 @@ public class LabyrinthObject : NetworkBehaviour
                 NetworkServer.Destroy(targetScript.gameObject);
                 pm.RpcShowCard(targetScript.card, "OpponentDestroyed", 0);
 
+                // Normally destroying a Defense-position monster deals no LP
+                // damage at all -- Piercing lets the excess ATK over the
+                // defender's DEF spill over onto the opponent's LP instead.
+                if (myCard.cardProperty == Property.Piercing)
+                {
+                    int pierceDamage = myAtk - enemyDef;
+                    pm.RpcGMChangeLP(0, pierceDamage);
+                }
+
                 if (this.monsterID == 26) // Heartstealer
                 {
                     pm.RpcGMChangeLP(-500, 0);
