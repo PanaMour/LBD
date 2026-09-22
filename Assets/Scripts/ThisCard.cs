@@ -740,8 +740,19 @@ public class ThisCard : NetworkBehaviour
         // Gained properties are prefixed with "+" so a player can tell them
         // apart from the card's printed one -- "[Plague, +Immobile]" reads as
         // Plague printed, Immobile granted by some effect.
+        //
+        // Immobile is a special case: unlike the other printed properties, it
+        // has a live on/off flag (isImmobile) because Mechanical Legs can
+        // remove it without changing what's printed on the card. So a printed
+        // Immobile only shows while isImmobile is still true -- once
+        // Mechanical Legs clears it, the label drops "Immobile" entirely
+        // instead of continuing to claim the monster can't move.
         string props = "";
-        if (cardProperty != Property.None) props += cardProperty.ToString();
+        if (cardProperty != Property.None && cardProperty != Property.Immobile)
+            props += cardProperty.ToString();
+        else if (cardProperty == Property.Immobile && isImmobile)
+            props += cardProperty.ToString();
+
         if (grantedWallwalk && cardProperty != Property.Wallwalk)
             props += (props.Length > 0 ? ", " : "") + "+" + Property.Wallwalk;
         if (isImmobile && cardProperty != Property.Immobile)

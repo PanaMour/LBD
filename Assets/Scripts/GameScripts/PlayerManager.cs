@@ -386,6 +386,14 @@ public class PlayerManager : NetworkBehaviour
                                     isTargeting = false;
                                     isTargetingTile = true;
                                     teleportMonsterCandidate = targetCandidate;
+
+                                    // Clear the "valid ally monster" highlight
+                                    // from the picking-a-monster phase before
+                                    // switching to the destination-tile
+                                    // highlight, otherwise the two overlap.
+                                    foreach (LabyrinthTile t in FindObjectsOfType<LabyrinthTile>())
+                                        if (t.isHighlighted) t.StopGlowBlock();
+
                                     HighlightTeleportTiles(targetCandidate);
                                     return;
                                 }
@@ -401,9 +409,7 @@ public class PlayerManager : NetworkBehaviour
                         {
                             if (pendingMonsterEffect == "ShadowImp")
                             {
-                                ThisCard targetCard = targetCandidate.card.GetComponent<ThisCard>();
-
-                                if (targetCard != null && targetCard.currentAttributes.Contains(Attribute.Dark))
+                                if (IsValidMonsterEffectTarget("ShadowImp", activeMonsterEffectCard, targetCandidate))
                                 {
                                     CmdApplyTempAtk(targetCandidate.card, 200);
                                     CancelTargeting();
@@ -415,17 +421,20 @@ public class PlayerManager : NetworkBehaviour
                             }
                             else if (pendingMonsterEffect == "Rattlesnake")
                             {
-                                GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
-                                if (gridGen != null)
+                                if (IsValidMonsterEffectTarget("Rattlesnake", activeMonsterEffectCard, targetCandidate))
                                 {
-                                    gridGen.GetComponent<GridBehavior>().ShowPossiblePaths(targetCandidate.gameObject, 3);
+                                    GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+                                    if (gridGen != null)
+                                    {
+                                        gridGen.GetComponent<GridBehavior>().ShowPossiblePaths(targetCandidate.gameObject, 3);
 
-                                    CancelTargeting();
+                                        CancelTargeting();
+                                    }
                                 }
                             }
                             else if (pendingMonsterEffect == "FrostWraith")
                             {
-                                if (IsTileInAnyCardBase(targetCandidate))
+                                if (IsValidMonsterEffectTarget("FrostWraith", activeMonsterEffectCard, targetCandidate))
                                 {
                                     CmdTributeFrostWraith(activeMonsterEffectCard, targetCandidate.gameObject);
                                     CancelTargeting();
@@ -437,10 +446,7 @@ public class PlayerManager : NetworkBehaviour
                             }
                             else if (pendingMonsterEffect == "ShyMagician")
                             {
-                                ThisCard targetCard = targetCandidate.card != null ? targetCandidate.card.GetComponent<ThisCard>() : null;
-                                bool isValidMageAlly = targetCandidate.hasAuthority && targetCard != null && targetCard.currentTypes.Contains(Type.Mage);
-
-                                if (!isValidMageAlly)
+                                if (!IsValidMonsterEffectTarget("ShyMagician", activeMonsterEffectCard, targetCandidate))
                                 {
                                     Debug.Log("Invalid Target: You must select one of YOUR Mage-type monsters!");
                                 }
@@ -462,17 +468,9 @@ public class PlayerManager : NetworkBehaviour
                             }
                             else if (pendingMonsterEffect == "SpiritTribute")
                             {
-                                ThisCard spiritCard = activeMonsterEffectCard.GetComponent<ThisCard>();
-                                ThisCard targetCard = targetCandidate.card != null ? targetCandidate.card.GetComponent<ThisCard>() : null;
-
-                                bool isLabyrinthSpirit = spiritCard.id == 35;
-                                bool attributeMatches = isLabyrinthSpirit
-                                    || (targetCard != null && spiritCard.currentAttributes.Count > 0 && targetCard.currentAttributes.Contains(spiritCard.currentAttributes[0]));
-                                bool isNotSelf = targetCandidate.card != activeMonsterEffectCard;
-                                bool isValidTarget = targetCandidate.hasAuthority && targetCard != null && isNotSelf && attributeMatches;
-
-                                if (!isValidTarget)
+                                if (!IsValidMonsterEffectTarget("SpiritTribute", activeMonsterEffectCard, targetCandidate))
                                 {
+                                    bool isLabyrinthSpirit = activeMonsterEffectCard.GetComponent<ThisCard>().id == 35;
                                     string need = isLabyrinthSpirit ? "one of YOUR monsters" : "one of YOUR matching-attribute monsters";
                                     Debug.Log("Invalid Target: You must select " + need + "!");
                                 }
@@ -729,6 +727,18 @@ public class PlayerManager : NetworkBehaviour
         isTargeting = true;
         activeMagicCard = card;
         currentTargetCriteria = type;
+
+        // Playing the card from hand is already the deliberate "yes, use this
+        // effect" (unlike Shadow Imp/Aetherwing, which piggyback on summoning
+        // a monster and never got their own confirmation click), so this only
+        // needs the same highlight-valid-targets treatment, not a confirm box.
+        foreach (LabyrinthObject candidate in FindObjectsOfType<LabyrinthObject>())
+        {
+            if (!CheckTargetValidity(card, candidate, type)) continue;
+            LabyrinthTile tile = candidate.GetComponentInParent<LabyrinthTile>();
+            if (tile != null) tile.GlowBlock();
+        }
+
         Debug.Log($"Targeting Mode Started: Looking for {type}");
     }
 
@@ -752,6 +762,66 @@ public class PlayerManager : NetworkBehaviour
         return isValidTargetType;
     }
 
+    // Shared validity check for the monster-ability targeting flow (Shadow
+    // Imp, Rattlesnake, Frost Wraith, Shy Magician, Spirit tributes). Used
+    // both to decide what to highlight the moment targeting starts and to
+    // validate the actual click, so the two can never drift apart.
+    bool IsValidMonsterEffectTarget(string effect, GameObject effectCard, LabyrinthObject candidate)
+    {
+        if (candidate == null) return false;
+
+        switch (effect)
+        {
+            case "ShadowImp":
+                {
+                    ThisCard targetCard = candidate.card != null ? candidate.card.GetComponent<ThisCard>() : null;
+                    return targetCard != null && targetCard.currentAttributes.Contains(Attribute.Dark);
+                }
+            case "Rattlesnake":
+                // "you target one monster on the field" -- no ownership restriction.
+                return true;
+            case "FrostWraith":
+                return IsTileInAnyCardBase(candidate);
+            case "ShyMagician":
+                {
+                    ThisCard targetCard = candidate.card != null ? candidate.card.GetComponent<ThisCard>() : null;
+                    return candidate.hasAuthority && targetCard != null && targetCard.currentTypes.Contains(Type.Mage);
+                }
+            case "SpiritTribute":
+                {
+                    ThisCard spiritCard = effectCard.GetComponent<ThisCard>();
+                    ThisCard targetCard = candidate.card != null ? candidate.card.GetComponent<ThisCard>() : null;
+                    bool isLabyrinthSpirit = spiritCard.id == 35;
+                    bool attributeMatches = isLabyrinthSpirit
+                        || (targetCard != null && spiritCard.currentAttributes.Count > 0 && targetCard.currentAttributes.Contains(spiritCard.currentAttributes[0]));
+                    bool isNotSelf = candidate.card != effectCard;
+                    return candidate.hasAuthority && targetCard != null && isNotSelf && attributeMatches;
+                }
+        }
+        return false;
+    }
+
+    bool HasAnyValidMonsterEffectTarget(string effect, GameObject effectCard)
+    {
+        foreach (LabyrinthObject candidate in FindObjectsOfType<LabyrinthObject>())
+            if (IsValidMonsterEffectTarget(effect, effectCard, candidate)) return true;
+        return false;
+    }
+
+    // Glows the tile under every currently-valid target green, mirroring the
+    // existing movement/attack highlight convention (GlowBlock/RedGlowBlock),
+    // so the player sees their legal options up front instead of finding out
+    // only after an "Invalid Target" log message.
+    void HighlightValidMonsterTargets(string effect, GameObject effectCard)
+    {
+        foreach (LabyrinthObject candidate in FindObjectsOfType<LabyrinthObject>())
+        {
+            if (!IsValidMonsterEffectTarget(effect, effectCard, candidate)) continue;
+            LabyrinthTile tile = candidate.GetComponentInParent<LabyrinthTile>();
+            if (tile != null) tile.GlowBlock();
+        }
+    }
+
     public void CancelTargeting()
     {
         isTargeting = false;
@@ -760,6 +830,14 @@ public class PlayerManager : NetworkBehaviour
         {
             CmdPlayerDestroyCard(activeMagicCard, 0);
         }
+
+        // StopGlowBlock (not GridBehavior.ResetTileColors -- that only clears
+        // the Quad child, leaving the tile's own renderer stuck green and
+        // isHighlighted stuck true, which then skews future hover colors)
+        // clears everything GlowBlock touched, and only on tiles this
+        // targeting session actually highlighted.
+        foreach (LabyrinthTile tile in FindObjectsOfType<LabyrinthTile>())
+            if (tile.isHighlighted) tile.StopGlowBlock();
 
         activeMagicCard = null;
         activeMonsterEffectCard = null;
@@ -776,6 +854,7 @@ public class PlayerManager : NetworkBehaviour
         isTargeting = true;
         activeMonsterEffectCard = frostWraithCard;
         pendingMonsterEffect = "FrostWraith";
+        HighlightValidMonsterTargets("FrostWraith", frostWraithCard);
         Debug.Log("Frost Wraith: Select a monster in a Card Base to make Immobile!");
     }
 
@@ -828,6 +907,7 @@ public class PlayerManager : NetworkBehaviour
         isTargeting = true;
         activeMonsterEffectCard = spiritCard;
         pendingMonsterEffect = "SpiritTribute";
+        HighlightValidMonsterTargets("SpiritTribute", spiritCard);
         Debug.Log("Select one of your monsters to grant Wallwalk!");
     }
 
@@ -867,6 +947,7 @@ public class PlayerManager : NetworkBehaviour
         activeMonsterEffectCard = shyMagicianCard;
         pendingMonsterEffect = "ShyMagician";
         pendingSwapFirst = null;
+        HighlightValidMonsterTargets("ShyMagician", shyMagicianCard);
         Debug.Log("Shy Magician: Select the first Mage-type monster to swap!");
     }
 
@@ -1646,28 +1727,74 @@ public class PlayerManager : NetworkBehaviour
 
             if (tempCard.GetComponent<ThisCard>().id == 46) // Shadow Imp
             {
-                isTargeting = true;
-                activeMonsterEffectCard = tempCard;
-                pendingMonsterEffect = "ShadowImp";
-                Debug.Log("Targeting Mode Started: Select a Dark Attribute Monster!");
+                // Printed text is "you can target..." -- unlike Rattlesnake
+                // (below), this is optional, and the player never got a
+                // deliberate activation click the way tribute/equip abilities
+                // do (those are opted into by choosing a context-menu item),
+                // so it needs its own Activate/Decline prompt before forcing
+                // the player into targeting mode.
+                GameObject shadowImpCard = tempCard;
+                if (HasAnyValidMonsterEffectTarget("ShadowImp", shadowImpCard))
+                {
+                    SpawnBox("Use Shadow Imp's effect? Target a DARK attribute monster to give it +200 ATK until the end of the turn.", "Activate", "Decline",
+                        () =>
+                        {
+                            Destroy(activeUIBox);
+                            isTargeting = true;
+                            activeMonsterEffectCard = shadowImpCard;
+                            pendingMonsterEffect = "ShadowImp";
+                            HighlightValidMonsterTargets("ShadowImp", shadowImpCard);
+                            Debug.Log("Targeting Mode Started: Select a Dark Attribute Monster!");
+                        },
+                        () =>
+                        {
+                            Destroy(activeUIBox);
+                            Debug.Log("Shadow Imp: Effect declined.");
+                        }
+                    );
+                }
+                else
+                {
+                    Debug.Log("Shadow Imp: No Dark attribute monster to target.");
+                }
             }
 
             if (tempCard.GetComponent<ThisCard>().id == 51) // Rattlesnake
             {
+                // Printed text is "you target..." (no "can") -- treated as a
+                // mandatory on-summon effect, so it skips the Activate/Decline
+                // prompt and goes straight to targeting, same as before.
                 isTargeting = true;
                 activeMonsterEffectCard = tempCard;
                 pendingMonsterEffect = "Rattlesnake";
+                HighlightValidMonsterTargets("Rattlesnake", tempCard);
                 Debug.Log("Rattlesnake: Select a monster to move!");
             }
 
             if (tempCard.GetComponent<ThisCard>().id == 56) // Aetherwing Butterfly
             {
+                // Same reasoning as Shadow Imp: printed text is "you can
+                // destroy...", and this on-summon trigger never gave the
+                // player a deliberate activation click, so it needs its own
+                // Activate/Decline prompt instead of forcing targeting mode.
+                GameObject aetherwingCard = tempCard;
                 if (HasValidAetherwingTarget())
                 {
-                    isTargeting = true;
-                    activeMonsterEffectCard = tempCard;
-                    pendingMonsterEffect = "Aetherwing";
-                    Debug.Log("Aetherwing Butterfly: Select an Enemy Magic/Action card to destroy!");
+                    SpawnBox("Use Aetherwing Butterfly's effect? Destroy 1 Magic or Action card your opponent controls.", "Activate", "Decline",
+                        () =>
+                        {
+                            Destroy(activeUIBox);
+                            isTargeting = true;
+                            activeMonsterEffectCard = aetherwingCard;
+                            pendingMonsterEffect = "Aetherwing";
+                            Debug.Log("Aetherwing Butterfly: Select an Enemy Magic/Action card to destroy!");
+                        },
+                        () =>
+                        {
+                            Destroy(activeUIBox);
+                            Debug.Log("Aetherwing Butterfly: Effect declined.");
+                        }
+                    );
                 }
                 else
                 {

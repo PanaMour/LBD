@@ -350,7 +350,12 @@ public class ThisMagic : NetworkBehaviour
         {
             if (damageHealedBySpell > 0)
             {
-                PlayerManager.CmdGMChangeLP(damageHealedBySpell, 0);
+                // GameManager.ChangeLP SUBTRACTS whatever it's given (see
+                // Heartstealer's/Labyrinth Love's RpcGMChangeLP(-amount, 0) for
+                // the same convention elsewhere), so healing needs a negative
+                // value -- passing the raw positive amount here was damaging
+                // the caster instead of healing them.
+                PlayerManager.CmdGMChangeLP(-damageHealedBySpell, 0);
                 canBeDestroyed = true;
             }
             if (damageDealtBySpell > 0)
