@@ -363,6 +363,11 @@ public class ThisMagic : NetworkBehaviour
                 PlayerManager.CmdGMChangeLP(0, damageDealtBySpell);
                 canBeDestroyed = true;
             }
+            if (thisId == 23 && !canBeDestroyed)
+            {
+                PlayerManager.CmdRegenerateLabyrinth();
+                canBeDestroyed = true;
+            }
         }
 
         if (PlayerManager != null && !PlayerManager.IsMyTurn) UcanReturn = false;

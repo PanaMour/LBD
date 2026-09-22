@@ -31,6 +31,24 @@ public class GridBehavior : MonoBehaviour
         gridArray = new GameObject[columns, rows];
         if (gridPrefab) GenerateGrid();
         else Debug.LogError("Missing gridPrefab!");
+
+        gridReady = true;
+
+        // Every game gets its own random interior. The server rolls it here;
+        // a joining client built its grid from the scene's authored reference
+        // layout and asks the server for the real one once its local player
+        // spawns (PlayerManager.CmdRequestMazeLayout), which may land before
+        // or after this Start -- hence pendingLayout.
+        if (Mirror.NetworkServer.active)
+        {
+            ApplyMazeLayout(RegenerateServerLayout());
+        }
+        else if (pendingLayout != null)
+        {
+            int[] layout = pendingLayout;
+            pendingLayout = null;
+            ApplyMazeLayout(layout);
+        }
     }
 
     void Update()
@@ -213,40 +231,372 @@ public class GridBehavior : MonoBehaviour
         gridArray[startX, startY].GetComponent<GridStat>().visited = 0;
     }
 
-    bool BlocksDirection(int x, int y, string side)
+    // Which "labyrinthblockN" floor-texture IDs paint a wall on which side of
+    // the tile. This is the single source of truth for the maze's actual
+    // walkable structure -- there is no separate wall geometry, the picture
+    // on the floor IS the collision data (see BlocksDirection below and
+    // GenerateInteriorMazeLayout, which both key off these same sets so they
+    // can never disagree with each other).
+    static readonly HashSet<int> TopWallIds = new HashSet<int> { 1, 6, 8, 10, 11, 12, 19, 20, 28, 29, 37 };
+    static readonly HashSet<int> BottomWallIds = new HashSet<int> { 3, 5, 9, 10, 11, 12, 13, 23, 24, 27, 30, 40 };
+    static readonly HashSet<int> LeftWallIds = new HashSet<int> { 2, 7, 8, 9, 12, 13, 21, 22, 29, 30, 38 };
+    static readonly HashSet<int> RightWallIds = new HashSet<int> { 4, 5, 6, 7, 11, 13, 25, 26, 27, 28, 39 };
+
+    // Every "labyrinthblockN" id that exists as a Resources texture (0..45)
+    // but isn't in any of the four sets above is a plain open floor tile --
+    // several exist purely for visual variety among otherwise-identical
+    // open cells.
+    const int MaxBlockId = 45;
+
+    int GetBlockId(int x, int y)
     {
-        if (gridArray[x, y] == null) return true;
+        if (gridArray[x, y] == null) return -1;
 
         Transform quad = gridArray[x, y].transform.Find("Quad");
-        if (quad == null) return false;
+        if (quad == null) return -1;
 
         Texture tex = quad.GetComponent<Renderer>().material.mainTexture;
-        if (tex == null) return false;
+        if (tex == null) return -1;
 
-        string textureName = tex.name;
-
-        string idStr = textureName.Replace("labyrinthblock", "");
+        string idStr = tex.name.Replace("labyrinthblock", "");
         int id = -1;
         if (string.IsNullOrEmpty(idStr)) id = 0;
         else int.TryParse(idStr, out id);
+        return id;
+    }
 
+    bool IsWallOnSide(int id, string side)
+    {
         switch (side)
         {
-            case "Top":
-                if (id == 1 || id == 6 || id == 8 || id == 10 || id == 11 || id == 12 || id == 19 || id == 20 || id == 28 || id == 29 || id == 37) return true;
-                break;
-            case "Bottom":
-                if (id == 3 || id == 5 || id == 9 || id == 10 || id == 11 || id == 12 || id == 13 || id == 23 || id == 24 || id == 27 || id == 30 || id == 40) return true;
-                break;
-            case "Left":
-                if (id == 2 || id == 7 || id == 8 || id == 9 || id == 12 || id == 13 || id == 21 || id == 22 || id == 29 || id == 30 || id == 38) return true;
-                break;
-            case "Right":
-                if (id == 4 || id == 5 || id == 6 || id == 7 || id == 11 || id == 13 || id == 25 || id == 26 || id == 27 || id == 28 || id == 39) return true;
-                break;
+            case "Top": return TopWallIds.Contains(id);
+            case "Bottom": return BottomWallIds.Contains(id);
+            case "Left": return LeftWallIds.Contains(id);
+            case "Right": return RightWallIds.Contains(id);
+        }
+        return false;
+    }
+
+    bool BlocksDirection(int x, int y, string side)
+    {
+        if (gridArray[x, y] == null) return true;
+        int id = GetBlockId(x, y);
+        if (id < 0) return false;
+        return IsWallOnSide(id, side);
+    }
+
+    // Which corners of each "labyrinthblockN" texture are painted black, in
+    // the order top-left, top-right, bottom-left, bottom-right (decoded from
+    // the PNGs). A corner is black either because one of the tile's own walls
+    // runs through it, or as a "dot" continuing a neighbouring tile's wall
+    // that ends at that corner -- the dots are what make walls look joined up.
+    static readonly string[] BlockCorners =
+    {
+        "0000", "1100", "1010", "0011", "0101", "0111", "1101", "1111", "1110", "1011", // 0-9
+        "1111", "1111", "1111", "1111", "1111", "1000", "0100", "0001", "0010", "1110", // 10-19
+        "1101", "1110", "1011", "1011", "0111", "1101", "0111", "1111", "1111", "1111", // 20-29
+        "1111", "1100", "1010", "1001", "0110", "0101", "0011", "1111", "1111", "1111", // 30-39
+        "1111", "1110", "1101", "1011", "0111", "1111",                                 // 40-45
+    };
+
+    static Dictionary<(bool, bool, bool, bool, string), int> signatureToId;
+
+    static Dictionary<(bool, bool, bool, bool, string), int> SignatureToId
+    {
+        get
+        {
+            if (signatureToId == null)
+            {
+                signatureToId = new Dictionary<(bool, bool, bool, bool, string), int>();
+                for (int id = 0; id <= MaxBlockId; id++)
+                {
+                    // 14 walls nothing for movement (BlocksDirection) but is
+                    // missing from Intercept's open-tile list
+                    // (LabyrinthObject.CheckIfNextToWallOrInBase), so the two
+                    // systems disagree about it -- keep it out of generated
+                    // mazes so every generated cell reads the same to both.
+                    if (id == 14) continue;
+
+                    signatureToId[(TopWallIds.Contains(id), BottomWallIds.Contains(id), LeftWallIds.Contains(id), RightWallIds.Contains(id), BlockCorners[id])] = id;
+                }
+            }
+            return signatureToId;
+        }
+    }
+
+    // Walls plus which corners must be black. Returns -1 if no texture
+    // matches -- the only gap is walled everywhere except the bottom (id 14,
+    // excluded above); see the correction pass in GenerateInteriorMazeLayout.
+    int PickBlockIdForSignature(bool wallTop, bool wallBottom, bool wallLeft, bool wallRight, bool cTL, bool cTR, bool cBL, bool cBR)
+    {
+        string corners = (cTL ? "1" : "0") + (cTR ? "1" : "0") + (cBL ? "1" : "0") + (cBR ? "1" : "0");
+        return SignatureToId.TryGetValue((wallTop, wallBottom, wallLeft, wallRight, corners), out int id) ? id : -1;
+    }
+
+    void SetOpenSide(bool[,] top, bool[,] bottom, bool[,] left, bool[,] right, int x, int y, string side, bool value)
+    {
+        switch (side)
+        {
+            case "Top": top[x, y] = value; break;
+            case "Bottom": bottom[x, y] = value; break;
+            case "Left": left[x, y] = value; break;
+            case "Right": right[x, y] = value; break;
+        }
+    }
+
+    // The server's authoritative copy of the current interior layout (see
+    // GenerateInteriorMazeLayout for the format). Tiles are plain local
+    // Instantiate()s on every machine rather than network-spawned objects, so
+    // nothing replicates them automatically -- the server decides a layout
+    // and PlayerManager ships it to clients (RpcApplyMazeLayout for everyone
+    // on Magical Labyrinth, TargetApplyMazeLayout for a client that joins
+    // after the host already rolled the starting maze).
+    int[] serverLayout;
+    int[] pendingLayout;
+    bool gridReady;
+
+    public int[] CurrentServerLayout => serverLayout;
+
+    public int[] RegenerateServerLayout()
+    {
+        serverLayout = GenerateInteriorMazeLayout();
+        return serverLayout;
+    }
+
+    // Applies a layout from GenerateInteriorMazeLayout to this machine's own
+    // tiles: swaps each tile's floor texture (which is what BlocksDirection
+    // reads) and its blockID (which Intercept's wall check reads). Monsters
+    // are parented to the tile GameObjects themselves, which are never
+    // replaced, so they stay exactly where they are.
+    public void ApplyMazeLayout(int[] layout)
+    {
+        if (layout == null || layout.Length != columns * rows) return;
+
+        if (!gridReady)
+        {
+            pendingLayout = layout;
+            return;
         }
 
-        return false;
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                int id = layout[x * rows + y];
+                if (id < 0 || gridArray[x, y] == null) continue;
+
+                Texture2D tex = Resources.Load<Texture2D>(id == 0 ? "labyrinthblock" : "labyrinthblock" + id);
+                if (tex == null)
+                {
+                    Debug.LogError($"ApplyMazeLayout: missing Resources texture for block id {id}");
+                    continue;
+                }
+
+                Transform quad = gridArray[x, y].transform.Find("Quad");
+                if (quad != null) quad.GetComponent<Renderer>().material.mainTexture = tex;
+
+                GridStat stat = gridArray[x, y].GetComponent<GridStat>();
+                if (stat != null) stat.blockID = id;
+            }
+        }
+    }
+
+    // Builds a fresh random maze for the interior (rows 1-14; the two Card
+    // Base rows, 0 and 15, keep their authored layout so summoning/tribute
+    // zones are never accidentally walled off). Returns a flat array indexed
+    // [x * rows + y] holding the block id to paint on each tile, with -1 for
+    // tiles to leave unchanged. Pure: it doesn't touch any tile itself --
+    // only the server should call it, then ApplyMazeLayout on every machine.
+    public int[] GenerateInteriorMazeLayout()
+    {
+        int minY = 1, maxY = rows - 2; // interior rows; 0 and rows-1 are Card Base, untouched
+        int midY = rows / 2 - 1;       // last row of the bottom player's half
+        bool[,] visited = new bool[columns, rows];
+        bool[,] openTop = new bool[columns, rows];
+        bool[,] openBottom = new bool[columns, rows];
+        bool[,] openLeft = new bool[columns, rows];
+        bool[,] openRight = new bool[columns, rows];
+
+        // Fairness: the board is 180-degree rotationally symmetric, so each
+        // player faces exactly the same maze from their own Card Base (the
+        // authored base rows are already symmetric this way). Every opening
+        // is applied together with its rotated twin.
+        System.Action<int, int, string> openEdge = (x, y, side) =>
+        {
+            int nx = x, ny = y;
+            string back;
+            switch (side)
+            {
+                case "Top": ny = y + 1; back = "Bottom"; break;
+                case "Bottom": ny = y - 1; back = "Top"; break;
+                case "Left": nx = x - 1; back = "Right"; break;
+                default: nx = x + 1; back = "Left"; break;
+            }
+            SetOpenSide(openTop, openBottom, openLeft, openRight, x, y, side, true);
+            SetOpenSide(openTop, openBottom, openLeft, openRight, nx, ny, back, true);
+            SetOpenSide(openTop, openBottom, openLeft, openRight, columns - 1 - x, rows - 1 - y, back, true);
+            SetOpenSide(openTop, openBottom, openLeft, openRight, columns - 1 - nx, rows - 1 - ny, side, true);
+        };
+
+        // Randomized recursive backtracker over the bottom half only -- a
+        // spanning tree, so every cell of that half is reachable. openEdge
+        // copies each carve into the top half, making it a spanning tree too.
+        var stack = new List<(int x, int y)>();
+        int startX = UnityEngine.Random.Range(0, columns);
+        int startY = UnityEngine.Random.Range(minY, midY + 1);
+        visited[startX, startY] = true;
+        stack.Add((startX, startY));
+
+        while (stack.Count > 0)
+        {
+            (int cx, int cy) = stack[stack.Count - 1];
+
+            var candidates = new List<(int nx, int ny, string side)>();
+            if (cy + 1 <= midY && !visited[cx, cy + 1]) candidates.Add((cx, cy + 1, "Top"));
+            if (cy - 1 >= minY && !visited[cx, cy - 1]) candidates.Add((cx, cy - 1, "Bottom"));
+            if (cx - 1 >= 0 && !visited[cx - 1, cy]) candidates.Add((cx - 1, cy, "Left"));
+            if (cx + 1 < columns && !visited[cx + 1, cy]) candidates.Add((cx + 1, cy, "Right"));
+
+            if (candidates.Count == 0)
+            {
+                stack.RemoveAt(stack.Count - 1);
+                continue;
+            }
+
+            (int nx, int ny, string side) = candidates[UnityEngine.Random.Range(0, candidates.Count)];
+            openEdge(cx, cy, side);
+            visited[nx, ny] = true;
+            stack.Add((nx, ny));
+        }
+
+        // Join the two halves across the middle (the twin crossing is added
+        // automatically, so there are one or two symmetric passages).
+        openEdge(UnityEngine.Random.Range(0, columns), midY, "Top");
+
+        // Loosen the perfect maze: a per-game share of the remaining walls is
+        // knocked out (creating loops), plus a few small open rooms, so boards
+        // range from twisty to fairly open. Only the bottom half's edges are
+        // rolled; their twins cover the top half.
+        float openness = UnityEngine.Random.Range(0.12f, 0.32f);
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = minY; y <= midY; y++)
+            {
+                if (!openTop[x, y] && UnityEngine.Random.value < openness) openEdge(x, y, "Top");
+                if (x + 1 < columns && !openRight[x, y] && UnityEngine.Random.value < openness) openEdge(x, y, "Right");
+            }
+        }
+
+        int rooms = UnityEngine.Random.Range(1, 3);
+        for (int r = 0; r < rooms; r++)
+        {
+            int w = UnityEngine.Random.Range(2, 4);
+            int h = UnityEngine.Random.Range(2, 4);
+            int rx = UnityEngine.Random.Range(0, columns - w + 1);
+            int ry = UnityEngine.Random.Range(minY + 1, maxY - h + 1);
+            for (int x = rx; x < rx + w; x++)
+            {
+                for (int y = ry; y < ry + h; y++)
+                {
+                    if (x + 1 < rx + w) openEdge(x, y, "Right");
+                    if (y + 1 < ry + h) openEdge(x, y, "Top");
+                }
+            }
+        }
+
+        // The rows touching each Card Base mirror its openings exactly, so
+        // every wall along the base edge is drawn on both sides (as in the
+        // authored board) and every base entrance leads into the maze.
+        for (int x = 0; x < columns; x++)
+        {
+            openBottom[x, minY] = !IsWallOnSide(GetBlockId(x, 0), "Top");
+            openTop[x, maxY] = !IsWallOnSide(GetBlockId(x, rows - 1), "Bottom");
+        }
+
+        // labyrinthblock's texture set has no tile walled on every side
+        // except the bottom (a dead end that only opens downward) -- if the
+        // carving above produced one, open one more random side so it
+        // becomes a representable (still fully connected) cell instead of
+        // silently picking a texture that would show the wrong walls.
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = minY; y <= maxY; y++)
+            {
+                bool onlyOpenIsBottom = openBottom[x, y] && !openTop[x, y] && !openLeft[x, y] && !openRight[x, y];
+                if (!onlyOpenIsBottom) continue;
+
+                var extra = new List<string>();
+                if (y + 1 <= maxY) extra.Add("Top");
+                if (x - 1 >= 0) extra.Add("Left");
+                if (x + 1 < columns) extra.Add("Right");
+                if (extra.Count == 0) continue; // not reachable inside an 11-wide interior
+
+                openEdge(x, y, extra[UnityEngine.Random.Range(0, extra.Count)]);
+            }
+        }
+
+        // Card Base rows keep their walls; read them from the current tiles so
+        // the corner-dot pass below sees the whole board.
+        foreach (int baseY in new[] { 0, rows - 1 })
+        {
+            for (int x = 0; x < columns; x++)
+            {
+                int id = GetBlockId(x, baseY);
+                openTop[x, baseY] = !IsWallOnSide(id, "Top");
+                openBottom[x, baseY] = !IsWallOnSide(id, "Bottom");
+                openLeft[x, baseY] = !IsWallOnSide(id, "Left");
+                openRight[x, baseY] = !IsWallOnSide(id, "Right");
+            }
+        }
+
+        // A wall segment exists if either tile sharing it draws it.
+        System.Func<int, int, string, bool> wallAt = (x, y, side) =>
+        {
+            if (x < 0 || y < 0 || x >= columns || y >= rows) return false;
+            switch (side)
+            {
+                case "Top": return !openTop[x, y] || (y + 1 < rows && !openBottom[x, y + 1]);
+                case "Bottom": return !openBottom[x, y] || (y - 1 >= 0 && !openTop[x, y - 1]);
+                case "Left": return !openLeft[x, y] || (x - 1 >= 0 && !openRight[x - 1, y]);
+                case "Right": return !openRight[x, y] || (x + 1 < columns && !openLeft[x + 1, y]);
+            }
+            return false;
+        };
+
+        int[] layout = new int[columns * rows];
+        for (int i = 0; i < layout.Length; i++) layout[i] = -1;
+
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                bool wallTop = !openTop[x, y];
+                bool wallBottom = !openBottom[x, y];
+                bool wallLeft = !openLeft[x, y];
+                bool wallRight = !openRight[x, y];
+
+                // A corner is black if this tile's own wall covers it, or if
+                // any neighbouring wall ends at that grid point.
+                bool sTop = wallAt(x, y, "Top"), sBottom = wallAt(x, y, "Bottom");
+                bool sLeft = wallAt(x, y, "Left"), sRight = wallAt(x, y, "Right");
+                bool cTL = sTop || sLeft || wallAt(x - 1, y, "Top") || wallAt(x, y + 1, "Left");
+                bool cTR = sTop || sRight || wallAt(x + 1, y, "Top") || wallAt(x, y + 1, "Right");
+                bool cBL = sBottom || sLeft || wallAt(x - 1, y, "Bottom") || wallAt(x, y - 1, "Left");
+                bool cBR = sBottom || sRight || wallAt(x + 1, y, "Bottom") || wallAt(x, y - 1, "Right");
+
+                int id = PickBlockIdForSignature(wallTop, wallBottom, wallLeft, wallRight, cTL, cTR, cBL, cBR);
+                if (id < 0)
+                {
+                    if (y >= minY && y <= maxY)
+                        Debug.LogError($"GenerateInteriorMazeLayout: no texture for T{wallTop} B{wallBottom} L{wallLeft} R{wallRight} at ({x},{y}) -- leaving that tile unchanged.");
+                    continue;
+                }
+
+                layout[x * rows + y] = id;
+            }
+        }
+
+        return layout;
     }
     public void ShowSummonZone(GameObject card)
     {

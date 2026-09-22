@@ -153,7 +153,7 @@ public class PlayerManager : NetworkBehaviour
             }
             else if (r >= 60 && r<83)
             {
-                Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 23);
+                Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 24);
                 GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
                 NetworkServer.Spawn(card, connectionToClient);
                 RpcShowCard(card, "Dealt", 0);
@@ -181,7 +181,7 @@ public class PlayerManager : NetworkBehaviour
         }
         else if (r >= 60 && r <83)
         {
-            Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 23);
+            Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 24);
             GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
             NetworkServer.Spawn(card, connectionToClient);
             RpcShowCard(card, "Dealt", 0);
@@ -583,6 +583,52 @@ public class PlayerManager : NetworkBehaviour
         {
             ServerSpawnTreasure();
         }
+    }
+
+    // The host rolls the starting maze in GridBehavior.Start; a joining
+    // client built its grid from the scene's authored reference layout, so it
+    // asks the server for the real one here.
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+        if (isClientOnly) CmdRequestMazeLayout();
+    }
+
+    GridBehavior FindGridBehavior()
+    {
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+        return gridGen != null ? gridGen.GetComponent<GridBehavior>() : null;
+    }
+
+    [Command]
+    void CmdRequestMazeLayout()
+    {
+        GridBehavior gb = FindGridBehavior();
+        if (gb != null && gb.CurrentServerLayout != null)
+            TargetApplyMazeLayout(connectionToClient, gb.CurrentServerLayout);
+    }
+
+    [TargetRpc]
+    void TargetApplyMazeLayout(NetworkConnection target, int[] layout)
+    {
+        GridBehavior gb = FindGridBehavior();
+        if (gb != null) gb.ApplyMazeLayout(layout);
+    }
+
+    // Magical Labyrinth: the server rolls a new interior and every machine
+    // (host included) applies it to its own tiles.
+    [Command]
+    public void CmdRegenerateLabyrinth()
+    {
+        GridBehavior gb = FindGridBehavior();
+        if (gb != null) RpcApplyMazeLayout(gb.RegenerateServerLayout());
+    }
+
+    [ClientRpc]
+    void RpcApplyMazeLayout(int[] layout)
+    {
+        GridBehavior gb = FindGridBehavior();
+        if (gb != null) gb.ApplyMazeLayout(layout);
     }
 
     [Command]

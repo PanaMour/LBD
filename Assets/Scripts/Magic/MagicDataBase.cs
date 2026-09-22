@@ -41,5 +41,6 @@ public class MagicDataBase : NetworkBehaviour
         magicList.Add(new Magic(20, "Weighted Shackles", "The equipped monster gains -2 square.", Resources.Load<Sprite>("weighted_shackles"), "Magic", MagicTargetType.AnyUnit, 0, 0, 0, 0, false, false, false, true, 0, MagicType.Armor));
         magicList.Add(new Magic(21, "Fatal Square", "Select one empty square and until the end of the next turn the first monster that stays on that square is destroyed.", Resources.Load<Sprite>("fatal_square"), "Magic", MagicTargetType.EmptySquare, 0, 0, 0, 0, false, false, false, false, 0, MagicType.Normal));
         magicList.Add(new Magic(22, "Labyrinth Lootbox", "Draw 2 cards from your deck.", Resources.Load<Sprite>("labyrinth_lootbox"), "Magic", MagicTargetType.None, 2, 0, 0, 0, false, false, false, false, 0, MagicType.Labyrinth));
+        magicList.Add(new Magic(23, "Magical Labyrinth", "Reshape the labyrinth into a new random maze. Monsters stay on the squares they are on, and both Card Bases are left unchanged.", Resources.Load<Sprite>("magical_labyrinth"), "Magic", MagicTargetType.None, 0, 0, 0, 0, false, false, false, false, 0, MagicType.Normal));
     }
 }
