@@ -298,7 +298,9 @@ public class LabyrinthObject : NetworkBehaviour
 
         PlayerManager attackerPM = connectionToClient.identity.GetComponent<PlayerManager>();
         NetworkIdentity defenderIdentity = targetObj.GetComponent<NetworkIdentity>();
-        PlayerManager defenderPM = defenderIdentity.connectionToClient.identity.GetComponent<PlayerManager>();
+        PlayerManager defenderPM = defenderIdentity.connectionToClient != null
+            ? defenderIdentity.connectionToClient.identity.GetComponent<PlayerManager>()
+            : null; // unowned test monsters (solo host sessions) have no player
 
         int predictedDef = enemyCard.actualDEF;
         if (myCard.id == 45) predictedDef -= 500;

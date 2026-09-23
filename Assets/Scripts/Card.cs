@@ -117,6 +117,7 @@ public class Card
         atk = ATK;
         def = DEF;
         cardDescription = CardDescription;
+        property = Property.None; // enum default is Hydrowalk
 
         thisImage = ThisImage;
         modelPrefab = ModelPrefab;

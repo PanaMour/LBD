@@ -167,6 +167,11 @@ public class GridBehavior : MonoBehaviour
     void SetDistance()
     {
         InitialSetUp();
+        if (MonsterHasProperty(objectToMove, Property.Hydrowalk) && AnyFlood())
+        {
+            SetDistanceHydrowalk();
+            return;
+        }
         int x = startX;
         int y = startY;
         int[] testArray = new int[rows * columns];
@@ -399,6 +404,273 @@ public class GridBehavior : MonoBehaviour
                 if (stat != null) stat.blockID = id;
             }
         }
+    }
+
+    // ---- Flooding ----
+    // Water spreads from a Card Base along open paths (never through walls)
+    // up to `reach` steps, so squares behind walls or too far away stay dry.
+    // The server computes the flooded squares once and sends them to every
+    // machine; floodTurnsLeft is only counted down on the server.
+    const float FloodStepDelay = 0.12f;
+    WaterTile[,] water;
+    public int floodTurnsLeft;
+    static Material waterMaterial;
+
+    public bool IsFlooded(int x, int y) => water != null && water[x, y] != null;
+
+    public int[] BaseRowCells(int baseY)
+    {
+        int[] seeds = new int[columns];
+        for (int x = 0; x < columns; x++) seeds[x] = x * rows + baseY;
+        return seeds;
+    }
+
+    // seeds are cells as x * rows + y: a whole Card Base row for flood
+    // cards, or the single square a Flood monster was summoned on.
+    public void ComputeFlood(int[] seeds, int reach, out int[] cells, out int[] steps)
+    {
+        int[,] dist = new int[columns, rows];
+        for (int x = 0; x < columns; x++)
+            for (int y = 0; y < rows; y++)
+                dist[x, y] = -1;
+
+        var queue = new Queue<(int x, int y)>();
+        foreach (int seed in seeds)
+        {
+            int sx = seed / rows, sy = seed % rows;
+            if (dist[sx, sy] == 0) continue;
+            dist[sx, sy] = 0;
+            queue.Enqueue((sx, sy));
+        }
+
+        int[] dx = { 0, 0, -1, 1 };
+        int[] dy = { 1, -1, 0, 0 };
+        string[] side = { "Top", "Bottom", "Left", "Right" };
+        string[] back = { "Bottom", "Top", "Right", "Left" };
+
+        var cellList = new List<int>();
+        var stepList = new List<int>();
+        while (queue.Count > 0)
+        {
+            (int cx, int cy) = queue.Dequeue();
+            cellList.Add(cx * rows + cy);
+            stepList.Add(dist[cx, cy]);
+            if (dist[cx, cy] >= reach) continue;
+
+            for (int i = 0; i < 4; i++)
+            {
+                int nx = cx + dx[i], ny = cy + dy[i];
+                if (nx < 0 || ny < 0 || nx >= columns || ny >= rows || dist[nx, ny] >= 0) continue;
+                if (BlocksDirection(cx, cy, side[i]) || BlocksDirection(nx, ny, back[i])) continue;
+                dist[nx, ny] = dist[cx, cy] + 1;
+                queue.Enqueue((nx, ny));
+            }
+        }
+
+        cells = cellList.ToArray();
+        steps = stepList.ToArray();
+    }
+
+    public void ApplyFlood(int[] cells, int[] steps)
+    {
+        if (gridArray == null || cells == null || steps == null || cells.Length != steps.Length) return;
+        if (water == null) water = new WaterTile[columns, rows];
+
+        for (int i = 0; i < cells.Length; i++)
+        {
+            int x = cells[i] / rows, y = cells[i] % rows;
+            if (x < 0 || x >= columns || y < 0 || y >= rows || water[x, y] != null || gridArray[x, y] == null) continue;
+            water[x, y] = CreateWater(gridArray[x, y], steps[i] * FloodStepDelay);
+        }
+    }
+
+    public void ClearFlood()
+    {
+        if (water == null) return;
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                if (water[x, y] != null) water[x, y].Drain();
+                water[x, y] = null;
+            }
+        }
+    }
+
+    bool AnyFlood()
+    {
+        if (water == null) return false;
+        foreach (WaterTile w in water) if (w != null) return true;
+        return false;
+    }
+
+    static bool MonsterHasProperty(GameObject monster, Property property)
+    {
+        if (monster == null) return false;
+        LabyrinthObject lo = monster.GetComponent<LabyrinthObject>();
+        if (lo == null || lo.card == null) return false;
+        ThisCard c = lo.card.GetComponent<ThisCard>();
+        return c != null && c.cardProperty == property;
+    }
+
+    static bool MonsterHasWallwalk(GameObject monster)
+    {
+        if (monster == null) return false;
+        LabyrinthObject lo = monster.GetComponent<LabyrinthObject>();
+        if (lo == null || lo.card == null) return false;
+        ThisCard c = lo.card.GetComponent<ThisCard>();
+        return c != null && (c.cardProperty == Property.Wallwalk || c.grantedWallwalk);
+    }
+
+    static readonly int[] StepDX = { 0, 0, -1, 1 };
+    static readonly int[] StepDY = { 1, -1, 0, 0 };
+    static readonly string[] StepSide = { "Top", "Bottom", "Left", "Right" };
+    static readonly string[] StepBack = { "Bottom", "Top", "Right", "Left" };
+
+    bool PathOpen(int x, int y, int dir, bool wallwalk)
+    {
+        int nx = x + StepDX[dir], ny = y + StepDY[dir];
+        if (nx < 0 || ny < 0 || nx >= columns || ny >= rows || gridArray[nx, ny] == null) return false;
+        if (wallwalk) return true;
+        return !BlocksDirection(x, y, StepSide[dir]) && !BlocksDirection(nx, ny, StepBack[dir]);
+    }
+
+    // Hydrowalk: entering a flooded square costs no movement, so the monster
+    // can ride any connected water in one move. A square still shows as at
+    // least 1 step away, since 0 is reserved for the monster's own square.
+    void SetDistanceHydrowalk()
+    {
+        bool wallwalk = MonsterHasWallwalk(objectToMove);
+        int[,] cost = new int[columns, rows];
+        for (int x = 0; x < columns; x++)
+            for (int y = 0; y < rows; y++)
+                cost[x, y] = int.MaxValue;
+
+        var deque = new LinkedList<(int x, int y)>();
+        cost[startX, startY] = 0;
+        deque.AddFirst((startX, startY));
+
+        while (deque.Count > 0)
+        {
+            (int cx, int cy) = deque.First.Value;
+            deque.RemoveFirst();
+
+            for (int d = 0; d < 4; d++)
+            {
+                if (!PathOpen(cx, cy, d, wallwalk)) continue;
+                int nx = cx + StepDX[d], ny = cy + StepDY[d];
+                if (IsOccupied(nx, ny)) continue;
+
+                int step = IsFlooded(nx, ny) ? 0 : 1;
+                if (cost[cx, cy] + step >= cost[nx, ny]) continue;
+                cost[nx, ny] = cost[cx, cy] + step;
+                if (step == 0) deque.AddFirst((nx, ny));
+                else deque.AddLast((nx, ny));
+            }
+        }
+
+        for (int x = 0; x < columns; x++)
+        {
+            for (int y = 0; y < rows; y++)
+            {
+                if (gridArray[x, y] == null || (x == startX && y == startY) || cost[x, y] == int.MaxValue) continue;
+                gridArray[x, y].GetComponent<GridStat>().visited = Mathf.Max(1, cost[x, y]);
+            }
+        }
+    }
+
+    // The body of water a square belongs to: flooded squares linked by open
+    // paths (the same way the water spread).
+    List<GameObject> ConnectedWater(int sx, int sy)
+    {
+        var result = new List<GameObject>();
+        if (!IsFlooded(sx, sy)) return result;
+
+        bool[,] seen = new bool[columns, rows];
+        var queue = new Queue<(int x, int y)>();
+        seen[sx, sy] = true;
+        queue.Enqueue((sx, sy));
+        while (queue.Count > 0)
+        {
+            (int cx, int cy) = queue.Dequeue();
+            result.Add(gridArray[cx, cy]);
+            for (int d = 0; d < 4; d++)
+            {
+                int nx = cx + StepDX[d], ny = cy + StepDY[d];
+                if (!PathOpen(cx, cy, d, false) || seen[nx, ny] || !IsFlooded(nx, ny)) continue;
+                seen[nx, ny] = true;
+                queue.Enqueue((nx, ny));
+            }
+        }
+        return result;
+    }
+
+    // Voltstream: while standing in water, it can strike any enemy monster
+    // standing in the same connected body of water, however far away.
+    List<GameObject> VoltstreamTargetTiles(LabyrinthObject attacker)
+    {
+        var targets = new List<GameObject>();
+        if (attacker == null || !MonsterHasProperty(attacker.gameObject, Property.Voltstream)) return targets;
+
+        GridStat here = attacker.GetComponentInParent<GridStat>();
+        if (here == null) return targets;
+
+        foreach (GameObject tile in ConnectedWater(here.x, here.y))
+        {
+            LabyrinthObject other = tile.GetComponentInChildren<LabyrinthObject>();
+            if (other != null && other.hasAuthority != attacker.hasAuthority) targets.Add(tile);
+        }
+        return targets;
+    }
+
+    WaterTile CreateWater(GameObject tile, float delay)
+    {
+        Transform floor = tile.transform.Find("Quad");
+        GameObject w = GameObject.CreatePrimitive(PrimitiveType.Quad);
+        Destroy(w.GetComponent<Collider>()); // must not swallow tile clicks
+        w.name = "Water";
+        w.transform.SetParent(floor != null ? floor : tile.transform, false);
+        w.transform.localPosition = new Vector3(0f, 0f, -0.01f);
+        w.transform.localRotation = Quaternion.identity;
+
+        WaterTile wt = w.AddComponent<WaterTile>();
+        wt.Begin(GetWaterMaterial(), delay);
+        return wt;
+    }
+
+    static Material GetWaterMaterial()
+    {
+        if (waterMaterial != null) return waterMaterial;
+
+        Material baseMat = Resources.Load<Material>("WaterFlood");
+        waterMaterial = baseMat != null ? new Material(baseMat) : new Material(Shader.Find("Sprites/Default"));
+        waterMaterial.mainTexture = BuildWaterTexture();
+        return waterMaterial;
+    }
+
+    // Tileable ripple pattern (whole sine periods per tile), so neighbouring
+    // flooded squares read as one continuous body of water.
+    static Texture2D BuildWaterTexture()
+    {
+        const int size = 64;
+        var tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.wrapMode = TextureWrapMode.Repeat;
+        tex.filterMode = FilterMode.Bilinear;
+
+        float tau = Mathf.PI * 2f;
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float u = (float)x / size, v = (float)y / size;
+                float w = Mathf.Sin(tau * (2 * u + v)) + Mathf.Sin(tau * (u - 3 * v)) * 0.7f + Mathf.Sin(tau * (3 * u + 2 * v)) * 0.4f;
+                float crest = Mathf.Clamp01((w - 0.9f) / 1.2f);
+                float shade = 0.72f + 0.28f * crest;
+                tex.SetPixel(x, y, new Color(shade, shade, 1f, 0.85f + 0.15f * crest));
+            }
+        }
+        tex.Apply();
+        return tex;
     }
 
     // Builds a fresh random maze for the interior (rows 1-14; the two Card
@@ -729,7 +1001,7 @@ public class GridBehavior : MonoBehaviour
                 {
                     if (!hasWallwalk)
                     {
-                        if (BlocksDirection(x, y, "Up") || BlocksDirection(x, y + 1, "Bottom")) return false;
+                        if (BlocksDirection(x, y, "Top") || BlocksDirection(x, y + 1, "Bottom")) return false;
                     }
                     if (IsOccupied(x, y + 1)) return false;
                     return true;
@@ -877,6 +1149,13 @@ public class GridBehavior : MonoBehaviour
         CheckForEnemy(x, y, x - 1, y, "Left");
         CheckForEnemy(x, y, x, y + 1, "Top");
         CheckForEnemy(x, y, x, y - 1, "Bottom");
+
+        if (objectToMove == null) return;
+        foreach (GameObject tile in VoltstreamTargetTiles(objectToMove.GetComponent<LabyrinthObject>()))
+        {
+            tile.GetComponent<LabyrinthTile>().RedGlowBlock();
+            tile.GetComponent<GridStat>().visited = 999;
+        }
     }
 
     void CheckForEnemy(int sourceX, int sourceY, int targetX, int targetY, string direction)
@@ -963,6 +1242,13 @@ public class GridBehavior : MonoBehaviour
         CheckAndHighlight(x, y, x - 1, y, "Left", attacker, ref foundTarget);
         CheckAndHighlight(x, y, x, y + 1, "Top", attacker, ref foundTarget);
         CheckAndHighlight(x, y, x, y - 1, "Bottom", attacker, ref foundTarget);
+
+        foreach (GameObject tile in VoltstreamTargetTiles(attacker))
+        {
+            Transform quad = tile.transform.Find("Quad");
+            if (quad != null) quad.GetComponent<Renderer>().material.color = Color.red;
+            foundTarget = true;
+        }
 
         return foundTarget;
     }

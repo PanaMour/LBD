@@ -631,6 +631,67 @@ public class PlayerManager : NetworkBehaviour
         if (gb != null) gb.ApplyMazeLayout(layout);
     }
 
+    // Floods the labyrinth from the caster's own Card Base (host = row 0,
+    // joining player = the far row) for `turns` turn changes.
+    [Command]
+    public void CmdFloodLabyrinth(int reach, int turns)
+    {
+        GridBehavior gb = FindGridBehavior();
+        if (gb == null) return;
+        int baseY = connectionToClient == NetworkServer.localConnection ? 0 : gb.rows - 1;
+        ServerFlood(gb, gb.BaseRowCells(baseY), reach, turns);
+    }
+
+    // Flood property: summoning the monster floods the labyrinth from its square.
+    const int FloodMonsterReach = 5;
+    const int FloodMonsterTurns = 3;
+
+    void ServerFlood(GridBehavior gb, int[] seeds, int reach, int turns)
+    {
+        if (!NetworkServer.active) return;
+        gb.ComputeFlood(seeds, reach, out int[] cells, out int[] steps);
+        gb.floodTurnsLeft = Mathf.Max(gb.floodTurnsLeft, turns);
+        RpcApplyFlood(cells, steps);
+        ServerDrownFireMonsters(gb, cells);
+    }
+
+    // Fire monsters caught by the incoming water are destroyed, unless they
+    // are standing on a Card Base row. Not [Server]-attributed (see the
+    // weaver note on ServerResolveAttack), so it guards manually.
+    void ServerDrownFireMonsters(GridBehavior gb, int[] cells)
+    {
+        if (!NetworkServer.active) return;
+
+        foreach (int cell in cells)
+        {
+            int x = cell / gb.rows, y = cell % gb.rows;
+            if (y == 0 || y == gb.rows - 1 || gb.gridArray[x, y] == null) continue;
+
+            LabyrinthObject monster = gb.gridArray[x, y].GetComponentInChildren<LabyrinthObject>();
+            if (monster == null || monster.card == null) continue;
+            ThisCard c = monster.card.GetComponent<ThisCard>();
+            if (c == null || !c.currentAttributes.Contains(Attribute.Fire)) continue;
+
+            bool mine = monster.connectionToClient == connectionToClient;
+            RpcShowCard(monster.card, mine ? "PlayerDestroyed" : "OpponentDestroyed", 0);
+            NetworkServer.Destroy(monster.gameObject);
+        }
+    }
+
+    [ClientRpc]
+    void RpcApplyFlood(int[] cells, int[] steps)
+    {
+        GridBehavior gb = FindGridBehavior();
+        if (gb != null) gb.ApplyFlood(cells, steps);
+    }
+
+    [ClientRpc]
+    void RpcClearFlood()
+    {
+        GridBehavior gb = FindGridBehavior();
+        if (gb != null) gb.ClearFlood();
+    }
+
     [Command]
     public void CmdDealCards()
     {
@@ -1471,6 +1532,13 @@ public class PlayerManager : NetworkBehaviour
             }
         }
 
+        GridBehavior floodGrid = FindGridBehavior();
+        if (floodGrid != null && floodGrid.floodTurnsLeft > 0)
+        {
+            floodGrid.floodTurnsLeft--;
+            if (floodGrid.floodTurnsLeft == 0) RpcClearFlood();
+        }
+
         RpcGMChangeTurn();
 
         ThisAction[] allActions = FindObjectsOfType<ThisAction>();
@@ -1646,6 +1714,14 @@ public class PlayerManager : NetworkBehaviour
         RpcLinkMonsterToCard(monster, cardNetId.gameObject);
 
         if (script.isImmobile) RpcShowCard(cardNetId.gameObject, "SetImmobile", 0);
+
+        if (cardScript.cardProperty == Property.Flood)
+        {
+            GridBehavior gb = FindGridBehavior();
+            Transform tile = gb != null ? gb.transform.Find(tileName) : null;
+            GridStat stat = tile != null ? tile.GetComponent<GridStat>() : null;
+            if (stat != null) ServerFlood(gb, new[] { stat.x * gb.rows + stat.y }, FloodMonsterReach, FloodMonsterTurns);
+        }
     }
 
     [ClientRpc]
