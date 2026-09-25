@@ -124,7 +124,10 @@ public class LabyrinthObject : NetworkBehaviour
                 if (isServer)
                 {
                     newTile.isFatalSquare = false;
-                    PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
+                    // "PlayerDestroyed" goes to the sending player's yard, so send
+                    // through the monster's owner, not whoever is hosting.
+                    NetworkConnection owner = connectionToClient ?? NetworkServer.localConnection;
+                    PlayerManager pm = owner.identity.GetComponent<PlayerManager>();
                     pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
                     NetworkServer.Destroy(this.gameObject);
                 }

@@ -3,14 +3,14 @@ var LibraryWebSockets = {
 
 	SocketCreate: function(url, id, onopen, ondata, onclose)
 	{
-		var str = Pointer_stringify(url);
+		var str = UTF8ToString(url);
 
 		var socket = new WebSocket(str, "binary");
 
 		socket.binaryType = 'arraybuffer';
 
 		socket.onopen = function(e) {
-			Runtime.dynCall('vi', onopen, [id]);
+			{{{ makeDynCall('vi', 'onopen') }}}(id);
 		}
 
 		socket.onerror = function(e) {
@@ -33,7 +33,7 @@ var LibraryWebSockets = {
 				var ptr = _malloc(array.length);
 				var dataHeap = new Uint8Array(HEAPU8.buffer, ptr, array.length);
 				dataHeap.set(array);
-				Runtime.dynCall('viii', ondata, [id, ptr, array.length]);
+				{{{ makeDynCall('viii', 'ondata') }}}(id, ptr, array.length);
 				_free(ptr);
 			}
 			else if(typeof e.data === "string") {
@@ -47,7 +47,7 @@ var LibraryWebSockets = {
 		};
 
 		socket.onclose = function (e) {
-			Runtime.dynCall('vi', onclose, [id]);
+			{{{ makeDynCall('vi', 'onclose') }}}(id);
 
 			if (e.code != 1000)
 			{

@@ -70,6 +70,7 @@ public class ThisMagic : NetworkBehaviour
     public bool equip;
     public int equipBoost;
     public GameObject equippedTo;
+    bool lostEquipHost;
 
     private bool initialized = false;
     public GameObject lastTargetedMonster;
@@ -391,6 +392,7 @@ public class ThisMagic : NetworkBehaviour
                     canBeDestroyed = true;
                     beInGraveyard = true;
                     equippedTo = null;
+                    lostEquipHost = true;
                 }
             }
         }
@@ -399,8 +401,20 @@ public class ThisMagic : NetworkBehaviour
     IEnumerator SmoothDestruction(int sec)
     {
         yield return new WaitForSeconds(sec);
-        if (Magic != null && PlayerManager != null)
+        if (Magic == null) yield break;
+
+        // "PlayerDestroyed" goes to the sending player's yard, so it must be
+        // sent through the card's owner. The equip link only exists on the
+        // server, so an equip card whose monster died is sent by the server.
+        if (lostEquipHost)
+        {
+            if (isServer && connectionToClient != null && connectionToClient.identity != null)
+                connectionToClient.identity.GetComponent<PlayerManager>().RpcShowCard(Magic, "PlayerDestroyed", 0);
+        }
+        else if (hasAuthority && PlayerManager != null)
+        {
             PlayerManager.CmdPlayerDestroyCard(Magic, 0);
+        }
     }
 
     public void Activate()
