@@ -999,7 +999,7 @@ public class PlayerManager : NetworkBehaviour
             }
         }
 
-        CmdPlayerDestroyCard(frostWraithCard, 0);
+        RpcShowCard(frostWraithCard, "PlayerDestroyed", 0);
     }
 
     // Water/Fire/Nature/Wind/Labyrinth Spirit: "You can tribute this card to
@@ -1041,7 +1041,7 @@ public class PlayerManager : NetworkBehaviour
             }
         }
 
-        CmdPlayerDestroyCard(spiritCard, 0);
+        RpcShowCard(spiritCard, "PlayerDestroyed", 0);
     }
 
     // Shy Magician: "Once per duel, you can select two of your Mage-type
@@ -2536,7 +2536,7 @@ public class PlayerManager : NetworkBehaviour
 
         if (!magicScript.equip)
         {
-            CmdPlayerDestroyCard(magicCard, 0);
+            RpcShowCard(magicCard, "PlayerDestroyed", 0);
         }
     }
 
@@ -2902,7 +2902,7 @@ public class PlayerManager : NetworkBehaviour
                 attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, true, actionScript.id);
             }
 
-            CmdPlayerDestroyCard(trapCard, 0);
+            RpcShowCard(trapCard, "PlayerDestroyed", 0);
         }
         else
         {
@@ -2940,7 +2940,7 @@ public class PlayerManager : NetworkBehaviour
             actionScript.faceup = true;
             actionScript.beInGraveyard = true;
         }
-        CmdPlayerDestroyCard(trapCard, 0);
+        RpcShowCard(trapCard, "PlayerDestroyed", 0);
 
         if (attacker != null && defender != null)
         {
