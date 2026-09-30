@@ -879,11 +879,24 @@ public class GridBehavior : MonoBehaviour
 
         for (int col = 2; col <= 8; col++)
         {
-            if (gridArray[col, row] != null)
+            if (IsFreeSummonTile(col, row))
             {
                 gridArray[col, row].GetComponent<LabyrinthTile>().GlowBlock();
             }
         }
+    }
+
+    bool IsFreeSummonTile(int x, int y)
+    {
+        return gridArray[x, y] != null && gridArray[x, y].GetComponentInChildren<LabyrinthObject>() == null;
+    }
+
+    public bool HasFreeSummonTile()
+    {
+        int row = Mirror.NetworkServer.active ? 0 : 15;
+        for (int col = 2; col <= 8; col++)
+            if (IsFreeSummonTile(col, row)) return true;
+        return false;
     }
 
     public void OnTileClicked(int x, int y)
@@ -891,7 +904,7 @@ public class GridBehavior : MonoBehaviour
         if (cardWaitingToSpawn != null)
         {
             int validRow = Mirror.NetworkServer.active ? 0 : 15;
-            if (y == validRow && x >= 2 && x <= 8)
+            if (y == validRow && x >= 2 && x <= 8 && IsFreeSummonTile(x, y))
             {
                 int cardId = cardWaitingToSpawn.GetComponent<ThisCard>().thisId;
                 NetworkIdentity ni = cardWaitingToSpawn.GetComponent<NetworkIdentity>();

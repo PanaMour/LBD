@@ -2280,66 +2280,67 @@ public class PlayerManager : NetworkBehaviour
         cardScript.thisId = cardId;
         NetworkServer.Spawn(cardObj, connectionToClient);
 
-        // ThisCard.Update() populates stars/cardProperty/etc. from thisId on
-        // its own next Update() tick, not synchronously -- CmdSpawnMonster
-        // reads those fields, so give it a moment before using them.
+        // Give the new card a moment to reach the owner's machine and fill its
+        // stats from thisId before the owner starts summoning it.
         yield return new WaitForSeconds(0.1f);
 
-        // Card Base row matches the summon-placement/tribute rule used
-        // elsewhere (GridBehavior.cs, ThisCard.IsInsideOwnCardBase()): the
-        // host's own base is row 0, the joining client's is row 15.
-        bool ownerIsHost = (hasAuthority == NetworkServer.active);
-        int homeRow = ownerIsHost ? 0 : 15;
+        // The owner picks the Card Base square themselves, through the same
+        // flow as a normal summon (their own slots, their own base row).
+        TargetBeginPickupSummon(connectionToClient, cardObj);
+    }
 
-        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
-        string openTileName = null;
-        if (gridGen != null)
+    [TargetRpc]
+    void TargetBeginPickupSummon(NetworkConnection target, GameObject cardObj)
+    {
+        if (cardObj == null) return;
+
+        GridBehavior gb = FindGridBehavior();
+        int freeSlot = FirstFreePlayerSocket();
+        if (gb == null || freeSlot < 0 || !gb.HasFreeSummonTile())
         {
-            for (int col = 2; col <= 8 && openTileName == null; col++)
+            Debug.Log("Labyrinth pickup: No open zone, adding the monster to your hand.");
+            CmdPickupToHand(cardObj);
+            return;
+        }
+
+        tempCard = cardObj;
+        tempSlot = PlayerSockets[freeSlot];
+
+        // Same path as a normal summon: pick the battle mode (the card is
+        // placed in the slot accordingly), then pick the Card Base square.
+        // Read from the database: the card's own fields fill in on its next
+        // Update, which may not have run yet on this machine.
+        ThisCard cardScript = cardObj.GetComponent<ThisCard>();
+        int id = cardScript != null ? cardScript.thisId : 0;
+        string label = id > 0 && id < CardDataBase.cardList.Count
+            ? $"{CardDataBase.cardList[id].cardName} (ATK {CardDataBase.cardList[id].atk} / DEF {CardDataBase.cardList[id].def})"
+            : "a monster";
+        if (Canvas == null) Canvas = GameObject.Find("Canvas");
+        SpawnBox("Treasure! You found " + label + ". Summon it in which mode?", "Attack", "Defense",
+            () => { Destroy(activeUIBox); FinalizeSummon(true); },
+            () => { Destroy(activeUIBox); FinalizeSummon(false); });
+    }
+
+    [Command]
+    void CmdPickupToHand(GameObject cardObj)
+    {
+        RpcShowCard(cardObj, "Dealt", 0);
+    }
+
+    int FirstFreePlayerSocket()
+    {
+        for (int i = 0; i < PlayerSockets.Count; i++)
+        {
+            if (PlayerSockets[i] == null) continue;
+            bool occupied = false;
+            foreach (Transform child in PlayerSockets[i].transform)
             {
-                foreach (Transform child in gridGen.transform)
-                {
-                    GridStat stat = child.GetComponent<GridStat>();
-                    if (stat != null && stat.x == col && stat.y == homeRow && child.GetComponentInChildren<LabyrinthObject>() == null)
-                    {
-                        openTileName = child.name;
-                        break;
-                    }
-                }
+                if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null || child.GetComponent<ThisAction>() != null)
+                { occupied = true; break; }
             }
+            if (!occupied) return i;
         }
-
-        int freeSlotIndex = -1;
-        if (openTileName != null)
-        {
-            for (int i = 0; i < PlayerSockets.Count; i++)
-            {
-                if (PlayerSockets[i] == null) continue;
-                bool occupied = false;
-                foreach (Transform child in PlayerSockets[i].transform)
-                {
-                    if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null || child.GetComponent<ThisAction>() != null)
-                    { occupied = true; break; }
-                }
-                if (!occupied) { freeSlotIndex = i; break; }
-            }
-        }
-
-        if (openTileName != null && freeSlotIndex != -1)
-        {
-            cardScript.summoned = true;
-            cardScript.attackmode = true;
-
-            RpcShowCard(cardObj, "Played", freeSlotIndex);
-            CmdSpawnMonster(cardId, openTileName, cardObj.GetComponent<NetworkIdentity>());
-
-            Debug.Log("Labyrinth pickup: Special Summoned " + cardScript.cardName + " to the Card Base!");
-        }
-        else
-        {
-            RpcShowCard(cardObj, "Dealt", 0);
-            Debug.Log("Labyrinth pickup: No open zone, added " + cardScript.cardName + " to hand.");
-        }
+        return -1;
     }
 
     IEnumerator DrawSpecificMagic(int magicId)
