@@ -17,6 +17,9 @@ public class UIManager : NetworkBehaviour
     public Text TurnText;
 
     Color blueColor = new Color32(17, 216, 238, 255);
+
+    // Turns until the next treasure chest appears; 0 while one is on the board.
+    public static int treasureCountdown;
     private Text phaseButtonText;
 
     void Start()
@@ -91,6 +94,37 @@ public class UIManager : NetworkBehaviour
         {
             TurnText.text = "Turn: " + GameManager.turn;
         }
+
+        Text treasure = TreasureText();
+        if (treasure != null)
+        {
+            treasure.gameObject.SetActive(treasureCountdown > 0);
+            treasure.text = "Next treasure in " + treasureCountdown + (treasureCountdown == 1 ? " turn" : " turns");
+        }
+    }
+
+    Text treasureText;
+
+    // A copy of the turn counter placed just below it (the turn counter's own
+    // box is too small and cuts off longer text).
+    Text TreasureText()
+    {
+        if (treasureText != null || TurnText == null) return treasureText;
+
+        treasureText = Instantiate(TurnText, TurnText.transform.parent);
+        treasureText.name = "TreasureText";
+        treasureText.horizontalOverflow = HorizontalWrapMode.Overflow;
+        treasureText.verticalOverflow = VerticalWrapMode.Overflow;
+        treasureText.alignment = TextAnchor.UpperLeft;
+        treasureText.fontSize = Mathf.RoundToInt(TurnText.fontSize * 0.85f);
+        treasureText.color = new Color(0.85f, 0.5f, 0f);
+        Outline outline = treasureText.gameObject.AddComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.6f);
+        outline.effectDistance = new Vector2(1f, -1f);
+
+        RectTransform rt = treasureText.rectTransform;
+        rt.anchoredPosition = TurnText.rectTransform.anchoredPosition + new Vector2(0, -TurnText.rectTransform.rect.height);
+        return treasureText;
     }
 
     public void updateEndButtonColourMagenta()

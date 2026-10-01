@@ -581,6 +581,8 @@ public class PlayerManager : NetworkBehaviour
     {
         if (connectionToClient == NetworkServer.localConnection)
         {
+            treasureRespawnCountdown = 0;
+            UIManager.treasureCountdown = 0;
             ServerSpawnTreasure();
         }
     }
@@ -1532,6 +1534,13 @@ public class PlayerManager : NetworkBehaviour
             }
         }
 
+        if (treasureRespawnCountdown > 0)
+        {
+            treasureRespawnCountdown--;
+            if (treasureRespawnCountdown == 0) ServerSpawnTreasure();
+            RpcTreasureCountdown(treasureRespawnCountdown);
+        }
+
         GridBehavior floodGrid = FindGridBehavior();
         if (floodGrid != null && floodGrid.floodTurnsLeft > 0)
         {
@@ -2190,12 +2199,32 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    // Server-side: turns left until the next chest (0 = none pending).
+    static int treasureRespawnCountdown;
+
+    [ClientRpc]
+    void RpcTreasureCountdown(int turns)
+    {
+        UIManager.treasureCountdown = turns;
+        if (UIManager != null) UIManager.updateTurnText();
+    }
+
     public void ServerSpawnTreasure()
     {
         if (!NetworkServer.active) return;
 
+        // Middle rows, avoiding a square a monster is standing on (a chest is
+        // only collected by moving onto it).
+        GridBehavior grid = FindGridBehavior();
         int rX = Random.Range(0, 11);
         int rY = Random.Range(6, 10);
+        for (int attempt = 0; attempt < 30 && grid != null && grid.gridArray != null; attempt++)
+        {
+            GameObject candidate = grid.gridArray[rX, rY];
+            if (candidate != null && candidate.GetComponentInChildren<LabyrinthObject>() == null) break;
+            rX = Random.Range(0, 11);
+            rY = Random.Range(6, 10);
+        }
 
         Debug.Log($"[SERVER] Spawning Treasure at Grid Coordinates: {rX}, {rY}");
 
@@ -2244,6 +2273,10 @@ public class PlayerManager : NetworkBehaviour
         LabyrinthObject collector = (tileStat != null) ? tileStat.GetComponentInChildren<LabyrinthObject>() : null;
 
         NetworkServer.Destroy(chest);
+
+        // Roll a die: a new chest appears that many turns from now.
+        treasureRespawnCountdown = Random.Range(1, 7);
+        RpcTreasureCountdown(treasureRespawnCountdown);
 
         List<KeyValuePair<string, int>> labyrinthPool = new List<KeyValuePair<string, int>>();
         for (int i = 1; i < CardDataBase.cardList.Count; i++)
