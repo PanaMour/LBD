@@ -11,6 +11,15 @@ public class CardDataBase : NetworkBehaviour
 
     public static List<Card> cardList = new List<Card>();
 
+    // Card ids are not list positions (some ids are unused), so always look
+    // cards up by id. Returns null for an unknown id.
+    public static Card GetCard(int id)
+    {
+        foreach (Card c in cardList)
+            if (c.id == id) return c;
+        return null;
+    }
+
     private void Start()
     {
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -19,12 +28,7 @@ public class CardDataBase : NetworkBehaviour
     private void Awake()
     {
         cardList.Add(new Card(0, "None", 10, 0, 0, Type.Labyrinth, Attribute.Labyrinth, Property.None, "None", Resources.Load <Sprite>("noimg"), Resources.Load<GameObject>("TestMonster"), "None", 0, 0, false, 0, false));
-        cardList.Add(new Card(1, "Dark Goat", 4, 1000, 700, "Other goats were eaten by the Armored Lizard.", Resources.Load<Sprite>("dgoat"), null, "Brown", 0, 0, false, 0, true));
-        cardList.Add(new Card(2, "Surprised Fish", 2, 500, 400, "+1 Draw. Hey Vidiano! I love you!", Resources.Load<Sprite>("sfish"), null, "Brown", 1, 0, false, 0, true));
         cardList.Add(new Card(3, "Pixel Monster", 5, 1800, 150, Type.Animal, Attribute.Radiant, Property.None, "Found in GoogleSearch Results®", Resources.Load<Sprite>("pixel_monster"), Resources.Load<GameObject>("pixel_monster"), "Red", 0, 0, false, 0, true));
-        cardList.Add(new Card(4, "Ninja Squid", 1, 200, 350, "+1 Draw. He can slice bread with his bare arms.", Resources.Load<Sprite>("ninjasquid"), null, "Brown", 1, 1, false, 0, true));
-        cardList.Add(new Card(5, "Gkinia Toad", 2, 700,500, "A toad full of gkinia.", Resources.Load<Sprite>("toad"), null, "Brown", 0, 0, false, 0, true));
-        cardList.Add(new Card(6, "Feral Imp", 4, 1300,1400, "A playful little fiend that lurks in the dark.", Resources.Load<Sprite>("imp"), null, "Brown", 0, 0, false, 0, true));
         cardList.Add(new Card(7, "Spider Snowman", 4, 1150,900, Type.Bug, Attribute.Ice, Property.None, "A snowman got bitten by a spider and transformed into this monstrosity.", Resources.Load<Sprite>("spider_snowman"), Resources.Load<GameObject>("spider_snowman"), "Brown", 0, 0, false, 0, true));
         cardList.Add(new Card(8, "Rabbit with Carrot Ears", 4, 1000,1400, Type.Animal, Attribute.Nature, Property.None, "A rabbit that grew carrots as ears after consuming thousands of carrots. They say that when he gets mad, his carrot ears become sharper.", Resources.Load<Sprite>("rabbit_with_carrot_ears"), Resources.Load<GameObject>("rabbit_with_carrot_ears"), "Brown", 0, 0, false, 0, true));
         cardList.Add(new Card(9, "Dominalien", 4, 1350,800, Type.Alien, Attribute.Dark, Property.None, "An alien whose purpose is to dominate all the planets in the universe.", Resources.Load<Sprite>("dominalien"), Resources.Load<GameObject>("dominalien"), "Brown", 0, 0, false, 0, true));

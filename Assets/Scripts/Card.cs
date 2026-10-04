@@ -108,29 +108,4 @@ public class Card
 
         canBeTributed = CanBeTributed;
     }
-
-    public Card(int Id,string CardName, int Stars, int ATK, int DEF, string CardDescription, Sprite ThisImage, GameObject ModelPrefab, string Color, int DrawXCards, int ReturnXcards, bool Spell, int DamageDealtBySpell, bool CanBeTributed)
-    {
-        id = Id;
-        cardName = CardName;
-        stars = Stars;
-        atk = ATK;
-        def = DEF;
-        cardDescription = CardDescription;
-        property = Property.None; // enum default is Hydrowalk
-
-        thisImage = ThisImage;
-        modelPrefab = ModelPrefab;
-
-        color = Color;
-
-        drawXcards = DrawXCards;
-
-        returnXcards = ReturnXcards;
-
-        spell = Spell;
-        damageDealtBySpell = DamageDealtBySpell;
-
-        canBeTributed = CanBeTributed;
-    }
 }

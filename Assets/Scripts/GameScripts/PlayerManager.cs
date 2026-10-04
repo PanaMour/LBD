@@ -146,14 +146,14 @@ public class PlayerManager : NetworkBehaviour
             int r = Random.Range(0, 87);
             if (r < 60)
             {
-                Card.GetComponent<ThisCard>().thisId = Random.Range(1, 59);
+                Card.GetComponent<ThisCard>().thisId = RandomDeckMonsterId();
                 GameObject card = Instantiate(Card, new Vector2(0, 0), Quaternion.identity);
                 NetworkServer.Spawn(card, connectionToClient);
                 RpcShowCard(card, "Dealt", 0);
             }
             else if (r >= 60 && r<83)
             {
-                Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 24);
+                Magic.GetComponent<ThisMagic>().thisId = RandomDeckMagicId();
                 GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
                 NetworkServer.Spawn(card, connectionToClient);
                 RpcShowCard(card, "Dealt", 0);
@@ -168,20 +168,38 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    // Deck draws exclude Labyrinth cards: those only come from treasure
+    // chests (ServerCollectTreasure).
+    static int RandomDeckMonsterId()
+    {
+        var ids = new HashSet<int>();
+        foreach (Card c in CardDataBase.cardList)
+            if (c.id > 0 && c.type != Type.Labyrinth) ids.Add(c.id);
+        return new List<int>(ids)[Random.Range(0, ids.Count)];
+    }
+
+    static int RandomDeckMagicId()
+    {
+        var ids = new HashSet<int>();
+        foreach (Magic m in MagicDataBase.magicList)
+            if (m.id > 0 && m.magicType != MagicType.Labyrinth) ids.Add(m.id);
+        return new List<int>(ids)[Random.Range(0, ids.Count)];
+    }
+
     IEnumerator DrawCard()
     {
         yield return new WaitForSeconds(1);
         int r = Random.Range(0, 87);
         if (r < 60)
         {
-            Card.GetComponent<ThisCard>().thisId = Random.Range(1, 59);
+            Card.GetComponent<ThisCard>().thisId = RandomDeckMonsterId();
             GameObject card = Instantiate(Card, new Vector2(0, 0), Quaternion.identity);
             NetworkServer.Spawn(card, connectionToClient);
             RpcShowCard(card, "Dealt", 0);
         }
         else if (r >= 60 && r <83)
         {
-            Magic.GetComponent<ThisMagic>().thisId = Random.Range(1, 24);
+            Magic.GetComponent<ThisMagic>().thisId = RandomDeckMagicId();
             GameObject card = Instantiate(Magic, new Vector2(0, 0), Quaternion.identity);
             NetworkServer.Spawn(card, connectionToClient);
             RpcShowCard(card, "Dealt", 0);
@@ -2279,8 +2297,8 @@ public class PlayerManager : NetworkBehaviour
         RpcTreasureCountdown(treasureRespawnCountdown);
 
         List<KeyValuePair<string, int>> labyrinthPool = new List<KeyValuePair<string, int>>();
-        for (int i = 1; i < CardDataBase.cardList.Count; i++)
-            if (CardDataBase.cardList[i].type == Type.Labyrinth) labyrinthPool.Add(new KeyValuePair<string, int>("Monster", i));
+        foreach (Card c in CardDataBase.cardList)
+            if (c.id > 0 && c.type == Type.Labyrinth) labyrinthPool.Add(new KeyValuePair<string, int>("Monster", c.id));
 
         for (int i = 0; i < MagicDataBase.magicList.Count; i++)
             if (MagicDataBase.magicList[i].magicType == MagicType.Labyrinth) labyrinthPool.Add(new KeyValuePair<string, int>("Magic", i));
@@ -2345,8 +2363,9 @@ public class PlayerManager : NetworkBehaviour
         // Update, which may not have run yet on this machine.
         ThisCard cardScript = cardObj.GetComponent<ThisCard>();
         int id = cardScript != null ? cardScript.thisId : 0;
-        string label = id > 0 && id < CardDataBase.cardList.Count
-            ? $"{CardDataBase.cardList[id].cardName} (ATK {CardDataBase.cardList[id].atk} / DEF {CardDataBase.cardList[id].def})"
+        Card data = CardDataBase.GetCard(id);
+        string label = data != null
+            ? $"{data.cardName} (ATK {data.atk} / DEF {data.def})"
             : "a monster";
         if (Canvas == null) Canvas = GameObject.Find("Canvas");
         SpawnBox("Treasure! You found " + label + ". Summon it in which mode?", "Attack", "Defense",

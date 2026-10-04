@@ -39,9 +39,9 @@ public class LabyrinthObject : NetworkBehaviour
 
     void OnMonsterIDChanged(int oldID, int newID)
     {
-        if (newID > 0 && newID < CardDataBase.cardList.Count)
+        Card cardData = newID > 0 ? CardDataBase.GetCard(newID) : null;
+        if (cardData != null)
         {
-            Card cardData = CardDataBase.cardList[newID];
 
             if (current3DModel != null) Destroy(current3DModel);
 

@@ -147,7 +147,7 @@ public class ThisCard : NetworkBehaviour
             PlayerManager = networkIdentity.GetComponent<PlayerManager>();
         }
 
-        thisCard[0] = CardDataBase.cardList[thisId];
+        thisCard[0] = CardDataBase.GetCard(thisId) ?? CardDataBase.GetCard(0);
 
         nameText = transform.Find("CardCanvas").Find("Background").Find("CardName").Find("NameText").GetComponent<Text>();
         starsText = transform.Find("CardCanvas").Find("Background").Find("Stars").Find("StarsText").GetComponent<Text>();
@@ -189,10 +189,11 @@ public class ThisCard : NetworkBehaviour
 
         if (thisId != 0 && thisId != id)
         {
-            if (thisId < CardDataBase.cardList.Count)
+            Card data = CardDataBase.GetCard(thisId);
+            if (data != null)
             {
                 thisCard.Clear();
-                thisCard.Add(CardDataBase.cardList[thisId]);
+                thisCard.Add(data);
                 initialized = false;
             }
         }
