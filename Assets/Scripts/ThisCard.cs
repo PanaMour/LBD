@@ -10,7 +10,6 @@ public class ThisCard : NetworkBehaviour
     public GameManager GameManager;
     public GameObject Card;
     public List<Card> thisCard = new List<Card>();
-    public GameObject LabyrinthObject;
 
     [SyncVar]
     public int thisId;
@@ -39,61 +38,27 @@ public class ThisCard : NetworkBehaviour
     public Image frame;
 
     public bool cardBack;
-    public static bool staticCardBack;
+    GameObject cardBackVisual;
 
     public GameObject PlayerArea;
 
-    public int numberOfCardsInDeck;
 
     public bool canBeSummoned;
     public bool summoned;
     public GameObject battleZone;///d///////////////////
 
-    public static int drawX;
-    public int drawXcards;
-
     public GameObject attackBorder;
-
-    public GameObject Target;
-    public GameObject Enemy;
 
     public bool cantAttack;
 
     public bool canAttack;
 
-    public static bool staticTargeting;
-    public static bool staticTargetingEnemy;
-
-    public bool targeting;
-    public bool targetingEnemy;
-
-    public bool onlyThisCardAttack;
-
-    public bool canBeDestroyed;
-    //public GameObject Graveyard;
     public bool beInGraveyard;
 
-    public int decreased;
     public int actualATK;
     public int actualDEF;
-    public int returnXcards;
-    public bool useReturn;
-
-    public static bool UcanReturn;
-
-    public bool isTarget;
-    public GameObject PlayerSlots;
-    public GameObject EnemySlots;
-    public bool monstersExist;
-
-    public bool spell;//-////////////////////////////////////////////////////////////////////
-    public int damageDealtBySpell;///-////////////////////////////////////////////////////
-
-    public bool dealDamage;
-    public bool stopDealDamage;
 
     public bool canBeTributed;
-    public bool confirmationfinished = false;
 
     [SyncVar]
     public bool attackmode = true;
@@ -157,27 +122,17 @@ public class ThisCard : NetworkBehaviour
         thatImage = transform.Find("CardCanvas").Find("Background").Find("Image").GetComponent<Image>();
         frame = transform.Find("CardCanvas").GetComponent<Image>();
         attackBorder = transform.Find("Attack").transform.gameObject;
-        numberOfCardsInDeck = PlayerDeck.deckSize;
 
         canBeSummoned = false;
         summoned = false;
 
-        drawX = 0;
-
         canAttack = false;
-
-        Enemy = GameObject.Find("OpponentLP");
-        EnemySlots = GameObject.Find("EnemySlots");
-        PlayerSlots = GameObject.Find("PlayerSlots");
-        targeting = false;
-        targetingEnemy = false;
     }
 
     void Update()
     {
         if (PlayerArea == null) PlayerArea = GameObject.Find("Hand_Anchor");
         if (battleZone == null) battleZone = GameObject.Find("PlayerSlots");
-        if (PlayerSlots == null) PlayerSlots = GameObject.Find("PlayerSlots");
 
         if (this.transform.parent != null && PlayerArea != null)
         {
@@ -208,10 +163,6 @@ public class ThisCard : NetworkBehaviour
             cardDescription = thisCard[0].cardDescription;
             cardProperty = thisCard[0].property;
             thisSprite = thisCard[0].thisImage;
-            drawXcards = thisCard[0].drawXcards;
-            returnXcards = thisCard[0].returnXcards;
-            spell = thisCard[0].spell;
-            damageDealtBySpell = thisCard[0].damageDealtBySpell;
             canBeTributed = thisCard[0].canBeTributed;
             initialized = true;
         }
@@ -220,7 +171,7 @@ public class ThisCard : NetworkBehaviour
         {
             nameText.text = "" + cardName;
             starsText.text = "" + stars;
-            actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss - decreased;
+            actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss;
             actualDEF = def + tempDef + auraDef - plagueDefLoss - battleDefPenalty;
             if (actualATK < 0) actualATK = 0;
             if (actualDEF < 0) actualDEF = 0;
@@ -290,16 +241,14 @@ public class ThisCard : NetworkBehaviour
             }
         }
 
-        staticCardBack = cardBack;
-
-        if (this.tag == "Clone")
+        // Each card shows its own back (this used to go through one shared
+        // static, so every card followed whichever card updated last).
+        if (cardBackVisual == null)
         {
-            thisCard[0] = PlayerDeck.staticDeck[numberOfCardsInDeck - 1];
-            numberOfCardsInDeck -= 1;
-            PlayerDeck.deckSize -= 1;
-            cardBack = false;
-            this.tag = "Untagged";
+            Transform back = transform.Find("CardCanvas/CardBack");
+            if (back != null) cardBackVisual = back.gameObject;
         }
+        if (cardBackVisual != null && cardBackVisual.activeSelf != cardBack) cardBackVisual.SetActive(cardBack);
 
         if (tag != "Unusable")
         {
@@ -364,7 +313,6 @@ public class ThisCard : NetworkBehaviour
 
             HandleStatusBorders(isInBattleZone);
             HandleTurnLogic(isInBattleZone);
-            HandleDamageAndDestroy();
             HandleBoosts();
         }
     }
@@ -448,37 +396,11 @@ public class ThisCard : NetworkBehaviour
         if (PlayerManager.IsMyTurn == false)
         {
             if (summoned) { cantAttack = false; hasMoved = false; }
-            UcanReturn = false;
             alreadychanged = false;
         }
 
         canAttack = (PlayerManager.IsMyTurn && !cantAttack && attackmode && isInBattleZone && GameManager.turn != 0);
         canMove = (PlayerManager.IsMyTurn && attackmode && isInBattleZone && !hasMoved);
-
-        targeting = staticTargeting;
-        targetingEnemy = staticTargetingEnemy;
-        Target = targetingEnemy ? Enemy : null;
-
-        if (targeting && onlyThisCardAttack) Attack();
-    }
-
-    void HandleDamageAndDestroy()
-    {
-        if (actualATK <= 0 && initialized) Destroy();
-
-        if (returnXcards > 0 && summoned && !useReturn)
-        {
-            Return(returnXcards);
-            useReturn = true;
-        }
-
-        if (drawX > 0 && summoned && !beInGraveyard)
-        {
-            PlayerManager.CmdDrawCard();
-            drawX--;
-        }
-
-        if (damageDealtBySpell > 0) dealDamage = true;
     }
 
     void HandleBoosts()
@@ -498,203 +420,11 @@ public class ThisCard : NetworkBehaviour
             }
         }
     }
-    public void Summon()
-    {
-        summoned = true;
-        faceup = true;
-    }
-
-    public void Attack()
-    {
-        if (canAttack == true && summoned == true && spell == false)
-        {
-            if (Target != null)
-            {
-                if (Target == Enemy)
-                {
-                    monstersExist = false;
-                    foreach (Transform child in EnemySlots.transform)//child.child
-                    {
-                        if (child.transform.childCount != 0)
-                        {
-                            monstersExist = true;
-                        }
-                    }
-                    if (!monstersExist)
-                    {
-                        PlayerManager.CmdGMChangeLP(0, actualATK);
-                        targeting = false;
-                        cantAttack = true;
-                        hasMoved = true;
-                    }
-                }
-            }
-            else
-            {
-                foreach (Transform child in EnemySlots.transform)//child.child
-                {
-                    foreach (Transform grandChild in child)
-                    {
-                        ThisCard enemyCard = grandChild.GetComponent<ThisCard>();
-                        if (enemyCard != null && enemyCard.isTarget == true)
-                        {
-                            enemyCard.decreased = actualATK;
-                            decreased = enemyCard.actualATK;
-                            cantAttack = true;
-                            hasMoved = true;
-
-                            if (enemyCard.attackmode) // Enemy is in Attack Mode
-                            {
-                                if (enemyCard.actualATK < this.actualATK)
-                                {
-                                    if (enemyCard.cardProperty == Property.Plague)
-                                    {
-                                        PlayerManager.CmdApplyPlagueDebuff(this.gameObject);
-                                    }
-
-                                    PlayerManager.CmdOpponentDestroyCard(grandChild.gameObject, 0);
-                                    PlayerManager.CmdGMChangeLP(0, this.actualATK - enemyCard.actualATK);
-                                }
-                                else if (enemyCard.actualATK > this.actualATK)
-                                {
-                                    if (this.cardProperty == Property.Plague)
-                                    {
-                                        PlayerManager.CmdApplyPlagueDebuff(grandChild.gameObject);
-                                    }
-
-                                    PlayerManager.CmdPlayerDestroyCard(Card, 0);
-                                    PlayerManager.CmdGMChangeLP(this.actualATK - enemyCard.actualATK, 0);
-                                }
-                                else
-                                {
-                                    PlayerManager.CmdOpponentDestroyCard(grandChild.gameObject, 0);
-                                    PlayerManager.CmdPlayerDestroyCard(Card, 0);
-                                }
-                            }
-                            else if (!enemyCard.attackmode) // Enemy is in Defense Mode
-                            {
-                                if (enemyCard.actualDEF < this.actualATK)
-                                {
-                                    if (enemyCard.cardProperty == Property.Plague)
-                                    {
-                                        PlayerManager.CmdApplyPlagueDebuff(this.gameObject);
-                                    }
-
-                                    PlayerManager.CmdOpponentDestroyCard(grandChild.gameObject, 0);
-                                }
-                                else if (enemyCard.actualDEF > this.actualATK)
-                                {
-                                    PlayerManager.CmdGMChangeLP(this.actualATK - enemyCard.actualDEF, 0);
-                                }
-                                else
-                                {
-
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        alreadychanged = true;
-    }
-    public void UntargetEnemy()
-    {
-        staticTargetingEnemy = false; 
-    }
-
-    public void TargetEnemy()
-    {
-        staticTargetingEnemy = true;
-    }
-
-    public void StartAttack()
-    {
-        staticTargeting = true;
-    }
-
-    public void StopAttack()
-    {
-        staticTargeting = false;
-    }
-
-    public void OneCardAttack()
-    {
-        onlyThisCardAttack = true;
-    }
-
-    public void OneCardAttackStop()
-    {
-        onlyThisCardAttack = false;
-    }
-
-    public void Destroy()
-    {
-        canBeDestroyed = false;
-        summoned = false;
-        beInGraveyard = true;
-        decreased = 0;
-    }
-
-    public void Return(int x)
-    {
-        for(int i = 0; i <= x; i++)
-        {
-            ReturnCard();//not working now
-        }
-    }
-
-    public void ReturnCard()
-    {
-        UcanReturn = true;
-    }
-
-    public void ReturnThis()
-    {
-        if (beInGraveyard == true && UcanReturn == true)
-        {
-            this.transform.SetParent(PlayerArea.transform);
-            UcanReturn = false;
-            beInGraveyard = false;
-        }
-    }
-
-    public void BeingTarget()
-    {
-        isTarget = true;
-    }
-
-    public void NotBeingTarget()
-    {
-        isTarget = false;
-    }
-
-    public void dealxDamage(int x)
-    {
-        if (Target != null)
-        {
-            if (Target == Enemy && stopDealDamage == false && Input.GetMouseButton(0))
-            {
-                PlayerManager.CmdGMChangeLP(0, damageDealtBySpell);
-                stopDealDamage = true;
-            }
-        }
-        else
-        {
-
-        }
-    }
 
     [Command]
     public void CmdSetBattleMode(bool isAttack)
     {
         attackmode = isAttack;
-    }
-
-    public void ActivateSummonEffects()
-    {
-        drawX = drawXcards;
-        useReturn = false;
     }
 
     // Tints the type bar by attribute so a card is identifiable at a glance in
@@ -765,7 +495,7 @@ public class ThisCard : NetworkBehaviour
 
     public void RecalculateStats()
     {
-        actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss - decreased;
+        actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss;
         // Must match Update()'s formula below -- this omitted tempDef, so any
         // effect that needs a temp DEF boost reflected synchronously (Last
         // Stand Barrier) would see it silently vanish whenever this ran.

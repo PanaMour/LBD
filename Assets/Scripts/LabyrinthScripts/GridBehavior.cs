@@ -242,10 +242,10 @@ public class GridBehavior : MonoBehaviour
     // on the floor IS the collision data (see BlocksDirection below and
     // GenerateInteriorMazeLayout, which both key off these same sets so they
     // can never disagree with each other).
-    static readonly HashSet<int> TopWallIds = new HashSet<int> { 1, 6, 8, 10, 11, 12, 19, 20, 28, 29, 37 };
+    static readonly HashSet<int> TopWallIds = new HashSet<int> { 1, 6, 8, 10, 11, 12, 14, 19, 20, 28, 29, 37 };
     static readonly HashSet<int> BottomWallIds = new HashSet<int> { 3, 5, 9, 10, 11, 12, 13, 23, 24, 27, 30, 40 };
-    static readonly HashSet<int> LeftWallIds = new HashSet<int> { 2, 7, 8, 9, 12, 13, 21, 22, 29, 30, 38 };
-    static readonly HashSet<int> RightWallIds = new HashSet<int> { 4, 5, 6, 7, 11, 13, 25, 26, 27, 28, 39 };
+    static readonly HashSet<int> LeftWallIds = new HashSet<int> { 2, 7, 8, 9, 12, 13, 14, 21, 22, 29, 30, 38 };
+    static readonly HashSet<int> RightWallIds = new HashSet<int> { 4, 5, 6, 7, 11, 13, 14, 25, 26, 27, 28, 39 };
 
     // Every "labyrinthblockN" id that exists as a Resources texture (0..45)
     // but isn't in any of the four sets above is a plain open floor tile --
@@ -315,13 +315,6 @@ public class GridBehavior : MonoBehaviour
                 signatureToId = new Dictionary<(bool, bool, bool, bool, string), int>();
                 for (int id = 0; id <= MaxBlockId; id++)
                 {
-                    // 14 walls nothing for movement (BlocksDirection) but is
-                    // missing from Intercept's open-tile list
-                    // (LabyrinthObject.CheckIfNextToWallOrInBase), so the two
-                    // systems disagree about it -- keep it out of generated
-                    // mazes so every generated cell reads the same to both.
-                    if (id == 14) continue;
-
                     signatureToId[(TopWallIds.Contains(id), BottomWallIds.Contains(id), LeftWallIds.Contains(id), RightWallIds.Contains(id), BlockCorners[id])] = id;
                 }
             }
@@ -330,8 +323,8 @@ public class GridBehavior : MonoBehaviour
     }
 
     // Walls plus which corners must be black. Returns -1 if no texture
-    // matches -- the only gap is walled everywhere except the bottom (id 14,
-    // excluded above); see the correction pass in GenerateInteriorMazeLayout.
+    // matches -- the only gap is a tile walled on all four sides, which the
+    // generator never produces (every cell gets at least one opening).
     int PickBlockIdForSignature(bool wallTop, bool wallBottom, bool wallLeft, bool wallRight, bool cTL, bool cTR, bool cBL, bool cBR)
     {
         string corners = (cTL ? "1" : "0") + (cTR ? "1" : "0") + (cBL ? "1" : "0") + (cBR ? "1" : "0");
@@ -783,28 +776,6 @@ public class GridBehavior : MonoBehaviour
         {
             openBottom[x, minY] = !IsWallOnSide(GetBlockId(x, 0), "Top");
             openTop[x, maxY] = !IsWallOnSide(GetBlockId(x, rows - 1), "Bottom");
-        }
-
-        // labyrinthblock's texture set has no tile walled on every side
-        // except the bottom (a dead end that only opens downward) -- if the
-        // carving above produced one, open one more random side so it
-        // becomes a representable (still fully connected) cell instead of
-        // silently picking a texture that would show the wrong walls.
-        for (int x = 0; x < columns; x++)
-        {
-            for (int y = minY; y <= maxY; y++)
-            {
-                bool onlyOpenIsBottom = openBottom[x, y] && !openTop[x, y] && !openLeft[x, y] && !openRight[x, y];
-                if (!onlyOpenIsBottom) continue;
-
-                var extra = new List<string>();
-                if (y + 1 <= maxY) extra.Add("Top");
-                if (x - 1 >= 0) extra.Add("Left");
-                if (x + 1 < columns) extra.Add("Right");
-                if (extra.Count == 0) continue; // not reachable inside an 11-wide interior
-
-                openEdge(x, y, extra[UnityEngine.Random.Range(0, extra.Count)]);
-            }
         }
 
         // Card Base rows keep their walls; read them from the current tiles so

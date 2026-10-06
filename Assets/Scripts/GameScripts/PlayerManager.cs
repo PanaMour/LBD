@@ -41,7 +41,6 @@ public class PlayerManager : NetworkBehaviour
     public GameObject Card;
     public GameObject Magic;
     public GameObject Action;
-    public GameObject CardToHand;
 
     public int CardsPlayed = 0;
     public bool IsMyTurn = false;
@@ -731,16 +730,6 @@ public class PlayerManager : NetworkBehaviour
     {
         NetworkServer.Spawn(card, connectionToClient);
         RpcShowCard(card, "Dealt", 0);
-    }
-
-    public void PlayCard(GameObject card, int index)
-    {
-        if (card.GetComponent<CardAbilities>() != null)
-        {
-            card.GetComponent<CardAbilities>().OnCompile();
-        }
-
-        CmdPlayCard(card, index);
     }
 
     bool HasValidTargets(MagicTargetType type)
@@ -1498,18 +1487,6 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [Command]
-    public void CmdGMChangeVariables(int variables)
-    {
-        RpcGMChangeVariables(variables);
-    }
-
-    [ClientRpc]
-    public void RpcGMChangeVariables(int variables)
-    {
-        GameManager.ChangeVariables(variables, hasAuthority);
-    }
-
-    [Command]
     public void CmdGMChangeLP(int playerLP,int opponentLP)
     {
         RpcGMChangeLP(playerLP, opponentLP);
@@ -1851,22 +1828,9 @@ public class PlayerManager : NetworkBehaviour
             int index = 0;
             if (int.TryParse(numberOnly, out int result)) index = result - 1;
 
-            CardAbilities specialEffect = tempCard.GetComponent<CardAbilities>();
-            if (specialEffect != null)
-            {
-                specialEffect.OnCompile();
-            }
-
             ThisCard genericEffect = tempCard.GetComponent<ThisCard>();
-            if (genericEffect != null)
-            {
-                genericEffect.ActivateSummonEffects();
-            }
 
-            if (specialEffect != null)
-                PlayCard(tempCard, index);
-            else
-                CmdPlayCard(tempCard, index);
+            CmdPlayCard(tempCard, index);
 
             if (genericEffect != null)
             {

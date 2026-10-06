@@ -185,10 +185,6 @@ GameObject:
   - component: {fileID: 4872160696017188328}
   - component: {fileID: 8694465356798859483}
   - component: {fileID: 268005390305288747}
-  - component: {fileID: 6936565614365339200}
-  - component: {fileID: 2741344829769464854}
-  - component: {fileID: 2329743803369476579}
-  - component: {fileID: 2113241534960157519}
   - component: {fileID: 3822603671114954310}
   - component: {fileID: 9064297203577449194}
   - component: {fileID: 3132118303870359828}
@@ -288,8 +284,6 @@ MonoBehaviour:
     spell: 0
     damageDealtBySpell: 0
     canBeTributed: 0
-  LabyrinthObject: {fileID: 7951009996680074172, guid: 7170bd098f1d54c4e9eb2598bc51ed9d,
-    type: 3}
   thisId: 20
   id: 0
   cardName: 
@@ -312,7 +306,6 @@ MonoBehaviour:
   frame: {fileID: 0}
   cardBack: 1
   PlayerArea: {fileID: 0}
-  numberOfCardsInDeck: 0
   canBeSummoned: 0
   summoned: 0
   battleZone: {fileID: 0}
@@ -408,30 +401,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 4872160696017188328}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: StartAttack
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 4872160696017188328}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: OneCardAttack
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   - eventID: 14
     callback:
       m_PersistentCalls:
@@ -448,74 +417,10 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
-        - m_Target: {fileID: 4872160696017188328}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: StopAttack
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 4872160696017188328}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: OneCardAttackStop
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-  - eventID: 12
-    callback:
-      m_PersistentCalls:
-        m_Calls:
-        - m_Target: {fileID: 4872160696017188328}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: StartAttack
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
-        - m_Target: {fileID: 4872160696017188328}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: ReturnThis
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
   - eventID: 0
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 4872160696017188328}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: BeingTarget
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
         - m_Target: {fileID: 9064297203577449194}
           m_TargetAssemblyTypeName: 
           m_MethodName: OnHoverEnter
@@ -532,18 +437,6 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 4872160696017188328}
-          m_TargetAssemblyTypeName: 
-          m_MethodName: NotBeingTarget
-          m_Mode: 1
-          m_Arguments:
-            m_ObjectArgument: {fileID: 0}
-            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-            m_IntArgument: 0
-            m_FloatArgument: 0
-            m_StringArgument: 
-            m_BoolArgument: 0
-          m_CallState: 2
         - m_Target: {fileID: 9064297203577449194}
           m_TargetAssemblyTypeName: 
           m_MethodName: OnHoverExit
@@ -588,66 +481,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &6936565614365339200
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6605747384558647205}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb40935841fe70a4a988865c9d0c598e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CardFront: {fileID: 21300000, guid: 83e59dd764ceff046ad75fb28866b5bf, type: 3}
-  CardBack: {fileID: 21300000, guid: dbbe51d685342c148908adf31faab752, type: 3}
---- !u!114 &2741344829769464854
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6605747384558647205}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e04ffc0a61dac543a1faa96025b076f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  PlayerManager: {fileID: 0}
---- !u!114 &2329743803369476579
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6605747384558647205}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8687e364f7729c648ab7a8a2307d14c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CardName: 
-  ATK: 1000
-  DEF: 0
-  Mode: 1
-  Type: 
-  Attribute: 
---- !u!114 &2113241534960157519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6605747384558647205}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a1acd13dbf835c4099558df5a4bedb8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  cardBack: {fileID: 5947642260273158965}
 --- !u!114 &3822603671114954310
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1909,12 +1742,6 @@ PrefabInstance:
 --- !u!224 &4699968057211779640 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7611383516296512721, guid: 70150d4532c64bd4bac501c763d7fcbd,
-    type: 3}
-  m_PrefabInstance: {fileID: 2925286904550424297}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5947642260273158965 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8796359032978449884, guid: 70150d4532c64bd4bac501c763d7fcbd,
     type: 3}
   m_PrefabInstance: {fileID: 2925286904550424297}
   m_PrefabAsset: {fileID: 0}

@@ -27,10 +27,9 @@ public class ThisMagic : NetworkBehaviour
     public MagicTargetType targetType;
 
     public bool cardBack;
-    public static bool staticCardBack;
+    GameObject cardBackVisual;
 
     public GameObject PlayerArea;
-    public int numberOfCardsInDeck;
 
     public bool canBeActivated;
     public bool activated;
@@ -114,7 +113,6 @@ public class ThisMagic : NetworkBehaviour
             thisMagic.Add(MagicDataBase.magicList[0]);
         }
 
-        numberOfCardsInDeck = PlayerDeck.deckSize;
         canBeActivated = false;
         activated = false;
         drawX = 0;
@@ -192,7 +190,14 @@ public class ThisMagic : NetworkBehaviour
             }
         }
 
-        staticCardBack = cardBack;
+        // Each card shows its own back (this used to go through one shared
+        // static, so every card followed whichever card updated last).
+        if (cardBackVisual == null)
+        {
+            Transform back = transform.Find("MagicCanvas/MagicBackground/MagicCardBack");
+            if (back != null) cardBackVisual = back.gameObject;
+        }
+        if (cardBackVisual != null && cardBackVisual.activeSelf != cardBack) cardBackVisual.SetActive(cardBack);
 
         if (tag != "Unusable")
         {

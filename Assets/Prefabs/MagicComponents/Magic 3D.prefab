@@ -15,7 +15,6 @@ GameObject:
   - component: {fileID: 8754883198169277385}
   - component: {fileID: -7098578232568471390}
   - component: {fileID: 2371189222905091773}
-  - component: {fileID: 8776892952669659681}
   - component: {fileID: -4074743529719131515}
   - component: {fileID: 2622352400398172894}
   - component: {fileID: 8982046285179066192}
@@ -91,7 +90,6 @@ MonoBehaviour:
   targetType: 0
   cardBack: 1
   PlayerArea: {fileID: 0}
-  numberOfCardsInDeck: 0
   canBeActivated: 0
   activated: 0
   battleZone: {fileID: 0}
@@ -397,21 +395,6 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 0
           m_CallState: 2
---- !u!114 &8776892952669659681
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 626048065440055933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7e04ffc0a61dac543a1faa96025b076f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncMode: 0
-  syncInterval: 0.1
-  PlayerManager: {fileID: 0}
 --- !u!64 &-4074743529719131515
 MeshCollider:
   m_ObjectHideFlags: 0

@@ -9,8 +9,6 @@ public class GameManager : NetworkBehaviour
     public UIManager UIManager;
     public int TurnOrder = 0;
     public int turn = 0;
-    public int PlayerVariables = 0;
-    public int OpponentVariables = 0;
     public Image KEKW;
 
     private int ReadyClicks = 0;
@@ -76,18 +74,5 @@ public class GameManager : NetworkBehaviour
             PlayerLP.staticLP -= opponentLP;
             OpponentLP.staticLP -= playerLP;
         }
-    }
-
-    public void ChangeVariables(int variables, bool hasAuthority)
-    {
-        if (hasAuthority)
-        {
-            PlayerVariables += variables;
-        }
-        else
-        {
-            OpponentVariables += variables;
-        }
-        UIManager.updatePlayerText();
     }
 }
