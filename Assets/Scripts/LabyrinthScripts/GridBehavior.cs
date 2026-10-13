@@ -347,7 +347,7 @@ public class GridBehavior : MonoBehaviour
     // Instantiate()s on every machine rather than network-spawned objects, so
     // nothing replicates them automatically -- the server decides a layout
     // and PlayerManager ships it to clients (RpcApplyMazeLayout for everyone
-    // on Magical Labyrinth, TargetApplyMazeLayout for a client that joins
+    // on Labyrinth Morph, TargetApplyMazeLayout for a client that joins
     // after the host already rolled the starting maze).
     int[] serverLayout;
     int[] pendingLayout;

@@ -634,7 +634,7 @@ public class PlayerManager : NetworkBehaviour
         if (gb != null) gb.ApplyMazeLayout(layout);
     }
 
-    // Magical Labyrinth: the server rolls a new interior and every machine
+    // Labyrinth Morph: the server rolls a new interior and every machine
     // (host included) applies it to its own tiles.
     [Command]
     public void CmdRegenerateLabyrinth()
