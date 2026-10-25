@@ -2454,7 +2454,7 @@ public class PlayerManager : NetworkBehaviour
                             Debug.Log("[CmdExecuteMagicEffect] Equipped " + magicScript.magicName + " to " + monsterCardObj.name
                                 + " (netId=" + (monsterNi != null ? monsterNi.netId.ToString() : "none") + ", cardName=" + thisCardScript.cardName + ")"
                                 + " | target.summoned=" + thisCardScript.summoned + " target.beInGraveyard=" + thisCardScript.beInGraveyard
-                                + " | magicScript.canBeDestroyed=" + magicScript.canBeDestroyed + " magicScript.activated=" + magicScript.activated + " magicScript.activationcomplete=" + magicScript.activationcomplete + " ThisMagic.drawX=" + ThisMagic.drawX);
+                                + " | magicScript.canBeDestroyed=" + magicScript.canBeDestroyed + " magicScript.activated=" + magicScript.activated + " magicScript.activationcomplete=" + magicScript.activationcomplete + " drawX=" + magicScript.drawX);
 
                             RpcShowCard(monsterCardObj, "EquipBoost", magicScript.equipBoost);
                         }

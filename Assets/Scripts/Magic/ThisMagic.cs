@@ -36,31 +36,18 @@ public class ThisMagic : NetworkBehaviour
 
     public GameObject battleZone;
 
-    public static int drawX;
+    // Cards this magic still has to draw. Per card: it used to be static, so
+    // any new magic card reset it and other active cards reacted to it.
+    public int drawX;
     public int drawXcards;
-
-    public GameObject Target;
-    public GameObject Enemy;
-
-    public static bool staticTargeting;
-    public static bool staticTargetingEnemy;
-    public bool targeting;
-    public bool targetingEnemy;
 
     public bool canBeDestroyed = false;
     public bool beInGraveyard = false;
-    public int returnXcards;
-    public bool useReturn;
-    public static bool UcanReturn;
-    public bool isTarget;
     public GameObject PlayerSlots;
     public GameObject EnemySlots;
-    public bool monstersExist;
 
     public int damageHealedBySpell;
     public int damageDealtBySpell;
-    public bool dealDamage;
-    public bool stopDealDamage;
     public bool activationcomplete = false;
     public bool targetDestroy;
     public bool faceup;
@@ -115,9 +102,7 @@ public class ThisMagic : NetworkBehaviour
 
         canBeActivated = false;
         activated = false;
-        drawX = 0;
 
-        Enemy = GameObject.Find("OpponentLP");
         PlayerSlots = GameObject.Find("PlayerSlots");
         EnemySlots = GameObject.Find("EnemySlots");
     }
@@ -160,7 +145,6 @@ public class ThisMagic : NetworkBehaviour
             thisSprite = thisMagic[0].thisImage;
             targetType = thisMagic[0].targetType;
             drawXcards = thisMagic[0].drawXcards;
-            returnXcards = thisMagic[0].returnXcards;
             damageHealedBySpell = thisMagic[0].damageHealedBySpell;
             damageDealtBySpell = thisMagic[0].damageDealtBySpell;
             targetDestroy = thisMagic[0].targetDestroy;
@@ -228,7 +212,6 @@ public class ThisMagic : NetworkBehaviour
             if (activated == false && inActionSlot && targetType == MagicTargetType.None)
             {
                 Activate();
-                drawX = drawXcards;
             }
 
             if (initialized)
@@ -326,18 +309,6 @@ public class ThisMagic : NetworkBehaviour
     {
         if (thisMagic == null || thisMagic.Count == 0) return;
 
-        targeting = staticTargeting;
-        targetingEnemy = staticTargetingEnemy;
-        Target = targetingEnemy ? Enemy : null;
-
-        if (targeting) TargetMonster();
-
-        if (returnXcards > 0 && activated && !useReturn)
-        {
-            Return(returnXcards);
-            useReturn = true;
-        }
-
         if (drawX > 0 && activated && hasAuthority)
         {
             if (PlayerManager != null) PlayerManager.CmdDrawCard();
@@ -375,8 +346,6 @@ public class ThisMagic : NetworkBehaviour
                 canBeDestroyed = true;
             }
         }
-
-        if (PlayerManager != null && !PlayerManager.IsMyTurn) UcanReturn = false;
 
         if (equippedTo != null)
         {
@@ -428,29 +397,7 @@ public class ThisMagic : NetworkBehaviour
         drawX = drawXcards;
     }
 
-    public void UntargetEnemy() { staticTargetingEnemy = false; }
-    public void TargetEnemy() { staticTargetingEnemy = true; }
-    public void StartAttack() { staticTargeting = true; }
-    public void StopAttack() { staticTargeting = false; }
     public void Destroy() { canBeDestroyed = false; beInGraveyard = true; }
-
-    public void Return(int x)
-    {
-        for (int i = 0; i <= x; i++) ReturnCard();
-    }
-    public void ReturnCard() { UcanReturn = true; }
-
-    public void ReturnThis()
-    {
-        if (beInGraveyard == true && UcanReturn == true && PlayerArea != null)
-        {
-            this.transform.SetParent(PlayerArea.transform);
-            UcanReturn = false;
-            beInGraveyard = false;
-        }
-    }
-
-    public void TargetMonster() { }
 
     // Labyrinth magic shares the sandy tone ThisCard.AttributeColor gives the
     // Labyrinth attribute, so the two read as the same family.
