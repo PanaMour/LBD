@@ -266,16 +266,24 @@ public class ThisMagic : NetworkBehaviour
         return false;
     }
 
+    // Typed Armor cards: only a monster of this type can be equipped, and it
+    // gains equipBoost to both ATK and DEF.
+    public static bool TryGetRequiredEquipType(int magicId, out Type requiredType)
+    {
+        switch (magicId)
+        {
+            case 11: requiredType = Type.Mineral; return true; // Crystaline Enhancement
+            case 12: requiredType = Type.Alien; return true;   // Neutron Blaster
+            case 13: requiredType = Type.Human; return true;   // Axe of Ancient Champions
+            case 14: requiredType = Type.Animal; return true;  // Beast Claws
+        }
+        requiredType = Type.Alien;
+        return false;
+    }
+
     bool HasValidEquipTarget()
     {
-        bool requiresSpecificType = false;
-
-        Type requiredType = Type.Alien;
-
-        if (id == 11) { requiresSpecificType = true; requiredType = Type.Mineral; }
-        else if (id == 12) { requiresSpecificType = true; requiredType = Type.Alien; }
-        else if (id == 13) { requiresSpecificType = true; requiredType = Type.Human; }
-        else if (id == 14) { requiresSpecificType = true; requiredType = Type.Animal; }
+        bool requiresSpecificType = TryGetRequiredEquipType(id, out Type requiredType);
 
         List<GameObject> containersToCheck = new List<GameObject>();
         if (targetType == MagicTargetType.AnyAlly || targetType == MagicTargetType.AnyUnit) containersToCheck.Add(PlayerSlots);

@@ -81,6 +81,7 @@ public class ThisCard : NetworkBehaviour
 
     public bool faceup = false;
     public int boost = 0;
+    public int defBoost = 0; // typed Armor cards also raise DEF
     public bool boosted = false;
     public GameObject equippedTo;
 
@@ -172,7 +173,7 @@ public class ThisCard : NetworkBehaviour
             nameText.text = "" + cardName;
             starsText.text = "" + stars;
             actualATK = atk + boost + auraAtk + tempAtk - plagueAtkLoss;
-            actualDEF = def + tempDef + auraDef - plagueDefLoss - battleDefPenalty;
+            actualDEF = def + defBoost + tempDef + auraDef - plagueDefLoss - battleDefPenalty;
             if (actualATK < 0) actualATK = 0;
             if (actualDEF < 0) actualDEF = 0;
             ATKText.text = "" + actualATK;
@@ -415,6 +416,7 @@ public class ThisCard : NetworkBehaviour
             if (tm != null && tm.beInGraveyard)
             {
                 boost = 0;
+                defBoost = 0;
                 equippedTo = null;
                 boosted = false;
             }
@@ -499,7 +501,7 @@ public class ThisCard : NetworkBehaviour
         // Must match Update()'s formula below -- this omitted tempDef, so any
         // effect that needs a temp DEF boost reflected synchronously (Last
         // Stand Barrier) would see it silently vanish whenever this ran.
-        actualDEF = def + tempDef + auraDef - plagueDefLoss - battleDefPenalty;
+        actualDEF = def + defBoost + tempDef + auraDef - plagueDefLoss - battleDefPenalty;
 
         if (actualATK < 0) actualATK = 0;
         if (actualDEF < 0) actualDEF = 0;

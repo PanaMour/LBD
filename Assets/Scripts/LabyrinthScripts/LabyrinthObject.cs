@@ -266,6 +266,17 @@ public class LabyrinthObject : NetworkBehaviour
     [Command]
     public void CmdMoveToTile(string tileName)
     {
+        ServerMoveToTile(tileName);
+    }
+
+    // Server-side move, for effects that move a monster from inside another
+    // command (Teleport, Labyrinth Dice): a Cmd can't be called from the
+    // server for a monster the joining player owns. Not [Server]-attributed
+    // (see the weaver note on ServerResolveAttack).
+    public void ServerMoveToTile(string tileName)
+    {
+        if (!NetworkServer.active) return;
+
         currentTileName = tileName;
         hasMovedThisTurn = true;
 
@@ -574,8 +585,10 @@ public class LabyrinthObject : NetworkBehaviour
             hasMovedThisTurn = true;
             int damage = myCard.actualATK;
 
+            // Already on the server: send the LP change directly. Calling the
+            // Cmd from here only worked for the host's own monsters.
             PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
-            pm.CmdGMChangeLP(0, damage);
+            pm.RpcGMChangeLP(0, damage);
 
             waitingToAttack = false;
             ResetGridColors();

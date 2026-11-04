@@ -875,6 +875,13 @@ public class PlayerManager : NetworkBehaviour
             default: isValidTargetType = false; break;
         }
 
+        ThisMagic magicScript = magicCard != null ? magicCard.GetComponent<ThisMagic>() : null;
+        if (isValidTargetType && magicScript != null && ThisMagic.TryGetRequiredEquipType(magicScript.id, out Type requiredType))
+        {
+            ThisCard targetCard = monster.card != null ? monster.card.GetComponent<ThisCard>() : null;
+            isValidTargetType = targetCard != null && targetCard.currentTypes.Contains(requiredType);
+        }
+
         return isValidTargetType;
     }
 
@@ -1133,7 +1140,7 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [Command]
-    public void CmdResolveSpookyManRevival(GameObject reviveCard, string tileName)
+    public void CmdResolveSpookyManRevival(GameObject reviveCard, string tileName, int freeIndex)
     {
         ThisCard cardScript = reviveCard != null ? reviveCard.GetComponent<ThisCard>() : null;
         if (cardScript == null || !cardScript.beInGraveyard) return; // already resolved or invalid
@@ -1146,19 +1153,9 @@ public class PlayerManager : NetworkBehaviour
             return;
         }
 
-        int freeIndex = -1;
-        for (int i = 0; i < PlayerSockets.Count; i++)
-        {
-            if (PlayerSockets[i] == null) continue;
-            bool occupied = false;
-            foreach (Transform child in PlayerSockets[i].transform)
-            {
-                if (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null || child.GetComponent<ThisAction>() != null)
-                { occupied = true; break; }
-            }
-            if (!occupied) { freeIndex = i; break; }
-        }
-        if (freeIndex == -1)
+        // The free slot is chosen on the owner's machine: each player's slots
+        // only exist on their own screen, so the server can't look them up.
+        if (freeIndex < 0)
         {
             Debug.Log("Spooky Man revival failed: no free monster slot.");
             return;
@@ -1173,7 +1170,7 @@ public class PlayerManager : NetworkBehaviour
         // players' screens.
         RpcShowCard(reviveCard, "Played", freeIndex);
 
-        CmdSpawnMonster(cardScript.thisId, tileName, reviveCard.GetComponent<NetworkIdentity>());
+        ServerSpawnMonster(cardScript.thisId, tileName, reviveCard.GetComponent<NetworkIdentity>());
 
         Debug.Log("Spooky Man revived " + cardScript.cardName + "!");
     }
@@ -1291,22 +1288,28 @@ public class PlayerManager : NetworkBehaviour
 
             if (hasAuthority)
             {
-                if (card.GetComponent<ThisMagic>() != null) targetSocket = PlayerActionSockets[index].transform;
-                if (card.GetComponent<ThisCard>() != null) targetSocket = PlayerSockets[index].transform;
-                if (card.GetComponent<ThisAction>() != null) targetSocket = PlayerActionSockets[index].transform;
+                if (card.GetComponent<ThisMagic>() != null) targetSocket = PickSocket(PlayerActionSockets, index, card);
+                if (card.GetComponent<ThisCard>() != null) targetSocket = PickSocket(PlayerSockets, index, card);
+                if (card.GetComponent<ThisAction>() != null) targetSocket = PickSocket(PlayerActionSockets, index, card);
 
                 CmdGMCardPlayed();
             }
             else
             {
-                if (card.GetComponent<ThisMagic>() != null) targetSocket = EnemyActionSockets[index].transform;
-                if (card.GetComponent<ThisCard>() != null) targetSocket = EnemySockets[index].transform;
-                if (card.GetComponent<ThisAction>() != null) targetSocket = EnemyActionSockets[index].transform;
+                if (card.GetComponent<ThisMagic>() != null) targetSocket = PickSocket(EnemyActionSockets, index, card);
+                if (card.GetComponent<ThisCard>() != null) targetSocket = PickSocket(EnemySockets, index, card);
+                if (card.GetComponent<ThisAction>() != null) targetSocket = PickSocket(EnemyActionSockets, index, card);
             }
 
             if (targetSocket != null)
             {
                 card.transform.SetParent(targetSocket, true);
+
+                // A card coming back from the graveyard (e.g. Spooky Man's
+                // revival) had its colliders switched off there; without them
+                // it can't be hovered or right-clicked on the field.
+                foreach (Collider cardCollider in card.GetComponentsInChildren<Collider>(true))
+                    cardCollider.enabled = true;
 
                 card.transform.localPosition = new Vector3(0, 1.0f, 0);
                 card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
@@ -1402,6 +1405,11 @@ public class PlayerManager : NetworkBehaviour
                     tc.boost += index;
                 }
             }
+        }
+        else if (type == "EquipDefBoost")
+        {
+            ThisCard tc = card.GetComponent<ThisCard>();
+            if (tc != null && !isServer) tc.defBoost += index;
         }
         else if (type == "ChangeStars")
         {
@@ -1693,6 +1701,16 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdSpawnMonster(int id, string tileName, NetworkIdentity cardNetId)
     {
+        ServerSpawnMonster(id, tileName, cardNetId);
+    }
+
+    // Server-side summon, so effects resolved inside another command (Spooky
+    // Man's revival) can summon for the joining player too. Not
+    // [Server]-attributed (see the weaver note on ServerResolveAttack).
+    public void ServerSpawnMonster(int id, string tileName, NetworkIdentity cardNetId)
+    {
+        if (!NetworkServer.active) return;
+
         GameObject monster = Instantiate(LabyrinthObjectPrefab);
         LabyrinthObject script = monster.GetComponent<LabyrinthObject>();
         ThisCard cardScript = cardNetId.gameObject.GetComponent<ThisCard>();
@@ -2166,7 +2184,7 @@ public class PlayerManager : NetworkBehaviour
                 {
                     string tileName = pendingRevivalTile;
                     pendingRevivalTile = null;
-                    CmdResolveSpookyManRevival(capturedCard, tileName);
+                    CmdResolveSpookyManRevival(capturedCard, tileName, FirstFreePlayerSocket());
                     Destroy(activeGraveyardPanel);
                     activeGraveyardPanel = null;
                 });
@@ -2343,6 +2361,26 @@ public class PlayerManager : NetworkBehaviour
         RpcShowCard(cardObj, "Dealt", 0);
     }
 
+    // The requested slot, unless another card already sits in it on this
+    // screen (the index can come from the other player's machine, whose
+    // slots differ), in which case the first free slot.
+    Transform PickSocket(List<GameObject> sockets, int index, GameObject card)
+    {
+        if (sockets == null || sockets.Count == 0) return null;
+        System.Func<GameObject, bool> isFree = s =>
+        {
+            if (s == null) return false;
+            foreach (Transform child in s.transform)
+                if (child.gameObject != card && (child.GetComponent<ThisCard>() != null || child.GetComponent<ThisMagic>() != null || child.GetComponent<ThisAction>() != null))
+                    return false;
+            return true;
+        };
+
+        if (index >= 0 && index < sockets.Count && isFree(sockets[index])) return sockets[index].transform;
+        foreach (GameObject s in sockets) if (isFree(s)) return s.transform;
+        return index >= 0 && index < sockets.Count && sockets[index] != null ? sockets[index].transform : null;
+    }
+
     int FirstFreePlayerSocket()
     {
         for (int i = 0; i < PlayerSockets.Count; i++)
@@ -2443,9 +2481,22 @@ public class PlayerManager : NetworkBehaviour
                     {
                         ThisCard thisCardScript = monsterCardObj.GetComponent<ThisCard>();
 
+                        bool typedArmor = ThisMagic.TryGetRequiredEquipType(magicScript.id, out Type requiredType);
+                        if (thisCardScript != null && typedArmor && !thisCardScript.currentTypes.Contains(requiredType))
+                        {
+                            Debug.Log($"{magicScript.magicName} can only equip a {requiredType} monster.");
+                            thisCardScript = null;
+                            RpcShowCard(magicCard, "PlayerDestroyed", 0);
+                        }
+
                         if (thisCardScript != null)
                         {
                             thisCardScript.boost += magicScript.equipBoost;
+                            if (typedArmor)
+                            {
+                                thisCardScript.defBoost += magicScript.equipBoost;
+                                RpcShowCard(monsterCardObj, "EquipDefBoost", magicScript.equipBoost);
+                            }
 
                             thisCardScript.equippedTo = magicCard;
                             magicScript.equippedTo = monsterCardObj;
@@ -2538,7 +2589,7 @@ public class PlayerManager : NetworkBehaviour
                         {
                             GridStat randomTile = validTiles[Random.Range(0, validTiles.Count)];
 
-                            monsterScript.CmdMoveToTile(randomTile.gameObject.name);
+                            monsterScript.ServerMoveToTile(randomTile.gameObject.name);
 
                             Debug.Log($"Labyrinth Dice tossed {targetMonster.name} to {randomTile.gameObject.name}!");
                         }
@@ -2616,10 +2667,12 @@ public class PlayerManager : NetworkBehaviour
         LabyrinthObject monsterScript = monster.GetComponent<LabyrinthObject>();
         if (monsterScript != null)
         {
-            monsterScript.CmdMoveToTile(targetTileName);
+            monsterScript.ServerMoveToTile(targetTileName);
         }
 
-        RpcShowCard(magicCard, "Played", 0);
+        // Used up, like every other targeted magic (this used to re-"play"
+        // the card into action slot 0).
+        RpcShowCard(magicCard, "PlayerDestroyed", 0);
     }
 
     void CalculateBoardAuras()
