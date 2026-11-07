@@ -311,7 +311,9 @@ public class PlayerManager : NetworkBehaviour
 
                         if (monsterTile != null)
                         {
-                            if (targetTileCandidate.x == monsterTile.x && Mathf.Abs(targetTileCandidate.y - monsterTile.y) > 0 && Mathf.Abs(targetTileCandidate.y - monsterTile.y) <= 3)
+                            GridBehavior tpGrid = FindGridBehavior();
+                            if (targetTileCandidate.x == monsterTile.x && Mathf.Abs(targetTileCandidate.y - monsterTile.y) > 0 && Mathf.Abs(targetTileCandidate.y - monsterTile.y) <= 3
+                                && (tpGrid == null || !tpGrid.IsEnemyBaseSquare(teleportMonsterCandidate, targetTileCandidate.x, targetTileCandidate.y)))
                             {
                                 if (targetTileCandidate.GetComponentInChildren<LabyrinthObject>() == null)
                                 {
@@ -537,28 +539,24 @@ public class PlayerManager : NetworkBehaviour
                     return;
                 }
 
-                if (clickedMonster != null && !clickedMonster.hasAuthority)
+                // Only the highlighted targets count. waitingToAttack is a local
+                // flag (the server's copy is a different object for the joining
+                // player), so it is cleared here once the choice is made.
+                GridBehavior attackGrid = FindGridBehavior();
+                if (attackGrid != null && clickedMonster != null && attackGrid.CanAttackMonster(attackingUnit, clickedMonster))
                 {
                     attackingUnit.CmdAttackMonster(clickedMonster.gameObject);
                 }
-                else if (clickedTile != null)
+                else if (attackGrid != null && clickedMonster == null && clickedTile != null
+                    && attackGrid.IsAttackableBaseTile(attackingUnit, clickedTile.x, clickedTile.y))
                 {
-                    int targetRow = isServer ? 15 : 0;
-                    if (clickedTile.y == targetRow && clickedTile.x >= 2 && clickedTile.x <= 8)
-                    {
-                        attackingUnit.CmdDirectAttack();
-                    }
-                    else
-                    {
-                        Debug.Log("Attack skipped. Continuing turn.");
-                        attackingUnit.waitingToAttack = false;
-                    }
+                    attackingUnit.CmdDirectAttack();
                 }
                 else
                 {
                     Debug.Log("Attack skipped. Continuing turn.");
-                    attackingUnit.waitingToAttack = false;
                 }
+                attackingUnit.waitingToAttack = false;
 
                 GameObject grid = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
                 if (grid != null) grid.GetComponent<GridBehavior>().ResetTileColors();
@@ -598,6 +596,8 @@ public class PlayerManager : NetworkBehaviour
     {
         if (connectionToClient == NetworkServer.localConnection)
         {
+            serverHostHasTurn = false;
+            serverTurnNumber = 0;
             treasureRespawnCountdown = 0;
             UIManager.treasureCountdown = 0;
             ServerSpawnTreasure();
@@ -1506,9 +1506,25 @@ public class PlayerManager : NetworkBehaviour
         GameManager.ChangeLP(playerLP, opponentLP, hasAuthority);
     }
 
+    // Whose turn it is, tracked once on the server. Each machine is told the
+    // result (RpcGMChangeTurn) instead of flipping its own flag, so the two
+    // screens can't drift apart (e.g. after a double-clicked End Turn).
+    static bool serverHostHasTurn;
+    static int serverTurnNumber;
+    public static bool ServerHostHasTurn => serverHostHasTurn;
+
     [Command]
     public void CmdChangeTurn()
     {
+        bool callerIsHost = connectionToClient == NetworkServer.localConnection;
+        if (callerIsHost != serverHostHasTurn)
+        {
+            Debug.Log("[SERVER] End Turn ignored: it is not this player's turn.");
+            return;
+        }
+        serverHostHasTurn = !serverHostHasTurn;
+        serverTurnNumber++;
+
         PlayerManager[] allPlayers = FindObjectsOfType<PlayerManager>();
         foreach (PlayerManager player in allPlayers)
         {
@@ -1551,7 +1567,7 @@ public class PlayerManager : NetworkBehaviour
             if (floodGrid.floodTurnsLeft == 0) RpcClearFlood();
         }
 
-        RpcGMChangeTurn();
+        RpcGMChangeTurn(serverHostHasTurn, serverTurnNumber);
 
         ThisAction[] allActions = FindObjectsOfType<ThisAction>();
         foreach (ThisAction action in allActions)
@@ -1584,7 +1600,7 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcGMChangeTurn()
+    public void RpcGMChangeTurn(bool hostHasTurn, int turnNumber)
     {
         ThisCard[] allCardsOnBoard = FindObjectsOfType<ThisCard>();
         foreach (ThisCard c in allCardsOnBoard)
@@ -1593,12 +1609,12 @@ public class PlayerManager : NetworkBehaviour
             c.tempDef = 0;
         }
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-        pm.IsMyTurn = !pm.IsMyTurn;
+        pm.IsMyTurn = pm.isServer ? hostHasTurn : !hostHasTurn;
         pm.hasDrawnThisTurn = false;
 
         sprintBoostActive = false;
         sprintBoostTarget = null;
-        GameManager.turn++;
+        GameManager.turn = turnNumber;
         UIManager.updateTurnText();
 
         if (!hasAuthority)
@@ -1623,9 +1639,11 @@ public class PlayerManager : NetworkBehaviour
         LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
         foreach (LabyrinthObject monster in allMonsters)
         {
+            monster.waitingToAttack = false; // local flag; a missed attack doesn't carry over
             if (isServer)
             {
                 monster.hasMovedThisTurn = false;
+                monster.hasAttackedThisTurn = false;
             }
         }
 
@@ -2648,7 +2666,9 @@ public class PlayerManager : NetworkBehaviour
             GridStat tile = child.GetComponent<GridStat>();
             if (tile != null)
             {
-                if (tile.x == monsterTile.x && Mathf.Abs(tile.y - monsterTile.y) > 0 && Mathf.Abs(tile.y - monsterTile.y) <= 3)
+                GridBehavior tpGrid = FindGridBehavior();
+                if (tile.x == monsterTile.x && Mathf.Abs(tile.y - monsterTile.y) > 0 && Mathf.Abs(tile.y - monsterTile.y) <= 3
+                    && (tpGrid == null || !tpGrid.IsEnemyBaseSquare(monster, tile.x, tile.y)))
                 {
                     if (child.GetComponentInChildren<LabyrinthObject>() == null)
                     {
@@ -2831,8 +2851,9 @@ public class PlayerManager : NetworkBehaviour
         LabyrinthObject monsterScript = monsterToMove.GetComponent<LabyrinthObject>();
         if (monsterScript != null)
         {
-            monsterScript.currentTileName = targetTileName;
-            monsterScript.hasMovedThisTurn = true;
+            // Same server-side move as Teleport, so a dragged monster also
+            // collects a treasure it lands on.
+            monsterScript.ServerMoveToTile(targetTileName);
 
             Debug.Log($"[SERVER] Rattlesnake forced {monsterToMove.name} to move to {targetTileName}");
         }

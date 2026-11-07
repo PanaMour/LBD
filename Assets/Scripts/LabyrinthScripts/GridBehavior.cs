@@ -1127,78 +1127,34 @@ public class GridBehavior : MonoBehaviour
         CheckAttackableNeighbors(startX, startY);
     }
 
+    // Pre-move attack options (shown together with movement): marks
+    // attackable tiles with the visited codes OnTileClicked acts on.
     void CheckAttackableNeighbors(int x, int y)
     {
-        CheckForEnemy(x, y, x + 1, y, "Right");
-        CheckForEnemy(x, y, x - 1, y, "Left");
-        CheckForEnemy(x, y, x, y + 1, "Top");
-        CheckForEnemy(x, y, x, y - 1, "Bottom");
-
         if (objectToMove == null) return;
-        foreach (GameObject tile in VoltstreamTargetTiles(objectToMove.GetComponent<LabyrinthObject>()))
+        LabyrinthObject attacker = objectToMove.GetComponent<LabyrinthObject>();
+        if (attacker == null || !attacker.hasAuthority) return; // e.g. Rattlesnake moving an enemy
+
+        foreach (LabyrinthObject target in FindObjectsOfType<LabyrinthObject>())
+        {
+            if (!CanAttackMonster(attacker, target)) continue;
+            GridStat t = target.GetComponentInParent<GridStat>();
+            gridArray[t.x, t.y].GetComponent<LabyrinthTile>().RedGlowBlock();
+            gridArray[t.x, t.y].GetComponent<GridStat>().visited = 999;
+        }
+        foreach (GameObject tile in AttackableBaseTiles(attacker))
         {
             tile.GetComponent<LabyrinthTile>().RedGlowBlock();
-            tile.GetComponent<GridStat>().visited = 999;
+            tile.GetComponent<GridStat>().visited = 888;
         }
     }
 
-    void CheckForEnemy(int sourceX, int sourceY, int targetX, int targetY, string direction)
-    {
-        if (targetX < 0 || targetX >= columns || targetY < 0 || targetY >= rows) return;
-
-        if (objectToMove == null) return;
-
-        string opposite = "";
-        if (direction == "Right") opposite = "Left";
-        if (direction == "Left") opposite = "Right";
-        if (direction == "Top") opposite = "Bottom";
-        if (direction == "Bottom") opposite = "Top";
-
-        LabyrinthObject attacker = objectToMove.GetComponent<LabyrinthObject>();
-        ThisCard attackerCard = attacker.card.GetComponent<ThisCard>();
-
-        if (attackerCard.cardProperty != Property.Wallwalk && !attackerCard.grantedWallwalk)
-        {
-            if (BlocksDirection(sourceX, sourceY, direction) || BlocksDirection(targetX, targetY, opposite))
-            {
-                return;
-            }
-        }
-
-        GameObject tile = gridArray[targetX, targetY];
-        if (tile == null) return;
-
-        LabyrinthObject enemyMonster = tile.GetComponentInChildren<LabyrinthObject>();
-
-        if (enemyMonster != null)
-        {
-            // Monster vs Monster
-            if (enemyMonster.hasAuthority != objectToMove.GetComponent<LabyrinthObject>().hasAuthority)
-            {
-                tile.GetComponent<LabyrinthTile>().RedGlowBlock();
-                tile.GetComponent<GridStat>().visited = 999;
-            }
-        }
-        else
-        {
-            // Direct Attack Check
-            int targetRow = Mirror.NetworkServer.active ? 15 : 0;
-
-            if (targetY == targetRow)
-            {
-                // Only allow Center Columns (3-9, which is Index 2-8)
-                if (targetX >= 2 && targetX <= 8)
-                {
-                    tile.GetComponent<LabyrinthTile>().RedGlowBlock();
-                    tile.GetComponent<GridStat>().visited = 888;
-                }
-            }
-        }
-    }
-
+    // Squares a moving monster can't step onto: occupied squares, and the
+    // opponent's Card Base.
     bool IsOccupied(int x, int y)
     {
         if (gridArray[x, y] == null) return true;
+        if (objectToMove != null && IsEnemyBaseSquare(objectToMove.GetComponent<LabyrinthObject>(), x, y)) return true;
         LabyrinthObject monster = gridArray[x, y].GetComponentInChildren<LabyrinthObject>();
 
         if (monster != null)
@@ -1211,119 +1167,120 @@ public class GridBehavior : MonoBehaviour
         return false;
     }
 
+    // ---- Attack rules (shared by highlighting, clicks and the server) ----
+    // A monster can attack an enemy on an adjacent square unless a wall is in
+    // the way (Wallwalk ignores walls), or any enemy in its connected body of
+    // water if it has Voltstream and stands in water.
+    public bool CanAttackMonster(LabyrinthObject attacker, LabyrinthObject target)
+    {
+        if (attacker == null || target == null || attacker == target) return false;
+        if (target.hasAuthority == attacker.hasAuthority) return false;
+
+        GridStat a = attacker.GetComponentInParent<GridStat>();
+        GridStat t = target.GetComponentInParent<GridStat>();
+        if (a == null || t == null) return false;
+
+        int dir = AdjacentDirection(a.x, a.y, t.x, t.y);
+        if (dir >= 0 && PathOpen(a.x, a.y, dir, MonsterHasWallwalk(attacker.gameObject))) return true;
+
+        // In front of the opponent's Card Base: any monster in that base.
+        if (IsEnemyBaseSquare(attacker, t.x, t.y) && FrontBaseSquares(attacker).Count > 0) return true;
+
+        return VoltstreamTargetTiles(attacker).Contains(gridArray[t.x, t.y]);
+    }
+
+    // The opponent's Card Base for this monster: row 15 (columns 2-8) for the
+    // host's monsters, row 0 for the joining player's.
+    public bool IsEnemyBaseSquare(LabyrinthObject monster, int x, int y)
+    {
+        if (monster == null || x < 2 || x > 8) return false;
+        bool ownerIsHost = monster.hasAuthority == Mirror.NetworkServer.active;
+        return y == (ownerIsHost ? rows - 1 : 0);
+    }
+
+    // Opponent Card Base squares directly next to the monster with no wall
+    // in between (Wallwalk ignores walls): the monster is "in front of" the
+    // base when this is not empty.
+    List<GameObject> FrontBaseSquares(LabyrinthObject attacker)
+    {
+        var result = new List<GameObject>();
+        GridStat a = attacker != null ? attacker.GetComponentInParent<GridStat>() : null;
+        if (a == null) return result;
+        bool wallwalk = MonsterHasWallwalk(attacker.gameObject);
+        for (int d = 0; d < 4; d++)
+        {
+            int nx = a.x + StepDX[d], ny = a.y + StepDY[d];
+            if (IsEnemyBaseSquare(attacker, nx, ny) && PathOpen(a.x, a.y, d, wallwalk)) result.Add(gridArray[nx, ny]);
+        }
+        return result;
+    }
+
+    bool EnemyBaseHasMonsters(LabyrinthObject attacker)
+    {
+        foreach (LabyrinthObject m in FindObjectsOfType<LabyrinthObject>())
+        {
+            if (m.hasAuthority == attacker.hasAuthority) continue;
+            GridStat t = m.GetComponentInParent<GridStat>();
+            if (t != null && IsEnemyBaseSquare(attacker, t.x, t.y)) return true;
+        }
+        return false;
+    }
+
+    // Base squares a direct attack can be made through: the ones the
+    // attacker is in front of, and only while the opponent's Card Base has
+    // no monsters in it (otherwise those monsters must be attacked first).
+    public List<GameObject> AttackableBaseTiles(LabyrinthObject attacker)
+    {
+        var front = FrontBaseSquares(attacker);
+        if (front.Count == 0 || EnemyBaseHasMonsters(attacker)) return new List<GameObject>();
+        return front;
+    }
+
+    public bool CanDirectAttack(LabyrinthObject attacker) => AttackableBaseTiles(attacker).Count > 0;
+
+    public bool IsAttackableBaseTile(LabyrinthObject attacker, int x, int y)
+    {
+        if (x < 0 || y < 0 || x >= columns || y >= rows) return false;
+        return AttackableBaseTiles(attacker).Contains(gridArray[x, y]);
+    }
+
+    static int AdjacentDirection(int ax, int ay, int bx, int by)
+    {
+        for (int d = 0; d < 4; d++)
+            if (ax + StepDX[d] == bx && ay + StepDY[d] == by) return d;
+        return -1;
+    }
+
+    // Post-move attack options: colours attackable tiles; the click itself is
+    // checked again with CanAttackMonster / IsAttackableBaseTile.
     public bool HighlightAttackOptions(LabyrinthObject attacker)
     {
         bool foundTarget = false;
 
-        GridStat currentStat = attacker.GetComponentInParent<GridStat>();
-        if (currentStat == null) return false;
-
-        int x = currentStat.x;
-        int y = currentStat.y;
-
-        // Check 4 directions with Wall Checks
-        CheckAndHighlight(x, y, x + 1, y, "Right", attacker, ref foundTarget);
-        CheckAndHighlight(x, y, x - 1, y, "Left", attacker, ref foundTarget);
-        CheckAndHighlight(x, y, x, y + 1, "Top", attacker, ref foundTarget);
-        CheckAndHighlight(x, y, x, y - 1, "Bottom", attacker, ref foundTarget);
-
-        foreach (GameObject tile in VoltstreamTargetTiles(attacker))
+        foreach (LabyrinthObject target in FindObjectsOfType<LabyrinthObject>())
         {
-            Transform quad = tile.transform.Find("Quad");
-            if (quad != null) quad.GetComponent<Renderer>().material.color = Color.red;
+            if (!CanAttackMonster(attacker, target)) continue;
+            target.GetComponentInParent<LabyrinthTile>().RedGlowBlock();
             foundTarget = true;
         }
-
+        foreach (GameObject tile in AttackableBaseTiles(attacker))
+        {
+            tile.GetComponent<LabyrinthTile>().RedGlowBlock();
+            foundTarget = true;
+        }
         return foundTarget;
-    }
-
-    void CheckAndHighlight(int sourceX, int sourceY, int targetX, int targetY, string direction, LabyrinthObject attacker, ref bool foundTarget)
-    {
-        if (targetX >= 0 && targetX < columns && targetY >= 0 && targetY < rows)
-        {
-            string opposite = "";
-            if (direction == "Right") opposite = "Left";
-            if (direction == "Left") opposite = "Right";
-            if (direction == "Top") opposite = "Bottom";
-            if (direction == "Bottom") opposite = "Top";
-
-            if (BlocksDirection(sourceX, sourceY, direction) || BlocksDirection(targetX, targetY, opposite))
-            {
-                return; // Blocked by wall
-            }
-
-            GameObject tile = gridArray[targetX, targetY];
-            if (tile == null) return;
-
-            LabyrinthObject targetMonster = tile.GetComponentInChildren<LabyrinthObject>();
-
-            if (targetMonster != null)
-            {
-                if (targetMonster.hasAuthority != attacker.hasAuthority)
-                {
-                    Transform quad = tile.transform.Find("Quad");
-                    if (quad != null)
-                    {
-                        quad.GetComponent<Renderer>().material.color = Color.red;
-                    }
-                    foundTarget = true;
-                }
-            }
-            else
-            {
-                int baseRow = attacker.isClientOnly ? 0 : 15;
-
-                int targetRow = Mirror.NetworkServer.active ? 15 : 0;
-
-                if (targetY == targetRow)
-                {
-                    if (targetX >= 2 && targetX <= 8)
-                    {
-                        Transform quad = tile.transform.Find("Quad");
-                        if (quad != null) quad.GetComponent<Renderer>().material.color = Color.red;
-                        foundTarget = true;
-                    }
-                }
-            }
-        }
-    }
-
-    void CheckAndHighlight(int checkX, int checkY, LabyrinthObject attacker, ref bool foundTarget)
-    {
-        if (checkX >= 0 && checkX < columns && checkY >= 0 && checkY < rows)
-        {
-            GameObject tile = gridArray[checkX, checkY];
-            if (tile == null) return;
-
-            LabyrinthObject targetMonster = tile.GetComponentInChildren<LabyrinthObject>();
-
-            if (targetMonster != null)
-            {
-                if (targetMonster.hasAuthority != attacker.hasAuthority)
-                {
-                    Transform quad = tile.transform.Find("Quad");
-                    if (quad != null)
-                    {
-                        quad.GetComponent<Renderer>().material.color = Color.red;
-                    }
-                    foundTarget = true;
-                }
-            }
-        }
     }
 
     public void ResetTileColors()
     {
         foreach (GameObject tile in gridArray)
         {
-            if (tile != null)
-            {
-                Transform quad = tile.transform.Find("Quad");
-                if (quad != null)
-                {
-                    quad.GetComponent<Renderer>().material.color = Color.white;
-                }
-            }
+            if (tile == null) continue;
+            LabyrinthTile lt = tile.GetComponent<LabyrinthTile>();
+            if (lt != null && lt.isAttackTarget) lt.StopGlowBlock();
+
+            Transform quad = tile.transform.Find("Quad");
+            if (quad != null) quad.GetComponent<Renderer>().material.color = Color.white;
         }
     }
 }

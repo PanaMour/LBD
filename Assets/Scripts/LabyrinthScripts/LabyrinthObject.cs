@@ -26,6 +26,8 @@ public class LabyrinthObject : NetworkBehaviour
 
     [SyncVar]
     public bool hasMovedThisTurn = false;
+    [SyncVar]
+    public bool hasAttackedThisTurn = false;
     public float targetWorldSize = 0.5f;
 
     public override void OnStartClient()
@@ -288,7 +290,7 @@ public class LabyrinthObject : NetworkBehaviour
             {
                 TreasureChest chest = tile.GetComponentInChildren<TreasureChest>();
 
-                if (chest != null)
+                if (chest != null && connectionToClient != null && connectionToClient.identity != null)
                 {
                     PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
                     if (pm != null)
@@ -303,12 +305,24 @@ public class LabyrinthObject : NetworkBehaviour
     [Command]
     public void CmdAttackMonster(GameObject targetObj)
     {
-        LabyrinthObject targetScript = targetObj.GetComponent<LabyrinthObject>();
+        LabyrinthObject targetScript = targetObj != null ? targetObj.GetComponent<LabyrinthObject>() : null;
         if (targetScript == null) return;
+        if (!ServerMayAttack()) return;
+
+        GridBehavior gb = FindGrid();
+        if (gb == null || !gb.CanAttackMonster(this, targetScript))
+        {
+            Debug.Log("[SERVER] Attack rejected: target is not in range.");
+            return;
+        }
 
         ThisCard myCard = card.GetComponent<ThisCard>();
         ThisCard enemyCard = targetScript.card.GetComponent<ThisCard>();
         if (myCard == null || enemyCard == null) return;
+
+        // Marked now, not when the battle resolves: a trap prompt may be
+        // pending in between.
+        hasAttackedThisTurn = true;
 
         PlayerManager attackerPM = connectionToClient.identity.GetComponent<PlayerManager>();
         NetworkIdentity defenderIdentity = targetObj.GetComponent<NetworkIdentity>();
@@ -383,6 +397,8 @@ public class LabyrinthObject : NetworkBehaviour
 
         PlayerManager pm = connectionToClient.identity.GetComponent<PlayerManager>();
         if (pm == null) return;
+
+        hasAttackedThisTurn = true;
 
         if (myCard.id == 45) // Demon Lady
         {
@@ -570,19 +586,13 @@ public class LabyrinthObject : NetworkBehaviour
     {
         ThisCard myCard = card.GetComponent<ThisCard>();
         if (myCard == null) return;
+        if (!ServerMayAttack()) return;
 
-        GridStat currentGrid = GetComponentInParent<GridStat>();
-        if (currentGrid == null) return;
-
-        int y = currentGrid.y;
-        bool validHostPos = (y == 14);
-        bool validClientPos = (y == 1);
-
-        bool validRow = (y == 14 || y == 15 || y == 1 || y == 0);
-
-        if (validRow)
+        GridBehavior gb = FindGrid();
+        if (gb != null && gb.CanDirectAttack(this))
         {
             hasMovedThisTurn = true;
+            hasAttackedThisTurn = true;
             int damage = myCard.actualATK;
 
             // Already on the server: send the LP change directly. Calling the
@@ -593,6 +603,24 @@ public class LabyrinthObject : NetworkBehaviour
             waitingToAttack = false;
             ResetGridColors();
         }
+    }
+
+    GridBehavior FindGrid()
+    {
+        GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
+        return gridGen != null ? gridGen.GetComponent<GridBehavior>() : null;
+    }
+
+    // Server-side guard for attack commands: the owner's turn, attack mode,
+    // and at most one attack per monster per turn.
+    bool ServerMayAttack()
+    {
+        if (hasAttackedThisTurn) { Debug.Log("[SERVER] Attack rejected: this monster already attacked this turn."); return false; }
+        if (!attackMode) { Debug.Log("[SERVER] Attack rejected: monster is in Defense mode."); return false; }
+
+        bool ownerIsHost = connectionToClient == null || connectionToClient == NetworkServer.localConnection;
+        if (ownerIsHost != PlayerManager.ServerHostHasTurn) { Debug.Log("[SERVER] Attack rejected: not this player's turn."); return false; }
+        return true;
     }
 
     void ResetGridColors()
