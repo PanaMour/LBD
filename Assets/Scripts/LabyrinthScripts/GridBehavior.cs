@@ -1279,8 +1279,7 @@ public class GridBehavior : MonoBehaviour
             LabyrinthTile lt = tile.GetComponent<LabyrinthTile>();
             if (lt != null && lt.isAttackTarget) lt.StopGlowBlock();
 
-            Transform quad = tile.transform.Find("Quad");
-            if (quad != null) quad.GetComponent<Renderer>().material.color = Color.white;
+            if (lt != null) lt.ShowRestColor();
         }
     }
 }

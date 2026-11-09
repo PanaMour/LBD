@@ -43,7 +43,12 @@ public class DragDrop : NetworkBehaviour
         if (!hasAuthority) return;
         if (!isDraggable) return;
 
-        if (PlayerManager != null && !PlayerManager.IsMyTurn) return;
+        if (GameManager.IsGameOver) return;
+
+        // Cards can be dealt before the local player object exists; look it up again.
+        if (PlayerManager == null && NetworkClient.connection != null && NetworkClient.connection.identity != null)
+            PlayerManager = NetworkClient.connection.identity.GetComponent<PlayerManager>();
+        if (PlayerManager == null || !PlayerManager.IsMyTurn) return;
 
         if (GetComponent<ThisCard>() != null && PlayerManager.nomoresummons)
         {

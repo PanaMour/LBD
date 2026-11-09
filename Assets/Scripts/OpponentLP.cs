@@ -23,13 +23,13 @@ public class OpponentLP : NetworkBehaviour
     void Update()
     {
         LP = staticLP;
-        Health.fillAmount = LP / maxLP;
+        Health.fillAmount = Mathf.Max(0f, LP) / maxLP;
 
         if (LP >= maxLP)
         {
             //LP = maxLP;
         }
 
-        LpText.text = LP + " LP";
+        LpText.text = Mathf.Max(0f, LP) + " LP";
     }
 }

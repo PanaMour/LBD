@@ -283,6 +283,8 @@ public class PlayerManager : NetworkBehaviour
 
                 return;
             }
+            if (GameManager.IsGameOver) return;
+
             LabyrinthObject attackingUnit = null;
             LabyrinthObject[] allUnits = FindObjectsOfType<LabyrinthObject>();
 
@@ -1516,6 +1518,7 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdChangeTurn()
     {
+        if (GameManager.IsGameOver) return;
         bool callerIsHost = connectionToClient == NetworkServer.localConnection;
         if (callerIsHost != serverHostHasTurn)
         {
@@ -1589,14 +1592,11 @@ public class PlayerManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcResetTileColor(string tileName)
+    public void RpcResetTileColor(string tileName)
     {
         GameObject tileObj = GameObject.Find(tileName);
-        if (tileObj != null)
-        {
-            Renderer r = tileObj.GetComponentInChildren<Renderer>();
-            if (r != null) r.material.color = Color.white;
-        }
+        LabyrinthTile lt = tileObj != null ? tileObj.GetComponent<LabyrinthTile>() : null;
+        if (lt != null) lt.SetFatalMark(false);
     }
 
     [ClientRpc]
@@ -2900,11 +2900,8 @@ public class PlayerManager : NetworkBehaviour
     void RpcShowTrapEffect(string tileName)
     {
         GameObject tileObj = GameObject.Find(tileName);
-        if (tileObj != null)
-        {
-            Renderer r = tileObj.GetComponentInChildren<Renderer>();
-            if (r != null) r.material.color = new Color(0.5f, 0, 0.5f);
-        }
+        LabyrinthTile lt = tileObj != null ? tileObj.GetComponent<LabyrinthTile>() : null;
+        if (lt != null) lt.SetFatalMark(true);
     }
 
     [TargetRpc]

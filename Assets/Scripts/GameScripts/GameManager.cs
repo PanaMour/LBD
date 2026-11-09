@@ -13,6 +13,10 @@ public class GameManager : NetworkBehaviour
 
     private int ReadyClicks = 0;
 
+    // Either side at 0 LP: the match is over and no more moves, attacks,
+    // card plays or turn changes are accepted.
+    public static bool IsGameOver => PlayerLP.staticLP <= 0 || OpponentLP.staticLP <= 0;
+
     void Start()
     {
         UIManager = GameObject.Find("UIManager").GetComponent<UIManager>();

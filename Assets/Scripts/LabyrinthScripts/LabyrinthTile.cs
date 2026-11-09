@@ -14,6 +14,12 @@ public class LabyrinthTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public bool isHighlighted = false;
     public bool isAttackTarget = false;
     static readonly Color AttackHoverColor = new Color(1f, 0.55f, 0f);
+    static readonly Color FatalColor = new Color(0.5f, 0f, 0.5f);
+
+    // Fatal Square: the tile stays purple (instead of white) whenever it
+    // isn't highlighted, until the trap is used up or runs out.
+    public bool fatalMarked = false;
+    Color RestColor => fatalMarked ? FatalColor : Color.white;
 
     void Start()
     {
@@ -38,7 +44,7 @@ public class LabyrinthTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Color resetColor = isAttackTarget ? Color.red : isHighlighted ? Color.green : Color.white;
+        Color resetColor = isAttackTarget ? Color.red : isHighlighted ? Color.green : RestColor;
 
         GetComponent<Renderer>().material.color = resetColor;
 
@@ -81,14 +87,26 @@ public class LabyrinthTile : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     {
         isHighlighted = false;
         isAttackTarget = false;
+        SetColor(RestColor);
+    }
 
-        GetComponent<Renderer>().material.color = Color.white;
+    public void SetFatalMark(bool marked)
+    {
+        fatalMarked = marked;
+        if (!isHighlighted && !isAttackTarget) SetColor(RestColor);
+    }
 
+    // Back to the resting color unless the tile is currently highlighted.
+    public void ShowRestColor()
+    {
+        if (!isHighlighted && !isAttackTarget) SetColor(RestColor);
+    }
+
+    void SetColor(Color c)
+    {
+        GetComponent<Renderer>().material.color = c;
         Transform quad = transform.Find("Quad");
-        if (quad != null)
-        {
-            quad.GetComponent<Renderer>().material.color = Color.white;
-        }
+        if (quad != null) quad.GetComponent<Renderer>().material.color = c;
     }
 
     public Color LerpRed()

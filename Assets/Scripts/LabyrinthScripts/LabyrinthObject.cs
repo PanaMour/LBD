@@ -131,6 +131,7 @@ public class LabyrinthObject : NetworkBehaviour
                     NetworkConnection owner = connectionToClient ?? NetworkServer.localConnection;
                     PlayerManager pm = owner.identity.GetComponent<PlayerManager>();
                     pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
+                    pm.RpcResetTileColor(targetTileTransform.name); // the trap is used up
                     NetworkServer.Destroy(this.gameObject);
                 }
             }
@@ -233,7 +234,7 @@ public class LabyrinthObject : NetworkBehaviour
         if (NetworkClient.connection.identity == null) return;
 
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-        if (pm == null || !pm.IsMyTurn) return;
+        if (pm == null || !pm.IsMyTurn || GameManager.IsGameOver) return;
 
         if (hasMovedThisTurn) return;
 
@@ -268,6 +269,19 @@ public class LabyrinthObject : NetworkBehaviour
     [Command]
     public void CmdMoveToTile(string tileName)
     {
+        // A normal move by the owner: once per turn, on their own turn, never
+        // into the opponent's Card Base. (Effects that move monsters call
+        // ServerMoveToTile directly and skip these checks.)
+        if (GameManager.IsGameOver || hasMovedThisTurn || isImmobile) return;
+        bool ownerIsHost = connectionToClient == null || connectionToClient == NetworkServer.localConnection;
+        if (ownerIsHost != PlayerManager.ServerHostHasTurn) { Debug.Log("[SERVER] Move rejected: not this player's turn."); return; }
+
+        GridBehavior gb = FindGrid();
+        Transform tile = gb != null ? gb.transform.Find(tileName) : null;
+        GridStat stat = tile != null ? tile.GetComponent<GridStat>() : null;
+        if (stat == null) return;
+        if (gb.IsEnemyBaseSquare(this, stat.x, stat.y)) { Debug.Log("[SERVER] Move rejected: can't enter the opponent's Card Base."); return; }
+
         ServerMoveToTile(tileName);
     }
 
@@ -615,6 +629,7 @@ public class LabyrinthObject : NetworkBehaviour
     // and at most one attack per monster per turn.
     bool ServerMayAttack()
     {
+        if (GameManager.IsGameOver) return false;
         if (hasAttackedThisTurn) { Debug.Log("[SERVER] Attack rejected: this monster already attacked this turn."); return false; }
         if (!attackMode) { Debug.Log("[SERVER] Attack rejected: monster is in Defense mode."); return false; }
 

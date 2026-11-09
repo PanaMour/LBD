@@ -12,6 +12,7 @@ public class TreasureChest : NetworkBehaviour
     public float modelScale = 1.0f;
 
     private Renderer tileRenderer;
+    private LabyrinthTile tile;
 
     public override void OnStartClient()
     {
@@ -65,6 +66,7 @@ public class TreasureChest : NetworkBehaviour
             transform.localPosition = new Vector3(0, adjustedHeight, 0);
             transform.localRotation = Quaternion.identity;
 
+            tile = foundTile.GetComponent<LabyrinthTile>();
             Transform visualPart = foundTile.Find("Quad");
 
             if (visualPart != null)
@@ -100,6 +102,9 @@ public class TreasureChest : NetworkBehaviour
 
     void Update()
     {
+        // Let a move (green) or attack (red) highlight show on the chest's square.
+        if (tile != null && (tile.isHighlighted || tile.isAttackTarget)) return;
+
         if (tileRenderer != null)
         {
             if (tileRenderer.material.color != tileColor)

@@ -18,7 +18,7 @@ public class EndTurn : NetworkBehaviour
         NetworkIdentity networkIdentity = NetworkClient.connection.identity;
         PlayerManager = networkIdentity.GetComponent<PlayerManager>();
 
-        if (PlayerManager.IsMyTurn)
+        if (PlayerManager.IsMyTurn && !GameManager.IsGameOver)
         {
             InitializeClick();
         }
