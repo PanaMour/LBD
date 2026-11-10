@@ -24,6 +24,10 @@ public class LabyrinthObject : NetworkBehaviour
 
     public bool waitingToAttack = false;
 
+    // Server only: an attack by this monster is paused while the defender
+    // decides on a trap. Makes sure the answer resolves the battle only once.
+    [System.NonSerialized] public bool awaitingTrapAnswer = false;
+
     [SyncVar]
     public bool hasMovedThisTurn = false;
     [SyncVar]
@@ -273,6 +277,8 @@ public class LabyrinthObject : NetworkBehaviour
         // into the opponent's Card Base. (Effects that move monsters call
         // ServerMoveToTile directly and skip these checks.)
         if (GameManager.IsGameOver || hasMovedThisTurn || isImmobile) return;
+        foreach (PlayerManager p in FindObjectsOfType<PlayerManager>())
+            if (p.honeySnareActive) { Debug.Log("[SERVER] Move rejected: Honey Snare is active."); return; }
         bool ownerIsHost = connectionToClient == null || connectionToClient == NetworkServer.localConnection;
         if (ownerIsHost != PlayerManager.ServerHostHasTurn) { Debug.Log("[SERVER] Move rejected: not this player's turn."); return; }
 
@@ -335,8 +341,9 @@ public class LabyrinthObject : NetworkBehaviour
         if (myCard == null || enemyCard == null) return;
 
         // Marked now, not when the battle resolves: a trap prompt may be
-        // pending in between.
+        // pending in between, and the attacker mustn't walk off meanwhile.
         hasAttackedThisTurn = true;
+        hasMovedThisTurn = true;
 
         PlayerManager attackerPM = connectionToClient.identity.GetComponent<PlayerManager>();
         NetworkIdentity defenderIdentity = targetObj.GetComponent<NetworkIdentity>();
@@ -357,7 +364,7 @@ public class LabyrinthObject : NetworkBehaviour
         ThisAction[] allActions = FindObjectsOfType<ThisAction>();
         foreach (ThisAction action in allActions)
         {
-            if (action.connectionToClient == defenderIdentity.connectionToClient && !action.faceup && !action.beInGraveyard)
+            if (action.connectionToClient == defenderIdentity.connectionToClient && action.IsSetOnField)
             {
                 if (action.id == 4) // Last Stand Barrier
                 {
@@ -385,6 +392,7 @@ public class LabyrinthObject : NetworkBehaviour
         if (validTrap != null && defenderPM != null)
         {
             Debug.Log("Valid Trap found! Pausing attack to ask defender...");
+            awaitingTrapAnswer = true;
             defenderPM.TargetAskActivateTrap(defenderIdentity.connectionToClient, validTrap, this.gameObject, targetObj);
         }
         else
@@ -401,8 +409,9 @@ public class LabyrinthObject : NetworkBehaviour
     {
         if (!NetworkServer.active) return;
 
+        if (targetObj == null || card == null) return;
         LabyrinthObject targetScript = targetObj.GetComponent<LabyrinthObject>();
-        if (targetScript == null) return;
+        if (targetScript == null || targetScript.card == null) return;
 
         ThisCard myCard = card.GetComponent<ThisCard>();
         ThisCard enemyCard = targetScript.card.GetComponent<ThisCard>();

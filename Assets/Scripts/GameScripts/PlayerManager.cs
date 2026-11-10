@@ -1575,9 +1575,8 @@ public class PlayerManager : NetworkBehaviour
         ThisAction[] allActions = FindObjectsOfType<ThisAction>();
         foreach (ThisAction action in allActions)
         {
-            if (action.id == 3 && !action.faceup && !action.beInGraveyard)
+            if (action.id == 3 && action.IsSetOnField)
             {
-                if (action.transform.parent != null && action.transform.parent.name.Contains("ActionSlot"))
                 {
                     NetworkIdentity trapIdentity = action.GetComponent<NetworkIdentity>();
                     PlayerManager ownerPM = trapIdentity.connectionToClient.identity.GetComponent<PlayerManager>();
@@ -2935,9 +2934,18 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdAnswerTrapPrompt(bool wantsToActivate, GameObject trapCard, GameObject attacker, GameObject defender)
     {
+        // Each prompt is answered once: a double-click (or Decline after
+        // cancelling Echo of Silence's discard) must not fight the battle twice.
+        LabyrinthObject pausedAttacker = attacker != null ? attacker.GetComponent<LabyrinthObject>() : null;
+        if (attacker != null && (pausedAttacker == null || !pausedAttacker.awaitingTrapAnswer)) return;
+
+        ThisAction trapScript = trapCard != null ? trapCard.GetComponent<ThisAction>() : null;
+        if (wantsToActivate && (trapScript == null || trapScript.connectionToClient != connectionToClient || !trapScript.IsSetOnField))
+            wantsToActivate = false; // not this player's set trap (or already used): carry on without it
+
         if (wantsToActivate)
         {
-            ThisAction actionScript = trapCard.GetComponent<ThisAction>();
+            ThisAction actionScript = trapScript;
 
             // Echo of Silence's cost (discard 1 card) hasn't been paid yet at
             // this point -- CmdResolveEchoOfSilence reveals/plays the trap
@@ -2949,8 +2957,9 @@ public class PlayerManager : NetworkBehaviour
             if (actionScript.id == 1) // Echo of Silence
             {
                 TargetStartDiscardForEcho(connectionToClient, trapCard, attacker, defender);
-                return;
+                return; // still paused until the discard is chosen
             }
+            if (pausedAttacker != null) pausedAttacker.awaitingTrapAnswer = false;
 
             RpcShowCard(trapCard, "Played", 0);
             actionScript.faceup = true;
@@ -2995,6 +3004,7 @@ public class PlayerManager : NetworkBehaviour
         else
         {
             Debug.Log("Player declined to use the trap.");
+            if (pausedAttacker != null) pausedAttacker.awaitingTrapAnswer = false;
             if (attacker != null && defender != null)
             {
                 attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, false, 0);
@@ -3015,6 +3025,10 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdResolveEchoOfSilence(GameObject discardedCard, GameObject trapCard, GameObject attacker, GameObject defender)
     {
+        LabyrinthObject pausedAttacker = attacker != null ? attacker.GetComponent<LabyrinthObject>() : null;
+        if (pausedAttacker == null || !pausedAttacker.awaitingTrapAnswer || discardedCard == null) return;
+        pausedAttacker.awaitingTrapAnswer = false;
+
         if (discardedCard.GetComponent<ThisCard>() != null) discardedCard.GetComponent<ThisCard>().beInGraveyard = true;
         if (discardedCard.GetComponent<ThisMagic>() != null) discardedCard.GetComponent<ThisMagic>().beInGraveyard = true;
         if (discardedCard.GetComponent<ThisAction>() != null) discardedCard.GetComponent<ThisAction>().beInGraveyard = true;

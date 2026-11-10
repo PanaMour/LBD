@@ -34,6 +34,11 @@ public class ThisAction : NetworkBehaviour
 
     public GameObject CardBackVisual;
 
+    // A trap can only be sprung once it has been set face-down in an Action
+    // zone -- not while it's still in the hand or deck.
+    public bool IsSetOnField =>
+        !faceup && !beInGraveyard && transform.parent != null && transform.parent.name.Contains("ActionSlot");
+
     void Awake()
     {
 
