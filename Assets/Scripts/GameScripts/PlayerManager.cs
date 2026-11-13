@@ -44,6 +44,10 @@ public class PlayerManager : NetworkBehaviour
 
     public int CardsPlayed = 0;
     public bool IsMyTurn = false;
+
+    // True on the attacking player's machine while the opponent decides on a
+    // trap: every input (moves, attacks, card plays, menus, End Turn) waits.
+    public static bool WaitingForTrapAnswer = false;
     public bool nomoresummons = false;
     public bool hasDrawnInitialHand = false;
     public bool hasDrawnThisTurn = false;
@@ -214,7 +218,7 @@ public class PlayerManager : NetworkBehaviour
 
     public void OnDrawPhaseClicked()
     {
-        if (!hasAuthority || !IsMyTurn || hasDrawnThisTurn) return;
+        if (!hasAuthority || !IsMyTurn || hasDrawnThisTurn || WaitingForTrapAnswer) return;
 
         if (!hasDrawnInitialHand)
         {
@@ -233,6 +237,7 @@ public class PlayerManager : NetworkBehaviour
     {
         if (!hasAuthority) return;
         if (!IsMyTurn && !isTargetingDiscard) return;
+        if (WaitingForTrapAnswer) return;
 
         if (Input.GetMouseButtonDown(1))
 
@@ -612,6 +617,7 @@ public class PlayerManager : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
+        WaitingForTrapAnswer = false; // a new match never starts frozen
         if (isClientOnly) CmdRequestMazeLayout();
     }
 
@@ -1519,6 +1525,7 @@ public class PlayerManager : NetworkBehaviour
     public void CmdChangeTurn()
     {
         if (GameManager.IsGameOver) return;
+        if (LabyrinthObject.AnyAttackAwaitingTrap()) { Debug.Log("[SERVER] End Turn ignored: an attack is waiting on a trap answer."); return; }
         bool callerIsHost = connectionToClient == NetworkServer.localConnection;
         if (callerIsHost != serverHostHasTurn)
         {
@@ -1961,6 +1968,30 @@ public class PlayerManager : NetworkBehaviour
             () => { Destroy(activeUIBox); FinalizeSummon(true); },
             () => { Destroy(activeUIBox); FinalizeSummon(false); }
         );
+    }
+
+    // Shown to the attacking player while the defender decides whether to
+    // spring a trap, so a paused attack doesn't look like a dead click.
+    GameObject waitingBox;
+
+    [TargetRpc]
+    public void TargetShowWaitingForTrap(NetworkConnection target, bool show)
+    {
+        WaitingForTrapAnswer = show;
+        if (waitingBox != null) Destroy(waitingBox);
+        waitingBox = null;
+        if (!show || ConfirmationBoxPrefab == null || Canvas == null) return;
+
+        waitingBox = Instantiate(ConfirmationBoxPrefab, Canvas.transform);
+        waitingBox.transform.localPosition = Vector3.zero;
+        waitingBox.transform.localScale = Vector3.one;
+
+        Text txt = waitingBox.transform.Find("MessageText")?.GetComponent<Text>();
+        if (txt == null) txt = waitingBox.GetComponentInChildren<Text>();
+        if (txt != null) txt.text = "Your opponent is deciding whether to activate a trap...";
+
+        foreach (Button b in waitingBox.GetComponentsInChildren<Button>(true))
+            b.gameObject.SetActive(false);
     }
 
     void SpawnBox(string message, string yesLabel, string noLabel, UnityEngine.Events.UnityAction yesAction, UnityEngine.Events.UnityAction noAction)
@@ -2959,7 +2990,7 @@ public class PlayerManager : NetworkBehaviour
                 TargetStartDiscardForEcho(connectionToClient, trapCard, attacker, defender);
                 return; // still paused until the discard is chosen
             }
-            if (pausedAttacker != null) pausedAttacker.awaitingTrapAnswer = false;
+            if (pausedAttacker != null) pausedAttacker.ServerEndTrapPause();
 
             RpcShowCard(trapCard, "Played", 0);
             actionScript.faceup = true;
@@ -3004,7 +3035,7 @@ public class PlayerManager : NetworkBehaviour
         else
         {
             Debug.Log("Player declined to use the trap.");
-            if (pausedAttacker != null) pausedAttacker.awaitingTrapAnswer = false;
+            if (pausedAttacker != null) pausedAttacker.ServerEndTrapPause();
             if (attacker != null && defender != null)
             {
                 attacker.GetComponent<LabyrinthObject>().ServerResolveAttack(defender, false, 0);
@@ -3027,7 +3058,7 @@ public class PlayerManager : NetworkBehaviour
     {
         LabyrinthObject pausedAttacker = attacker != null ? attacker.GetComponent<LabyrinthObject>() : null;
         if (pausedAttacker == null || !pausedAttacker.awaitingTrapAnswer || discardedCard == null) return;
-        pausedAttacker.awaitingTrapAnswer = false;
+        pausedAttacker.ServerEndTrapPause();
 
         if (discardedCard.GetComponent<ThisCard>() != null) discardedCard.GetComponent<ThisCard>().beInGraveyard = true;
         if (discardedCard.GetComponent<ThisMagic>() != null) discardedCard.GetComponent<ThisMagic>().beInGraveyard = true;

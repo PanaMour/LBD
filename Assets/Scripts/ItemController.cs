@@ -38,7 +38,7 @@ public class ItemController : MonoBehaviour
         // (Frost Wraith's tribute, Shy Magician's swap, etc.) is independent
         // of whether its battle position was already changed this turn, and
         // must stay reachable even then.
-        if (Input.GetMouseButtonDown(1) && PlayerManager.IsMyTurn == true && gameObject.transform.parent.transform.parent == GameObject.Find("PlayerSlots").transform)
+        if (Input.GetMouseButtonDown(1) && PlayerManager.IsMyTurn == true && !PlayerManager.WaitingForTrapAnswer && gameObject.transform.parent.transform.parent == GameObject.Find("PlayerSlots").transform)
         {
             List<ContextMenuItem> items = new List<ContextMenuItem>();
             if (!gameObject.GetComponent<ThisCard>().alreadychanged)

@@ -28,6 +28,27 @@ public class LabyrinthObject : NetworkBehaviour
     // decides on a trap. Makes sure the answer resolves the battle only once.
     [System.NonSerialized] public bool awaitingTrapAnswer = false;
 
+    // While any attack waits on a trap answer, no other attack (or End Turn)
+    // is accepted, so battles can't pile up on the same target.
+    public static bool AnyAttackAwaitingTrap()
+    {
+        foreach (LabyrinthObject m in FindObjectsOfType<LabyrinthObject>())
+            if (m.awaitingTrapAnswer) return true;
+        return false;
+    }
+
+    // Server: the trap question has been answered; resume and drop the
+    // attacker's "waiting" message.
+    public void ServerEndTrapPause()
+    {
+        awaitingTrapAnswer = false;
+        if (connectionToClient != null && connectionToClient.identity != null)
+        {
+            PlayerManager owner = connectionToClient.identity.GetComponent<PlayerManager>();
+            if (owner != null) owner.TargetShowWaitingForTrap(connectionToClient, false);
+        }
+    }
+
     [SyncVar]
     public bool hasMovedThisTurn = false;
     [SyncVar]
@@ -238,7 +259,7 @@ public class LabyrinthObject : NetworkBehaviour
         if (NetworkClient.connection.identity == null) return;
 
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-        if (pm == null || !pm.IsMyTurn || GameManager.IsGameOver) return;
+        if (pm == null || !pm.IsMyTurn || GameManager.IsGameOver || PlayerManager.WaitingForTrapAnswer) return;
 
         if (hasMovedThisTurn) return;
 
@@ -277,6 +298,7 @@ public class LabyrinthObject : NetworkBehaviour
         // into the opponent's Card Base. (Effects that move monsters call
         // ServerMoveToTile directly and skip these checks.)
         if (GameManager.IsGameOver || hasMovedThisTurn || isImmobile) return;
+        if (AnyAttackAwaitingTrap()) { Debug.Log("[SERVER] Move rejected: an attack is waiting on a trap answer."); return; }
         foreach (PlayerManager p in FindObjectsOfType<PlayerManager>())
             if (p.honeySnareActive) { Debug.Log("[SERVER] Move rejected: Honey Snare is active."); return; }
         bool ownerIsHost = connectionToClient == null || connectionToClient == NetworkServer.localConnection;
@@ -393,6 +415,7 @@ public class LabyrinthObject : NetworkBehaviour
         {
             Debug.Log("Valid Trap found! Pausing attack to ask defender...");
             awaitingTrapAnswer = true;
+            if (attackerPM != null) attackerPM.TargetShowWaitingForTrap(connectionToClient, true);
             defenderPM.TargetAskActivateTrap(defenderIdentity.connectionToClient, validTrap, this.gameObject, targetObj);
         }
         else
@@ -639,6 +662,7 @@ public class LabyrinthObject : NetworkBehaviour
     bool ServerMayAttack()
     {
         if (GameManager.IsGameOver) return false;
+        if (AnyAttackAwaitingTrap()) { Debug.Log("[SERVER] Attack rejected: another attack is waiting on a trap answer."); return false; }
         if (hasAttackedThisTurn) { Debug.Log("[SERVER] Attack rejected: this monster already attacked this turn."); return false; }
         if (!attackMode) { Debug.Log("[SERVER] Attack rejected: monster is in Defense mode."); return false; }
 

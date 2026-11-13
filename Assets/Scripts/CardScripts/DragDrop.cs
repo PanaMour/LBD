@@ -48,7 +48,7 @@ public class DragDrop : NetworkBehaviour
         // Cards can be dealt before the local player object exists; look it up again.
         if (PlayerManager == null && NetworkClient.connection != null && NetworkClient.connection.identity != null)
             PlayerManager = NetworkClient.connection.identity.GetComponent<PlayerManager>();
-        if (PlayerManager == null || !PlayerManager.IsMyTurn) return;
+        if (PlayerManager == null || !PlayerManager.IsMyTurn || PlayerManager.WaitingForTrapAnswer) return;
 
         if (GetComponent<ThisCard>() != null && PlayerManager.nomoresummons)
         {
