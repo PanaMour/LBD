@@ -857,6 +857,13 @@ public class GridBehavior : MonoBehaviour
         }
     }
 
+    // A refused summon: stop waiting for a summon square.
+    public void CancelSummonZone()
+    {
+        cardWaitingToSpawn = null;
+        HighlightRange(false);
+    }
+
     bool IsFreeSummonTile(int x, int y)
     {
         return gridArray[x, y] != null && gridArray[x, y].GetComponentInChildren<LabyrinthObject>() == null;
@@ -882,10 +889,13 @@ public class GridBehavior : MonoBehaviour
                 string tileName = gridArray[x, y].name;
                 PlayerManager pm = Mirror.NetworkClient.connection.identity.GetComponent<PlayerManager>();
                 pm.CmdSpawnMonster(cardId, tileName, ni);
-                pm.CompleteSummonSequence();
 
+                // Clear the summon-square highlight first: on-summon effects
+                // (Rattlesnake, Shadow Imp) light up their own targets inside
+                // CompleteSummonSequence, and clearing afterwards hid them.
                 HighlightRange(false);
                 cardWaitingToSpawn = null;
+                pm.CompleteSummonSequence();
             }
             else
             {

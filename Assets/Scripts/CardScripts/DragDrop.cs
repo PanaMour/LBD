@@ -340,6 +340,15 @@ public class DragDrop : NetworkBehaviour
         this.enabled = false; // Turn off dragging now that it's set
     }
 
+    // The host refused this play: make the card draggable from the hand again.
+    public void ResetForHand()
+    {
+        isDragging = false;
+        isDraggable = hasAuthority;
+        enabled = true;
+        gameObject.layer = LayerMask.NameToLayer("Default");
+    }
+
     public void ReturnToHand()
     {
         transform.SetParent(startParent.transform);

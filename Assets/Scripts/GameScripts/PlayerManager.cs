@@ -48,6 +48,89 @@ public class PlayerManager : NetworkBehaviour
     // True on the attacking player's machine while the opponent decides on a
     // trap: every input (moves, attacks, card plays, menus, End Turn) waits.
     public static bool WaitingForTrapAnswer = false;
+
+    // ---- Server-side rule checks for card plays ----------------------------
+    // Each player's screen already checks these; the host checks them again
+    // so a lagging or out-of-date client can't summon twice, play out of turn,
+    // or target something its screen thought was valid but isn't any more.
+    [System.NonSerialized] int serverSummonsThisTurn;
+    [System.NonSerialized] int serverTributeCredit;
+    [System.NonSerialized] bool serverDrewThisTurn;
+    [System.NonSerialized] bool serverDealtHand;
+    static readonly HashSet<uint> serverCardsOnField = new HashSet<uint>();   // monster cards the host summoned
+    static readonly HashSet<uint> serverResolvedMagic = new HashSet<uint>();  // magic cards already used
+    static readonly HashSet<uint> serverPositionChanged = new HashSet<uint>(); // battle position switched this turn
+
+    static void ServerResetMatchBookkeeping()
+    {
+        serverCardsOnField.Clear();
+        serverResolvedMagic.Clear();
+        serverPositionChanged.Clear();
+    }
+
+    // Null when the player behind this PlayerManager may act right now.
+    string ServerTurnProblem()
+    {
+        if (GameManager.IsGameOver) return "the game is over";
+        if (LabyrinthObject.AnyAttackAwaitingTrap()) return "an attack is waiting on a trap answer";
+        bool callerIsHost = connectionToClient == NetworkServer.localConnection;
+        if (callerIsHost != serverHostHasTurn) return "it is not this player's turn";
+        return null;
+    }
+
+    bool OwnedByCaller(GameObject obj)
+    {
+        NetworkIdentity ni = obj != null ? obj.GetComponent<NetworkIdentity>() : null;
+        return ni != null && ni.connectionToClient == connectionToClient;
+    }
+
+    static bool CardOnField(GameObject card)
+    {
+        NetworkIdentity ni = card != null ? card.GetComponent<NetworkIdentity>() : null;
+        ThisCard tc = card != null ? card.GetComponent<ThisCard>() : null;
+        return ni != null && tc != null && !tc.beInGraveyard && serverCardsOnField.Contains(ni.netId);
+    }
+
+    bool ServerReject(string action, string why)
+    {
+        if (why == null) return false;
+        Debug.Log("[SERVER] " + action + " rejected: " + why + ".");
+        return true;
+    }
+
+    // A refused card play: the card goes back into the player's hand (it
+    // was never shown to the opponent) and any follow-up targeting is dropped.
+    [TargetRpc]
+    public void TargetReturnToHand(NetworkConnection target, GameObject card)
+    {
+        if (card == null) return;
+        Debug.Log("The host refused that play; the card returns to your hand.");
+
+        GameObject handAnchor = GameObject.Find("Hand_Anchor");
+        if (handAnchor != null)
+        {
+            card.transform.SetParent(handAnchor.transform);
+            card.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+            card.transform.localPosition = Vector3.zero;
+            card.transform.localRotation = Quaternion.identity;
+        }
+
+        ThisCard tc = card.GetComponent<ThisCard>();
+        if (tc != null) { tc.summoned = false; nomoresummons = false; }
+        ThisMagic tm = card.GetComponent<ThisMagic>();
+        if (tm != null) tm.activated = false;
+        DragDrop dd = card.GetComponent<DragDrop>();
+        if (dd != null) dd.ResetForHand();
+
+        if (tempCard == card) { tempCard = null; tempSlot = null; tempTributeVictim = null; }
+        if (activeUIBox != null) Destroy(activeUIBox);
+        isTargeting = false;
+        activeMonsterEffectCard = null;
+        pendingMonsterEffect = null;
+
+        GridBehavior gb = FindGridBehavior();
+        if (gb != null) { gb.CancelSummonZone(); gb.ResetTileColors(); }
+    }
     public bool nomoresummons = false;
     public bool hasDrawnInitialHand = false;
     public bool hasDrawnThisTurn = false;
@@ -361,7 +444,7 @@ public class PlayerManager : NetworkBehaviour
                         ThisMagic targetMagic = hit.collider.GetComponent<ThisMagic>();
                         if (targetMagic == null) targetMagic = hit.collider.GetComponentInParent<ThisMagic>();
 
-                        if (targetMagic != null && targetMagic.activated)
+                        if (targetMagic != null && IsInActionZone(targetMagic.transform))
                         {
                             if (!targetMagic.hasAuthority)
                             {
@@ -381,7 +464,7 @@ public class PlayerManager : NetworkBehaviour
                         ThisAction targetAction = hit.collider.GetComponent<ThisAction>();
                         if (targetAction == null) targetAction = hit.collider.GetComponentInParent<ThisAction>();
 
-                        if (targetAction != null && targetAction.activated)
+                        if (targetAction != null && IsInActionZone(targetAction.transform))
                         {
                             if (!targetAction.hasAuthority)
                             {
@@ -421,6 +504,7 @@ public class PlayerManager : NetworkBehaviour
                                         if (t.isHighlighted) t.StopGlowBlock();
 
                                     HighlightTeleportTiles(targetCandidate);
+                                    Debug.Log("Teleport: choose a lit square in the same column (up to 3 squares up or down).");
                                     return;
                                 }
 
@@ -452,9 +536,11 @@ public class PlayerManager : NetworkBehaviour
                                     GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
                                     if (gridGen != null)
                                     {
-                                        gridGen.GetComponent<GridBehavior>().ShowPossiblePaths(targetCandidate.gameObject, 3);
-
+                                        // Drop the target highlight before lighting the
+                                        // squares it can be moved to.
                                         CancelTargeting();
+                                        gridGen.GetComponent<GridBehavior>().ShowPossiblePaths(targetCandidate.gameObject, 3);
+                                        Debug.Log("Rattlesnake: choose a lit square to move it to.");
                                     }
                                 }
                             }
@@ -605,6 +691,7 @@ public class PlayerManager : NetworkBehaviour
         {
             serverHostHasTurn = false;
             serverTurnNumber = 0;
+            ServerResetMatchBookkeeping();
             treasureRespawnCountdown = 0;
             UIManager.treasureCountdown = 0;
             ServerSpawnTreasure();
@@ -722,6 +809,9 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDealCards()
     {
+        if (ServerReject("Opening hand", ServerTurnProblem() ?? (serverDealtHand || serverDrewThisTurn ? "already drawn" : null))) return;
+        serverDealtHand = true;
+        serverDrewThisTurn = true;
         StartCoroutine(DealFiveCards());
         RpcGMChangeState("Draw Card");
     }
@@ -729,6 +819,8 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDrawCard()
     {
+        if (ServerReject("Draw", ServerTurnProblem() ?? (serverDrewThisTurn ? "already drew this turn" : null))) return;
+        serverDrewThisTurn = true;
         StartCoroutine(DrawCard());
         RpcGMChangeState("Action Phase");
     }
@@ -863,7 +955,11 @@ public class PlayerManager : NetworkBehaviour
             if (tile != null) tile.GlowBlock();
         }
 
-        Debug.Log($"Targeting Mode Started: Looking for {type}");
+        string hint = type == MagicTargetType.UnmovedAlly ? "choose one of your lit monsters that hasn't moved this turn"
+            : type == MagicTargetType.AnyAlly ? "choose one of your lit monsters"
+            : type == MagicTargetType.AnyUnit ? "choose any lit monster"
+            : "choose a lit enemy monster";
+        Debug.Log(card.GetComponent<ThisMagic>().magicName + ": " + hint + " (right-click to cancel).");
     }
 
     bool CheckTargetValidity(GameObject magicCard, LabyrinthObject monster, MagicTargetType type)
@@ -1003,8 +1099,11 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdTributeFrostWraith(GameObject frostWraithCard, GameObject targetMonsterObj)
     {
-        LabyrinthObject targetMonster = targetMonsterObj.GetComponent<LabyrinthObject>();
+        LabyrinthObject targetMonster = targetMonsterObj != null ? targetMonsterObj.GetComponent<LabyrinthObject>() : null;
         if (targetMonster == null) return;
+        string why = ServerTurnProblem();
+        if (why == null && (!OwnedByCaller(frostWraithCard) || !CardOnField(frostWraithCard) || frostWraithCard.GetComponent<ThisCard>().id != 47)) why = "not this player's Frost Wraith on the field";
+        if (ServerReject("Frost Wraith tribute", why)) return;
 
         targetMonster.isImmobile = true;
         ThisCard targetCardScript = targetMonster.card != null ? targetMonster.card.GetComponent<ThisCard>() : null;
@@ -1048,6 +1147,10 @@ public class PlayerManager : NetworkBehaviour
         ThisCard spirit = spiritCard != null ? spiritCard.GetComponent<ThisCard>() : null;
         LabyrinthObject targetMonster = targetMonsterObj != null ? targetMonsterObj.GetComponent<LabyrinthObject>() : null;
         if (spirit == null || targetMonster == null || targetMonster.card == spiritCard) return;
+        string why = ServerTurnProblem();
+        if (why == null && (!OwnedByCaller(spiritCard) || !CardOnField(spiritCard))) why = "not this player's Spirit on the field";
+        if (why == null && !OwnedByCaller(targetMonsterObj)) why = "Wallwalk can only go to your own monster";
+        if (ServerReject("Spirit tribute", why)) return;
 
         ThisCard targetCardScript = targetMonster.card != null ? targetMonster.card.GetComponent<ThisCard>() : null;
         if (targetCardScript != null) targetCardScript.grantedWallwalk = true;
@@ -1091,6 +1194,10 @@ public class PlayerManager : NetworkBehaviour
         LabyrinthObject a = monsterAObj != null ? monsterAObj.GetComponent<LabyrinthObject>() : null;
         LabyrinthObject b = monsterBObj != null ? monsterBObj.GetComponent<LabyrinthObject>() : null;
         if (a == null || b == null || a == b) return;
+        string why = ServerTurnProblem();
+        if (why == null && (!OwnedByCaller(shyMagicianCard) || !CardOnField(shyMagicianCard))) why = "not this player's Shy Magician on the field";
+        if (why == null && (!OwnedByCaller(monsterAObj) || !OwnedByCaller(monsterBObj))) why = "both monsters must be your own";
+        if (ServerReject("Shy Magician swap", why)) return;
 
         // currentTileName is a SyncVar with a hook (OnTileNameChanged) that
         // reparents/snaps the monster to its new tile on every client, so
@@ -1183,6 +1290,11 @@ public class PlayerManager : NetworkBehaviour
         Debug.Log("Spooky Man revived " + cardScript.cardName + "!");
     }
 
+    static bool IsInActionZone(Transform card)
+    {
+        return card.parent != null && card.parent.name.Contains("ActionSlot");
+    }
+
     bool HasValidAetherwingTarget()
     {
         if (EnemyActionSockets == null) return false;
@@ -1191,14 +1303,10 @@ public class PlayerManager : NetworkBehaviour
         {
             if (slot == null) continue;
 
+            // Any card in the opponent's Magic/Action zones counts, including
+            // face-down Action cards (which are never "activated" until sprung).
             foreach (Transform child in slot.transform)
-            {
-                ThisMagic tm = child.GetComponent<ThisMagic>();
-                if (tm != null && tm.activated) return true;
-
-                ThisAction ta = child.GetComponent<ThisAction>();
-                if (ta != null && ta.activated) return true;
-            }
+                if (child.GetComponent<ThisMagic>() != null || child.GetComponent<ThisAction>() != null) return true;
         }
 
         return false;
@@ -1207,18 +1315,37 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdPlayCard(GameObject card, int index)
     {
+        if (card == null || !OwnedByCaller(card)) return;
+        if (card.GetComponent<ThisCard>() != null)
+        {
+            // Shown only once the host has actually summoned it (the summon
+            // command arrives first; a refused summon never reaches here).
+            if (!CardOnField(card)) { Debug.Log("[SERVER] Monster card not shown: its summon was refused."); return; }
+        }
+        else if (ServerReject("Card play", ServerTurnProblem()))
+        {
+            TargetReturnToHand(connectionToClient, card);
+            return;
+        }
         RpcShowCard(card, "Played",index);
     }
 
     [Command]
     public void CmdOpponentDestroyCard(GameObject card, int index)
     {
+        // Aetherwing Butterfly: destroys one of the OPPONENT's cards on the field.
+        if (card == null || OwnedByCaller(card) || !IsInActionZone(card.transform)) return;
+        if (ServerReject("Destroy", ServerTurnProblem())) return;
         RpcShowCard(card, "OpponentDestroyed", index);
     }
 
     [Command]
     public void CmdPlayerDestroyCard(GameObject card, int index)
     {
+        if (card == null || !OwnedByCaller(card)) return;
+        // Sending your own monster on the field to the Graveyard is a
+        // tribute: it pays for one 5+ star summon this turn.
+        if (CardOnField(card)) serverTributeCredit++;
         RpcShowCard(card, "PlayerDestroyed", index);
     }
 
@@ -1505,6 +1632,7 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdGMChangeLP(int playerLP,int opponentLP)
     {
+        if (ServerReject("Life point change", ServerTurnProblem())) return;
         RpcGMChangeLP(playerLP, opponentLP);
     }
 
@@ -1539,6 +1667,9 @@ public class PlayerManager : NetworkBehaviour
         foreach (PlayerManager player in allPlayers)
         {
             player.hasDrawnThisTurn = false;
+            player.serverSummonsThisTurn = 0;
+            player.serverTributeCredit = 0;
+            player.serverDrewThisTurn = false;
 
             player.honeySnareActive = false; 
 
@@ -1577,6 +1708,7 @@ public class PlayerManager : NetworkBehaviour
             if (floodGrid.floodTurnsLeft == 0) RpcClearFlood();
         }
 
+        serverPositionChanged.Clear();
         RpcGMChangeTurn(serverHostHasTurn, serverTurnNumber);
 
         ThisAction[] allActions = FindObjectsOfType<ThisAction>();
@@ -1659,6 +1791,11 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdChangeBattlePosition(GameObject card, bool ATKDEF)
     {
+        string why = ServerTurnProblem();
+        if (why == null && (!OwnedByCaller(card) || !CardOnField(card))) why = "not this player's monster on the field";
+        if (why == null && serverPositionChanged.Contains(card.GetComponent<NetworkIdentity>().netId)) why = "already changed position this turn";
+        if (ServerReject("Battle position change", why)) return;
+        serverPositionChanged.Add(card.GetComponent<NetworkIdentity>().netId);
         RpcGMChangeBattlePosition(card, ATKDEF);
     }
 
@@ -1725,7 +1862,34 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdSpawnMonster(int id, string tileName, NetworkIdentity cardNetId)
     {
-        ServerSpawnMonster(id, tileName, cardNetId);
+        ThisCard card = cardNetId != null ? cardNetId.GetComponent<ThisCard>() : null;
+        if (ServerReject("Summon", SummonProblem(card, tileName)))
+        {
+            if (card != null && OwnedByCaller(card.gameObject)) TargetReturnToHand(connectionToClient, card.gameObject);
+            return;
+        }
+        if (card.stars >= 5) serverTributeCredit--;
+        serverSummonsThisTurn++;
+        ServerSpawnMonster(card.thisId, tileName, cardNetId); // the card's own id, not the one sent
+    }
+
+    string SummonProblem(ThisCard card, string tileName)
+    {
+        string turn = ServerTurnProblem();
+        if (turn != null) return turn;
+        if (card == null || !OwnedByCaller(card.gameObject)) return "not this player's monster card";
+        if (card.beInGraveyard || serverCardsOnField.Contains(card.netId)) return "that card is already played";
+        if (serverSummonsThisTurn >= 1) return "already summoned this turn";
+        if (card.stars >= 5 && serverTributeCredit <= 0) return "a 5+ star monster needs a tribute";
+
+        GridBehavior gb = FindGridBehavior();
+        Transform tile = gb != null ? gb.transform.Find(tileName) : null;
+        GridStat stat = tile != null ? tile.GetComponent<GridStat>() : null;
+        if (stat == null) return "unknown square";
+        int ownBaseRow = connectionToClient == NetworkServer.localConnection ? 0 : gb.rows - 1;
+        if (stat.y != ownBaseRow || stat.x < 2 || stat.x > 8) return "monsters are summoned into your own Card Base";
+        if (tile.GetComponentInChildren<LabyrinthObject>() != null) return "that square is taken";
+        return null;
     }
 
     // Server-side summon, so effects resolved inside another command (Spooky
@@ -1757,6 +1921,7 @@ public class PlayerManager : NetworkBehaviour
         }
 
         NetworkServer.Spawn(monster, connectionToClient);
+        serverCardsOnField.Add(cardNetId.netId);
         RpcLinkMonsterToCard(monster, cardNetId.gameObject);
 
         if (script.isImmobile) RpcShowCard(cardNetId.gameObject, "SetImmobile", 0);
@@ -1923,7 +2088,7 @@ public class PlayerManager : NetworkBehaviour
                 activeMonsterEffectCard = tempCard;
                 pendingMonsterEffect = "Rattlesnake";
                 HighlightValidMonsterTargets("Rattlesnake", tempCard);
-                Debug.Log("Rattlesnake: Select a monster to move!");
+                Debug.Log("Rattlesnake: choose a lit monster to move up to 3 squares.");
             }
 
             if (tempCard.GetComponent<ThisCard>().id == 56) // Aetherwing Butterfly
@@ -2055,6 +2220,21 @@ public class PlayerManager : NetworkBehaviour
             card.transform.localRotation = Quaternion.Euler(90, 0, 0);
             
             card.transform.localScale = new Vector3(0.01f, 0.0075f, 0.01f);
+
+            // The Graveyard is public: a card destroyed while face-down (a set
+            // Action card) is revealed to both players.
+            ThisCard gyCard = card.GetComponent<ThisCard>();
+            if (gyCard != null) gyCard.cardBack = false;
+            ThisMagic gyMagic = card.GetComponent<ThisMagic>();
+            if (gyMagic != null) gyMagic.cardBack = false;
+            ThisAction gyAction = card.GetComponent<ThisAction>();
+            if (gyAction != null)
+            {
+                gyAction.cardBack = false;
+                gyAction.faceup = true;
+            }
+            CanvasGroup gyGroup = card.GetComponent<CanvasGroup>();
+            if (gyGroup != null) gyGroup.alpha = 1f;
 
             Collider[] cardColliders = card.GetComponentsInChildren<Collider>(true);
             foreach (Collider cardCollider in cardColliders)
@@ -2494,6 +2674,18 @@ public class PlayerManager : NetworkBehaviour
         LabyrinthObject monsterScript = targetMonster.GetComponent<LabyrinthObject>();
 
         if (magicScript == null || monsterScript == null) return;
+        if (ServerReject("Magic " + magicScript.magicName, MagicProblem(magicCard, magicScript, monsterScript)))
+        {
+            // Its target is gone or no longer valid: the card fizzles (and
+            // counts as used, so it can't be played again from the Graveyard).
+            if (OwnedByCaller(magicCard))
+            {
+                serverResolvedMagic.Add(magicCard.GetComponent<NetworkIdentity>().netId);
+                RpcShowCard(magicCard, "PlayerDestroyed", 0);
+            }
+            return;
+        }
+        serverResolvedMagic.Add(magicCard.GetComponent<NetworkIdentity>().netId);
         magicScript.lastTargetedMonster = monsterScript.card;
 
         switch (magicScript.targetType)
@@ -2656,6 +2848,25 @@ public class PlayerManager : NetworkBehaviour
         }
     }
 
+    string MagicProblem(GameObject magicCard, ThisMagic magic, LabyrinthObject target)
+    {
+        string turn = ServerTurnProblem();
+        if (turn != null) return turn;
+        if (!OwnedByCaller(magicCard)) return "not this player's card";
+        if (magic.beInGraveyard || serverResolvedMagic.Contains(magicCard.GetComponent<NetworkIdentity>().netId)) return "that card was already used";
+
+        bool isEnemy = target.connectionToClient != connectionToClient;
+        switch (magic.targetType)
+        {
+            case MagicTargetType.EnemyAttack: if (!isEnemy || !target.attackMode) return "needs an enemy monster in Attack position"; break;
+            case MagicTargetType.EnemyDefense: if (!isEnemy || target.attackMode) return "needs an enemy monster in Defense position"; break;
+            case MagicTargetType.AnyEnemy: if (!isEnemy) return "needs an enemy monster"; break;
+            case MagicTargetType.AnyAlly: if (isEnemy) return "needs one of your own monsters"; break;
+            case MagicTargetType.UnmovedAlly: if (isEnemy || target.hasMovedThisTurn) return "needs one of your monsters that hasn't moved"; break;
+        }
+        return null;
+    }
+
     [ClientRpc]
     public void RpcActivateSprintBoost(GameObject target)
     {
@@ -2675,6 +2886,9 @@ public class PlayerManager : NetworkBehaviour
         }
 
         activeMagicCard = null;
+
+        foreach (LabyrinthTile tile in FindObjectsOfType<LabyrinthTile>())
+            if (tile.isHighlighted) tile.StopGlowBlock();
 
         GameObject gridGen = GameObject.Find("GridGenerator(Clone)") ?? GameObject.Find("GridGenerator");
         if (gridGen != null)
@@ -2700,12 +2914,10 @@ public class PlayerManager : NetworkBehaviour
                 if (tile.x == monsterTile.x && Mathf.Abs(tile.y - monsterTile.y) > 0 && Mathf.Abs(tile.y - monsterTile.y) <= 3
                     && (tpGrid == null || !tpGrid.IsEnemyBaseSquare(monster, tile.x, tile.y)))
                 {
-                    if (child.GetComponentInChildren<LabyrinthObject>() == null)
-                    {
-                        Renderer r = child.GetComponent<Renderer>();
-                        if (r == null) r = child.GetComponentInChildren<Renderer>();
-                        if (r != null) r.material.color = Color.cyan;
-                    }
+                    // Lit like a normal move (the old tint only reached the
+                    // tile's base, which the Quad on top hides).
+                    LabyrinthTile lt = child.GetComponent<LabyrinthTile>();
+                    if (lt != null && child.GetComponentInChildren<LabyrinthObject>() == null) lt.GlowBlock();
                 }
             }
         }
@@ -2714,15 +2926,37 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdTeleportMonster(GameObject magicCard, GameObject monster, string targetTileName)
     {
-        LabyrinthObject monsterScript = monster.GetComponent<LabyrinthObject>();
-        if (monsterScript != null)
-        {
-            monsterScript.ServerMoveToTile(targetTileName);
-        }
+        LabyrinthObject monsterScript = monster != null ? monster.GetComponent<LabyrinthObject>() : null;
+        if (magicCard == null || !OwnedByCaller(magicCard)) return;
+        bool teleportOk = !ServerReject("Teleport", TeleportProblem(magicCard, monsterScript, targetTileName));
+        serverResolvedMagic.Add(magicCard.GetComponent<NetworkIdentity>().netId); // used either way
+        if (teleportOk) monsterScript.ServerMoveToTile(targetTileName);
 
         // Used up, like every other targeted magic (this used to re-"play"
         // the card into action slot 0).
         RpcShowCard(magicCard, "PlayerDestroyed", 0);
+    }
+
+    // Teleport: one of your monsters that hasn't moved, straight up or down
+    // 1-3 squares, onto an empty square outside the opponent's Card Base.
+    string TeleportProblem(GameObject magicCard, LabyrinthObject monster, string tileName)
+    {
+        string turn = ServerTurnProblem();
+        if (turn != null) return turn;
+        if (serverResolvedMagic.Contains(magicCard.GetComponent<NetworkIdentity>().netId)) return "that card was already used";
+        if (monster == null || monster.connectionToClient != connectionToClient) return "needs one of your own monsters";
+        if (monster.hasMovedThisTurn) return "that monster already moved";
+
+        GridBehavior gb = FindGridBehavior();
+        GridStat from = monster.GetComponentInParent<GridStat>();
+        Transform tile = gb != null ? gb.transform.Find(tileName) : null;
+        GridStat to = tile != null ? tile.GetComponent<GridStat>() : null;
+        if (from == null || to == null) return "unknown square";
+        int dy = Mathf.Abs(to.y - from.y);
+        if (to.x != from.x || dy < 1 || dy > 3) return "too far";
+        if (tile.GetComponentInChildren<LabyrinthObject>() != null) return "that square is taken";
+        if (gb.IsEnemyBaseSquare(monster, to.x, to.y)) return "can't enter the opponent's Card Base";
+        return null;
     }
 
     void CalculateBoardAuras()
@@ -2816,6 +3050,7 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdApplyTempAtk(GameObject card, int amount)
     {
+        if (ServerReject("ATK boost", ServerTurnProblem())) return;
         RpcApplyTempAtk(card, amount);
     }
 
@@ -2878,7 +3113,17 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdForceMoveMonster(GameObject monsterToMove, string targetTileName)
     {
-        LabyrinthObject monsterScript = monsterToMove.GetComponent<LabyrinthObject>();
+        LabyrinthObject monsterScript = monsterToMove != null ? monsterToMove.GetComponent<LabyrinthObject>() : null;
+        if (ServerReject("Rattlesnake move", ServerTurnProblem())) return;
+        GridBehavior forceGrid = FindGridBehavior();
+        Transform forceTile = forceGrid != null ? forceGrid.transform.Find(targetTileName) : null;
+        GridStat forceStat = forceTile != null ? forceTile.GetComponent<GridStat>() : null;
+        if (monsterScript == null || forceStat == null || forceTile.GetComponentInChildren<LabyrinthObject>() != null
+            || forceGrid.IsEnemyBaseSquare(monsterScript, forceStat.x, forceStat.y))
+        {
+            Debug.Log("[SERVER] Rattlesnake move rejected: that square isn't free.");
+            return;
+        }
         if (monsterScript != null)
         {
             // Same server-side move as Teleport, so a dragged monster also
@@ -2912,7 +3157,9 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdSetFatalSquare(string tileName)
     {
+        if (ServerReject("Fatal Square", ServerTurnProblem())) return;
         GameObject tileObj = GameObject.Find(tileName);
+        if (tileObj != null && tileObj.GetComponentInChildren<LabyrinthObject>() != null) { Debug.Log("[SERVER] Fatal Square rejected: the square isn't empty."); return; }
 
         if (tileObj != null)
         {
