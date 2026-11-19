@@ -35,5 +35,11 @@ public class EndGame : MonoBehaviour
             victoryText.text = "Draw!";
             playAgainButton.SetActive(true);
         }
+        if (PlayerLP.staticLP > 0 && OpponentLP.staticLP > 0 && textObject.activeSelf)
+        {
+            // Nobody is at 0 (e.g. a rematch just started): no end screen.
+            textObject.SetActive(false);
+            playAgainButton.SetActive(false);
+        }
     }
 }

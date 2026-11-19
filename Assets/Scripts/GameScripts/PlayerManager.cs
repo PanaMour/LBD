@@ -63,9 +63,59 @@ public class PlayerManager : NetworkBehaviour
 
     static void ServerResetMatchBookkeeping()
     {
+        serverRematchVotes.Clear();
         serverCardsOnField.Clear();
         serverResolvedMagic.Clear();
         serverPositionChanged.Clear();
+    }
+
+    // ---- Rematch: once both players ask, the host restarts its game and the
+    // other player rejoins automatically -- the same path as a normal first
+    // join, so the new match starts completely fresh for both.
+    static readonly HashSet<int> serverRematchVotes = new HashSet<int>();
+
+    [Command]
+    public void CmdRequestRematch()
+    {
+        if (!GameManager.IsGameOver) return;
+        serverRematchVotes.Add(connectionToClient.connectionId);
+        RpcRematchVote(connectionToClient == NetworkServer.localConnection);
+
+        if (NetworkServer.connections.Count >= 2 && serverRematchVotes.Count >= NetworkServer.connections.Count)
+        {
+            serverRematchVotes.Clear();
+            Debug.Log("[SERVER] Both players want a rematch: restarting the match.");
+            RpcStartRematch();
+            StartCoroutine(RestartHostSoon());
+        }
+    }
+
+    // Short pause so the rematch message reaches the other player before the
+    // host shuts its game down; the main menu then hosts again by itself.
+    IEnumerator RestartHostSoon()
+    {
+        yield return new WaitForSeconds(0.5f);
+        PlayerLP.staticLP = 4000;   // the new match must not start "already over"
+        OpponentLP.staticLP = 4000;
+        MainMenuController.AutoHost = true;
+        NetworkManager.singleton.StopHost();
+    }
+
+    [ClientRpc]
+    void RpcStartRematch()
+    {
+        if (NetworkServer.active) return; // the host restarts on its own
+        PlayerLP.staticLP = 4000;   // the new match must not start "already over"
+        OpponentLP.staticLP = 4000;
+        MainMenuController.RejoinAddress = NetworkManager.singleton.networkAddress;
+        MainMenuController.RejoinAttempts = 5;
+        PlayAgain.ShowRematchStarting();
+    }
+
+    [ClientRpc]
+    void RpcRematchVote(bool voterIsHost)
+    {
+        PlayAgain.OnRematchVote(voterIsHost);
     }
 
     // Null when the player behind this PlayerManager may act right now.
@@ -704,6 +754,7 @@ public class PlayerManager : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         base.OnStartLocalPlayer();
+        MainMenuController.RejoinAddress = null; // joined: a pending rematch rejoin is done
         WaitingForTrapAnswer = false; // a new match never starts frozen
         if (isClientOnly) CmdRequestMazeLayout();
     }
@@ -2224,9 +2275,9 @@ public class PlayerManager : NetworkBehaviour
             // The Graveyard is public: a card destroyed while face-down (a set
             // Action card) is revealed to both players.
             ThisCard gyCard = card.GetComponent<ThisCard>();
-            if (gyCard != null) gyCard.cardBack = false;
+            if (gyCard != null) { gyCard.cardBack = false; gyCard.faceup = true; }
             ThisMagic gyMagic = card.GetComponent<ThisMagic>();
-            if (gyMagic != null) gyMagic.cardBack = false;
+            if (gyMagic != null) { gyMagic.cardBack = false; gyMagic.faceup = true; }
             ThisAction gyAction = card.GetComponent<ThisAction>();
             if (gyAction != null)
             {
@@ -2337,6 +2388,15 @@ public class PlayerManager : NetworkBehaviour
         activeGraveyardPanel.transform.localPosition = Vector3.zero;
         activeGraveyardPanel.transform.localScale = Vector3.one;
 
+        // Leave the card zoom (left edge of the screen) uncovered, so hovering
+        // a graveyard card can show it there: trim the panel's left side only.
+        RectTransform panelRect = activeGraveyardPanel.GetComponent<RectTransform>();
+        if (panelRect != null)
+        {
+            panelRect.sizeDelta = new Vector2(panelRect.sizeDelta.x - 260f, panelRect.sizeDelta.y);
+            panelRect.anchoredPosition += new Vector2(130f, 0f);
+        }
+
         Text playerHeader = activeGraveyardPanel.transform.Find("PlayerColumn/PlayerHeaderText")?.GetComponent<Text>();
         if (playerHeader != null) playerHeader.text = pendingRevivalTile != null ? "Select an Undead monster to revive!" : "Your Graveyard";
 
@@ -2396,6 +2456,12 @@ public class PlayerManager : NetworkBehaviour
 
             Text label = tile.transform.Find("NameLabel")?.GetComponent<Text>();
             if (label != null) label.text = entry.cardName;
+
+            // Hovering a tile shows that card in the zoom panel, like hovering
+            // a card on the field.
+            GraveyardTileHover hover = tile.GetComponent<GraveyardTileHover>();
+            if (hover == null) hover = tile.AddComponent<GraveyardTileHover>();
+            hover.card = entry.cardObject;
 
             if (!revivalPending) continue;
 
