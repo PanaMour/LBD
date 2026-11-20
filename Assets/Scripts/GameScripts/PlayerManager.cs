@@ -155,6 +155,14 @@ public class PlayerManager : NetworkBehaviour
     {
         if (card == null) return;
         Debug.Log("The host refused that play; the card returns to your hand.");
+        ReturnCardToHandLocal(card);
+    }
+
+    // Puts a card that was on its way to the field back into this player's
+    // hand and drops any follow-up targeting (refused play, or a summon left
+    // unfinished when the turn ended).
+    void ReturnCardToHandLocal(GameObject card)
+    {
 
         GameObject handAnchor = GameObject.Find("Hand_Anchor");
         if (handAnchor != null)
@@ -1837,6 +1845,13 @@ public class PlayerManager : NetworkBehaviour
         }
 
         nomoresummons = false;
+
+        // Clear anything left half-done from the turn that just ended: a
+        // selected monster's green squares, red attack targets, or a summon
+        // that never got its square (that card goes back to the hand).
+        if (pm.tempCard != null) pm.ReturnCardToHandLocal(pm.tempCard);
+        GridBehavior selectionGrid = FindGridBehavior();
+        if (selectionGrid != null) selectionGrid.ClearSelection();
     }
 
     [Command]

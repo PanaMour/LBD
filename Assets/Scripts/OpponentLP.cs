@@ -18,18 +18,15 @@ public class OpponentLP : NetworkBehaviour
         staticLP = 4000;
         Health = transform.GetComponent<Image>();
         LpText = GameObject.Find("OpponentLPtext").GetComponent<Text>();
+        feedback = new LPFeedback((RectTransform)transform, Health, LpText, staticLP);
     }
+
+    // Smooth count, "-800"/"+200" popup and damage shake (see LPFeedback).
+    LPFeedback feedback;
 
     void Update()
     {
         LP = staticLP;
-        Health.fillAmount = Mathf.Max(0f, LP) / maxLP;
-
-        if (LP >= maxLP)
-        {
-            //LP = maxLP;
-        }
-
-        LpText.text = Mathf.Max(0f, LP) + " LP";
+        if (feedback != null) feedback.Tick(LP, maxLP);
     }
 }

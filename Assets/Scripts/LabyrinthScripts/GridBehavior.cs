@@ -857,6 +857,21 @@ public class GridBehavior : MonoBehaviour
         }
     }
 
+    // Turn change: drop any monster selection and clear every move, attack
+    // and summon highlight still showing from the turn that just ended.
+    public void ClearSelection()
+    {
+        objectToMove = null;
+        cardWaitingToSpawn = null;
+        foreach (GameObject tile in gridArray)
+        {
+            if (tile == null) continue;
+            LabyrinthTile lt = tile.GetComponent<LabyrinthTile>();
+            if (lt != null && (lt.isHighlighted || lt.isAttackTarget)) lt.StopGlowBlock();
+        }
+        ResetTileColors();
+    }
+
     // A refused summon: stop waiting for a summon square.
     public void CancelSummonZone()
     {

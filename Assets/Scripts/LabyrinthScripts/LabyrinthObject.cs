@@ -253,6 +253,16 @@ public class LabyrinthObject : NetworkBehaviour
         }
     }
 
+    // Hovering a monster on the board shows its card in the zoom panel, the
+    // same as hovering the card itself (opponent's monsters are face-up once
+    // on the field, so their cards show too).
+    void OnMouseEnter()
+    {
+        if (card == null) return;
+        CardZoom zoom = card.GetComponent<CardZoom>();
+        if (zoom != null) zoom.OnHoverEnter();
+    }
+
     public void ObjectToMove()
     {
         if (!hasAuthority) return;
@@ -502,6 +512,7 @@ public class LabyrinthObject : NetworkBehaviour
                 waitingToAttack = false;
                 ResetGridColors();
 
+                ServerShowBattle(targetObj, myAtk, enemyIsAttackMode ? enemyAtk : enemyDef, !enemyIsAttackMode, BattleAnimation.Negated);
                 return;
             }
         }
@@ -509,6 +520,18 @@ public class LabyrinthObject : NetworkBehaviour
         hasMovedThisTurn = true;
         waitingToAttack = false;
         ResetGridColors();
+
+        // Show the fight on both screens before the loser is removed below
+        // (the message arrives ahead of the destroy, so both monsters still
+        // exist when the animation copies them).
+        int defenderValue = enemyIsAttackMode ? enemyAtk : enemyDef;
+        int battleResult;
+        if (enemyIsAttackMode)
+            battleResult = myAtk > enemyAtk ? BattleAnimation.DefenderDies
+                : myAtk < enemyAtk ? BattleAnimation.AttackerDies : BattleAnimation.BothDie;
+        else
+            battleResult = myAtk > enemyDef ? BattleAnimation.DefenderDies : BattleAnimation.NobodyDies;
+        ServerShowBattle(targetObj, myAtk, defenderValue, !enemyIsAttackMode, battleResult);
 
         if (enemyIsAttackMode)
         {
@@ -609,6 +632,27 @@ public class LabyrinthObject : NetworkBehaviour
         enemyCard.battleDefPenalty = 0;
         enemyCard.RecalculateStats();
         pm.RpcResetDemonLadyShred(targetScript.card);
+    }
+
+    // The host's own screen plays the battle right away: a ClientRpc reaches
+    // the host's local client a tick later, after the loser is already gone.
+    void ServerShowBattle(GameObject defender, int attackerValue, int defenderValue, bool defenderInDefense, int result)
+    {
+        if (NetworkClient.active)
+            BattleAnimation.Play(this, defender.GetComponent<LabyrinthObject>(), attackerValue, defenderValue, defenderInDefense, result);
+        RpcPlayBattle(defender.GetComponent<NetworkIdentity>().netId, attackerValue, defenderValue, defenderInDefense, result);
+    }
+
+    // Sent as a netId rather than a GameObject: on the host the defender may
+    // already be gone when this arrives, and a plain id avoids a lookup warning.
+    [ClientRpc]
+    void RpcPlayBattle(uint defenderNetId, int attackerValue, int defenderValue, bool defenderInDefense, int result)
+    {
+        if (isServer) return; // the host already played it (ServerShowBattle)
+        NetworkIdentity defender;
+        NetworkIdentity.spawned.TryGetValue(defenderNetId, out defender);
+        BattleAnimation.Play(this, defender != null ? defender.GetComponent<LabyrinthObject>() : null,
+            attackerValue, defenderValue, defenderInDefense, result);
     }
 
     // Spooky Man: "When this card is destroyed by battle you can revive one
