@@ -643,6 +643,21 @@ public class LabyrinthObject : NetworkBehaviour
         RpcPlayBattle(defender.GetComponent<NetworkIdentity>().netId, attackerValue, defenderValue, defenderInDefense, result);
     }
 
+    // Direct attack: same idea as ServerShowBattle -- the host plays it at
+    // once, everyone else gets it by message.
+    void ServerShowDirectAttack(string baseTileName, int attackerValue)
+    {
+        if (NetworkClient.active) BattleAnimation.PlayDirect(this, baseTileName, attackerValue);
+        RpcPlayDirectAttack(baseTileName, attackerValue);
+    }
+
+    [ClientRpc]
+    void RpcPlayDirectAttack(string baseTileName, int attackerValue)
+    {
+        if (isServer) return; // the host already played it
+        BattleAnimation.PlayDirect(this, baseTileName, attackerValue);
+    }
+
     // Sent as a netId rather than a GameObject: on the host the defender may
     // already be gone when this arrives, and a plain id avoids a lookup warning.
     [ClientRpc]
@@ -684,6 +699,11 @@ public class LabyrinthObject : NetworkBehaviour
             hasMovedThisTurn = true;
             hasAttackedThisTurn = true;
             int damage = myCard.actualATK;
+
+            // Show the charge into the opponent's base on both screens first,
+            // so the LP popup can wait for the moment of impact.
+            var baseTiles = gb.AttackableBaseTiles(this);
+            ServerShowDirectAttack(baseTiles.Count > 0 ? baseTiles[0].name : null, damage);
 
             // Already on the server: send the LP change directly. Calling the
             // Cmd from here only worked for the host's own monsters.

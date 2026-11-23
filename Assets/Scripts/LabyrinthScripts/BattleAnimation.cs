@@ -158,6 +158,98 @@ public class BattleAnimation : MonoBehaviour
         Destroy(gameObject);
     }
 
+    // ---- direct attack: charge into the opponent's Card Base ----
+
+    const float ChargeTime = 0.35f;
+    const float ImpactTime = 0.25f;
+    const float SpringBackTime = 0.3f;
+    const float SettleTime = 0.4f;
+
+    public static void PlayDirect(LabyrinthObject attacker, string baseTileName, int attackerValue)
+    {
+        if (attacker == null) return;
+        BattleAnimation anim = new GameObject("DirectAttackAnimation").AddComponent<BattleAnimation>();
+        anim.StartCoroutine(anim.RunDirect(attacker, baseTileName, attackerValue));
+    }
+
+    IEnumerator RunDirect(LabyrinthObject attackerObj, string baseTileName, int attackerValue)
+    {
+        Fighter attacker = MakeFighter(attackerObj);
+        GameObject tile = string.IsNullOrEmpty(baseTileName) ? null : GameObject.Find(baseTileName);
+        Vector3 target = tile != null ? tile.transform.position : attacker.home;
+        target.y = attacker.home.y;
+        Vector3 toTarget = (target - attacker.home) * 0.85f;
+
+        attackerLabel = MakeLabel(Colored("ATK " + attackerValue, AttackColor));
+        defenderTop = target + Vector3.up * (attacker.height * Grow + LabelLift);
+
+        ActiveBeforeImpact++;
+        bool impactDone = false;
+        try
+        {
+            // 1. Grow and charge into the base square.
+            for (float t = 0f; t < ChargeTime; t += Time.deltaTime)
+            {
+                float k = t / ChargeTime;
+                SetScale(attacker, Mathf.Lerp(1f, Grow, k));
+                FollowAttacker(attacker, attacker.home + toTarget * k * k);
+                yield return null;
+            }
+            ActiveBeforeImpact--;
+            impactDone = true;
+
+            // 2. Impact: "DIRECT HIT!" bursts out at the base (the LP popup
+            // lands now too) and the attacker shudders against it.
+            defenderLabel = MakeLabel(Colored("DIRECT HIT!", EnemyAttackColor));
+            if (defenderLabel != null) defenderLabel.fontSize = 46;
+            for (float t = 0f; t < ImpactTime; t += Time.deltaTime)
+            {
+                float k = t / ImpactTime;
+                float shake = 0.06f * (1f - k);
+                FollowAttacker(attacker, attacker.home + toTarget + new Vector3(Random.Range(-shake, shake), 0f, Random.Range(-shake, shake)));
+                if (defenderLabel != null) defenderLabel.transform.localScale = Vector3.one * Mathf.Lerp(1.6f, 1f, k);
+                yield return null;
+            }
+
+            // 3. Spring back to its own square.
+            for (float t = 0f; t < SpringBackTime; t += Time.deltaTime)
+            {
+                float k = t / SpringBackTime;
+                FollowAttacker(attacker, attacker.home + toTarget * (1f - k * (2f - k)));
+                yield return null;
+            }
+            FollowAttacker(attacker, attacker.home);
+
+            // 4. Settle back to normal size while the labels fade.
+            for (float t = 0f; t < SettleTime; t += Time.deltaTime)
+            {
+                float k = t / SettleTime;
+                SetScale(attacker, Mathf.Lerp(Grow, 1f, k));
+                Fade(attackerLabel, 1f - k);
+                Fade(defenderLabel, 1f - k);
+                PlaceLabels();
+                yield return null;
+            }
+        }
+        finally
+        {
+            if (!impactDone) ActiveBeforeImpact--;
+            Cleanup(attacker);
+            if (attackerLabel != null) Destroy(attackerLabel.gameObject);
+            if (defenderLabel != null) Destroy(defenderLabel.gameObject);
+        }
+        Destroy(gameObject);
+    }
+
+    // Moves the attacker's copy and keeps its number just above it.
+    void FollowAttacker(Fighter f, Vector3 position)
+    {
+        Place(f, position);
+        float scale = f.ghost != null && f.baseScale.y > 0f ? f.ghost.localScale.y / f.baseScale.y : 1f;
+        attackerTop = position + Vector3.up * (f.height * scale + LabelLift);
+        PlaceLabels();
+    }
+
     // Hide the real model and work on a copy of it in its exact place.
     static Fighter MakeFighter(LabyrinthObject monster)
     {
