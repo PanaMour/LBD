@@ -229,6 +229,8 @@ public class PlayerManager : NetworkBehaviour
     public override void OnStartClient()
     {
         base.OnStartClient();
+        // The host sees the other player arrive: they move first.
+        if (!isLocalPlayer && NetworkServer.active) TurnBanner.Show(false);
 
         Canvas = GameObject.Find("Main Canvas");
         GameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
@@ -763,6 +765,7 @@ public class PlayerManager : NetworkBehaviour
     {
         base.OnStartLocalPlayer();
         MainMenuController.RejoinAddress = null; // joined: a pending rematch rejoin is done
+        if (isClientOnly) TurnBanner.Show(true); // the joining player moves first
         WaitingForTrapAnswer = false; // a new match never starts frozen
         if (isClientOnly) CmdRequestMazeLayout();
     }
@@ -847,7 +850,7 @@ public class PlayerManager : NetworkBehaviour
 
             bool mine = monster.connectionToClient == connectionToClient;
             RpcShowCard(monster.card, mine ? "PlayerDestroyed" : "OpponentDestroyed", 0);
-            NetworkServer.Destroy(monster.gameObject);
+            monster.ServerDestroyWithVanish();
         }
     }
 
@@ -1176,7 +1179,7 @@ public class PlayerManager : NetworkBehaviour
         {
             if (lo.card == frostWraithCard)
             {
-                NetworkServer.Destroy(lo.gameObject);
+                lo.ServerDestroyWithVanish();
                 break;
             }
         }
@@ -1222,7 +1225,7 @@ public class PlayerManager : NetworkBehaviour
         {
             if (lo.card == spiritCard)
             {
-                NetworkServer.Destroy(lo.gameObject);
+                lo.ServerDestroyWithVanish();
                 break;
             }
         }
@@ -1478,6 +1481,8 @@ public class PlayerManager : NetworkBehaviour
         }
         else if (type == "Played")
         {
+            if (card.GetComponent<ThisMagic>() != null) SoundFX.Play("spell");
+            else if (card.GetComponent<ThisAction>() != null) SoundFX.Play("card_set", 0.7f);
             Transform targetSocket = null;
 
             if (hasAuthority)
@@ -1807,6 +1812,7 @@ public class PlayerManager : NetworkBehaviour
         }
         PlayerManager pm = NetworkClient.connection.identity.GetComponent<PlayerManager>();
         pm.IsMyTurn = pm.isServer ? hostHasTurn : !hostHasTurn;
+        TurnBanner.Show(pm.IsMyTurn);
         pm.hasDrawnThisTurn = false;
 
         sprintBoostActive = false;
@@ -2330,7 +2336,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDestroyToken(GameObject token)
     {
-        NetworkServer.Destroy(token);
+        // Only a player's own monster (a tributed one whose card just went to
+        // the Graveyard) can be removed this way.
+        if (token == null || !OwnedByCaller(token)) return;
+        LabyrinthObject monster = token.GetComponent<LabyrinthObject>();
+        if (monster != null) monster.ServerDestroyWithVanish();
+        else NetworkServer.Destroy(token);
     }
 
     [System.Serializable]
@@ -2789,8 +2800,8 @@ public class PlayerManager : NetworkBehaviour
                 }
                 else
                 {
-                    NetworkServer.Destroy(targetMonster);
                     RpcShowCard(monsterScript.card, "OpponentDestroyed", 0);
+                    monsterScript.ServerDestroyWithVanish();
                 }
                 break;
 
@@ -2934,7 +2945,9 @@ public class PlayerManager : NetworkBehaviour
         string turn = ServerTurnProblem();
         if (turn != null) return turn;
         if (!OwnedByCaller(magicCard)) return "not this player's card";
-        if (magic.beInGraveyard || serverResolvedMagic.Contains(magicCard.GetComponent<NetworkIdentity>().netId)) return "that card was already used";
+        // The host's own record of used spells (a card's beInGraveyard flag is
+        // set locally on each screen and isn't reliable here).
+        if (serverResolvedMagic.Contains(magicCard.GetComponent<NetworkIdentity>().netId)) return "that card was already used";
 
         bool isEnemy = target.connectionToClient != connectionToClient;
         switch (magic.targetType)

@@ -77,6 +77,7 @@ public class BattleAnimation : MonoBehaviour
         Vector3 toDefender = defender.home - attacker.home;
         ActiveBeforeImpact++;
         bool impactDone = false;
+        SoundFX.Play("whoosh");
         try
         {
             // 1. Both grow, and the attacker lunges most of the way in.
@@ -92,6 +93,7 @@ public class BattleAnimation : MonoBehaviour
             }
             ActiveBeforeImpact--;
             impactDone = true;
+            SoundFX.Play(result == Negated ? "block" : "impact");
 
             // 2. Impact: the loser's number greys out, the defender shakes and
             // flares, and the attacker pulls back.
@@ -122,6 +124,7 @@ public class BattleAnimation : MonoBehaviour
             if (defenderLabel != null) defenderLabel.transform.localScale = Vector3.one;
 
             // 3. Losers shrink and sink away.
+            if (attacker.loses || defender.loses) SoundFX.Play("destroy");
             for (float t = 0f; t < VanishTime; t += Time.deltaTime)
             {
                 float k = t / VanishTime;
@@ -158,6 +161,42 @@ public class BattleAnimation : MonoBehaviour
         Destroy(gameObject);
     }
 
+    // ---- removed by an effect (spell, trap, tribute, fire): spin and shrink away ----
+
+    const float VanishSpinTime = 0.6f;
+
+    public static void PlayVanish(LabyrinthObject monster)
+    {
+        if (monster == null || monster.current3DModel == null) return;
+        BattleAnimation anim = new GameObject("VanishAnimation").AddComponent<BattleAnimation>();
+        anim.StartCoroutine(anim.RunVanish(monster));
+    }
+
+    IEnumerator RunVanish(LabyrinthObject monster)
+    {
+        Fighter f = MakeFighter(monster);
+        f.loses = true; // never give the real model back: the monster is being removed
+        SoundFX.Play("vanish");
+        try
+        {
+            for (float t = 0f; t < VanishSpinTime; t += Time.deltaTime)
+            {
+                float k = t / VanishSpinTime;
+                // a quick swell, then spin down to nothing while rising slightly
+                float scale = k < 0.2f ? Mathf.Lerp(1f, 1.25f, k / 0.2f) : Mathf.Lerp(1.25f, 0f, (k - 0.2f) / 0.8f);
+                SetScale(f, scale);
+                if (f.ghost != null) f.ghost.Rotate(Vector3.up, 900f * Time.deltaTime, Space.World);
+                Place(f, f.home + Vector3.up * f.height * 0.4f * k);
+                yield return null;
+            }
+        }
+        finally
+        {
+            Cleanup(f);
+        }
+        Destroy(gameObject);
+    }
+
     // ---- direct attack: charge into the opponent's Card Base ----
 
     const float ChargeTime = 0.35f;
@@ -185,6 +224,7 @@ public class BattleAnimation : MonoBehaviour
 
         ActiveBeforeImpact++;
         bool impactDone = false;
+        SoundFX.Play("whoosh");
         try
         {
             // 1. Grow and charge into the base square.
@@ -197,6 +237,8 @@ public class BattleAnimation : MonoBehaviour
             }
             ActiveBeforeImpact--;
             impactDone = true;
+
+            SoundFX.Play("direct_hit", 0.55f);
 
             // 2. Impact: "DIRECT HIT!" bursts out at the base (the LP popup
             // lands now too) and the attacker shudders against it.

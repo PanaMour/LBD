@@ -219,7 +219,10 @@ public class ThisMagic : NetworkBehaviour
                 HandleSpellEffects();
             }
 
-            if (activated == true && PlayerManager != null && PlayerManager.IsMyTurn == false && beInGraveyard == false && equip == false)
+            // Owner's copy only: on the other screen IsMyTurn is the *viewer's*
+            // turn, and this used to mark the opponent's spell as used the moment
+            // they played it.
+            if (hasAuthority && activated == true && PlayerManager != null && PlayerManager.IsMyTurn == false && beInGraveyard == false && equip == false)
             {
                 activationcomplete = true;
                 StartCoroutine(SmoothDestruction(2));

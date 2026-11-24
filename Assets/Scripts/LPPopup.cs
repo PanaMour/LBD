@@ -19,6 +19,9 @@ public class LPPopup : MonoBehaviour
     public static void Spawn(RectTransform circle, Text style, int delta)
     {
         if (delta == 0 || circle == null) return;
+        // the heal chime is naturally brighter, so it plays at half the damage tone's volume
+        if (delta < 0) SoundFX.Play("damage", 0.8f);
+        else SoundFX.Play("heal", 0.4f);
         Canvas canvas = circle.GetComponentInParent<Canvas>();
         if (canvas == null) return;
         RectTransform root = (RectTransform)canvas.rootCanvas.transform;

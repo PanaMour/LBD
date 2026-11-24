@@ -64,13 +64,21 @@ public class LabyrinthObject : NetworkBehaviour
         if (!string.IsNullOrEmpty(currentTileName)) StartCoroutine(WaitForTileAndSnap(currentTileName));
     }
 
+    // Which monster id the current model was built for: this can be called
+    // more than once for the same id (spawn + hook), and rebuilding the model
+    // then would cut its drop-in animation short.
+    int builtModelId;
+
     void OnMonsterIDChanged(int oldID, int newID)
     {
+        if (current3DModel != null && builtModelId == newID) return;
+
         Card cardData = newID > 0 ? CardDataBase.GetCard(newID) : null;
         if (cardData != null)
         {
 
             if (current3DModel != null) Destroy(current3DModel);
+            builtModelId = newID;
 
             if (cardData.modelPrefab != null)
             {
@@ -141,6 +149,12 @@ public class LabyrinthObject : NetworkBehaviour
 
         if (targetTileTransform != null)
         {
+            // Where the model was drawn before this snap: a monster already on
+            // a square hops to the new one; a brand-new one pops in.
+            Transform previousTile = transform.parent;
+            bool wasOnBoard = previousTile != null && previousTile.GetComponent<GridStat>() != null;
+            Vector3 modelWasAt = current3DModel != null ? current3DModel.transform.position : transform.position;
+
             transform.SetParent(targetTileTransform, true);
             transform.localPosition = new Vector3(0, 0.55f, 0);
 
@@ -157,7 +171,8 @@ public class LabyrinthObject : NetworkBehaviour
                     PlayerManager pm = owner.identity.GetComponent<PlayerManager>();
                     pm.RpcShowCard(this.card, "PlayerDestroyed", 0);
                     pm.RpcResetTileColor(targetTileTransform.name); // the trap is used up
-                    NetworkServer.Destroy(this.gameObject);
+                    ServerDestroyWithVanish();
+                    yield break;
                 }
             }
 
@@ -173,6 +188,18 @@ public class LabyrinthObject : NetworkBehaviour
             }
 
             AdjustSize();
+
+            // A repeat snap to the same square (a new monster is snapped twice
+            // on arrival) must not cut its drop-in short.
+            bool actuallyMoved = !wasOnBoard || previousTile != targetTileTransform;
+            if (current3DModel != null && actuallyMoved)
+            {
+                if (moveEffect != null) StopCoroutine(moveEffect);
+                current3DModel.transform.localPosition = ModelRestPosition;
+                current3DModel.transform.localScale = Vector3.one;
+                moveEffect = StartCoroutine(wasOnBoard ? HopModel(modelWasAt) : PopInModel());
+            }
+
             yield return new WaitForEndOfFrame();
 
             if (hasAuthority && hasMovedThisTurn)
@@ -180,6 +207,80 @@ public class LabyrinthObject : NetworkBehaviour
                 CheckSurroundingsForEnemies();
             }
         }
+    }
+
+    // ---- board effects (purely visual) ----
+
+    static readonly Vector3 ModelRestPosition = new Vector3(0f, 0f, -0.45f); // as set in OnMonsterIDChanged
+    Coroutine moveEffect;
+
+    // A newly summoned monster drops onto its square from above, growing as it
+    // falls, then lands with a bounce.
+    IEnumerator PopInModel()
+    {
+        Transform model = current3DModel != null ? current3DModel.transform : null;
+        const float DropTime = 0.35f;
+        const float LandTime = 0.25f;
+        const float DropHeight = 1.5f;
+
+        for (float t = 0f; t < DropTime && model != null; t += Time.deltaTime)
+        {
+            float k = t / DropTime;
+            Vector3 rest = model.parent.TransformPoint(ModelRestPosition);
+            model.position = rest + Vector3.up * DropHeight * (1f - k * k); // falls faster as it goes
+            model.localScale = Vector3.one * Mathf.Lerp(0.2f, 1f, k);
+            yield return null;
+        }
+        if (model != null) model.localPosition = ModelRestPosition;
+        if (model != null) SoundFX.Play("summon");
+
+        for (float t = 0f; t < LandTime && model != null; t += Time.deltaTime)
+        {
+            float k = t / LandTime;
+            model.localScale = Vector3.one * (1f + 0.3f * Mathf.Sin(Mathf.PI * k) * (1f - k)); // landing bump
+            yield return null;
+        }
+        if (model != null) model.localScale = Vector3.one;
+        moveEffect = null;
+    }
+
+    // A monster that changed squares hops there in an arc instead of jumping.
+    IEnumerator HopModel(Vector3 from)
+    {
+        Transform model = current3DModel != null ? current3DModel.transform : null;
+        if (model == null) yield break;
+        Vector3 to = model.parent.TransformPoint(ModelRestPosition);
+        float distance = Vector3.Distance(from, to);
+        if (distance < 0.01f) { moveEffect = null; yield break; }
+        float time = Mathf.Clamp(0.15f + distance * 0.06f, 0.2f, 0.5f);
+        SoundFX.Play("hop", 0.7f);
+        float height = Mathf.Clamp(distance * 0.3f, 0.2f, 1.2f);
+        for (float t = 0f; t < time && model != null; t += Time.deltaTime)
+        {
+            float k = t / time;
+            to = model.parent.TransformPoint(ModelRestPosition);
+            model.position = Vector3.Lerp(from, to, k) + Vector3.up * height * 4f * k * (1f - k);
+            yield return null;
+        }
+        if (model != null) model.localPosition = ModelRestPosition;
+        moveEffect = null;
+    }
+
+    // Server: remove this monster with a spin-and-shrink on every screen.
+    // For effects (spells, traps, tributes, fire); battles have their own animation.
+    public void ServerDestroyWithVanish()
+    {
+        if (!NetworkServer.active) return;
+        if (NetworkClient.active) BattleAnimation.PlayVanish(this);
+        RpcPlayVanish();
+        NetworkServer.Destroy(gameObject);
+    }
+
+    [ClientRpc]
+    void RpcPlayVanish()
+    {
+        if (isServer) return; // the host already played it
+        BattleAnimation.PlayVanish(this);
     }
 
     void CheckSurroundingsForEnemies()
