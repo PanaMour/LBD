@@ -49,6 +49,13 @@ public class PlayerManager : NetworkBehaviour
     // trap: every input (moves, attacks, card plays, menus, End Turn) waits.
     public static bool WaitingForTrapAnswer = false;
 
+    // The computer-controlled player (CPU mode): a player on the host with no
+    // real connection behind it. Its actions go through the same Server*
+    // methods (and rule checks) a real player's commands use.
+    public bool IsCpu => connectionToClient is BotConnectionToClient;
+    public bool ServerHasDealtHand => serverDealtHand;
+    public static bool IsCardOnField(GameObject card) => CardOnField(card);
+
     // ---- Server-side rule checks for card plays ----------------------------
     // Each player's screen already checks these; the host checks them again
     // so a lagging or out-of-date client can't summon twice, play out of turn,
@@ -239,6 +246,9 @@ public class PlayerManager : NetworkBehaviour
 
         PlayerArea = GameObject.Find("Hand_Anchor");
         EnemyArea = GameObject.Find("EnemyArea");
+        // The opponent's hand: spread out along the top of the screen like
+        // your own hand is along the bottom.
+        if (EnemyArea != null && EnemyArea.GetComponent<HandLayout>() == null) EnemyArea.AddComponent<HandLayout>();
         PlayerYard = GameObject.Find("PlayerYard");
         EnemyYard = GameObject.Find("EnemyYard");
 
@@ -752,6 +762,7 @@ public class PlayerManager : NetworkBehaviour
             serverHostHasTurn = false;
             serverTurnNumber = 0;
             ServerResetMatchBookkeeping();
+            if (CpuPlayer.Requested) StartCoroutine(CpuPlayer.SpawnWhenReady());
             treasureRespawnCountdown = 0;
             UIManager.treasureCountdown = 0;
             ServerSpawnTreasure();
@@ -871,6 +882,13 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDealCards()
     {
+        ServerDealOpeningHand();
+    }
+
+    // Server-side draw actions (the commands above/below, and the CPU player).
+    public void ServerDealOpeningHand()
+    {
+        if (!NetworkServer.active) return;
         if (ServerReject("Opening hand", ServerTurnProblem() ?? (serverDealtHand || serverDrewThisTurn ? "already drawn" : null))) return;
         serverDealtHand = true;
         serverDrewThisTurn = true;
@@ -881,6 +899,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdDrawCard()
     {
+        ServerDrawCard();
+    }
+
+    public void ServerDrawCard()
+    {
+        if (!NetworkServer.active) return;
         if (ServerReject("Draw", ServerTurnProblem() ?? (serverDrewThisTurn ? "already drew this turn" : null))) return;
         serverDrewThisTurn = true;
         StartCoroutine(DrawCard());
@@ -1377,6 +1401,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdPlayCard(GameObject card, int index)
     {
+        ServerPlayCard(card, index);
+    }
+
+    public void ServerPlayCard(GameObject card, int index)
+    {
+        if (!NetworkServer.active) return;
         if (card == null || !OwnedByCaller(card)) return;
         if (card.GetComponent<ThisCard>() != null)
         {
@@ -1404,6 +1434,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdPlayerDestroyCard(GameObject card, int index)
     {
+        ServerDestroyOwnCard(card, index);
+    }
+
+    public void ServerDestroyOwnCard(GameObject card, int index)
+    {
+        if (!NetworkServer.active) return;
         if (card == null || !OwnedByCaller(card)) return;
         // Sending your own monster on the field to the Graveyard is a
         // tribute: it pays for one 5+ star summon this turn.
@@ -1466,7 +1502,7 @@ public class PlayerManager : NetworkBehaviour
                 {
                     card.transform.SetParent(EnemyArea.transform);
                     card.transform.localPosition = new Vector3(index * 0.1f, 0, 0);
-                    card.transform.localScale = new Vector3(0.01f, 0.01f, 0.01f);
+                    card.transform.localScale = new Vector3(0.001f, 0.001f, 0.001f); // same size as your own hand
 
                     if (card.GetComponent<ThisCard>() != null)
                         card.GetComponent<ThisCard>().cardBack = true;
@@ -1716,6 +1752,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdChangeTurn()
     {
+        ServerEndTurn();
+    }
+
+    public void ServerEndTurn()
+    {
+        if (!NetworkServer.active) return;
         if (GameManager.IsGameOver) return;
         if (LabyrinthObject.AnyAttackAwaitingTrap()) { Debug.Log("[SERVER] End Turn ignored: an attack is waiting on a trap answer."); return; }
         bool callerIsHost = connectionToClient == NetworkServer.localConnection;
@@ -1934,15 +1976,22 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdSpawnMonster(int id, string tileName, NetworkIdentity cardNetId)
     {
-        ThisCard card = cardNetId != null ? cardNetId.GetComponent<ThisCard>() : null;
+        ServerTrySummon(cardNetId != null ? cardNetId.GetComponent<ThisCard>() : null, tileName);
+    }
+
+    // Server-side summon with all the rule checks; true if it happened.
+    public bool ServerTrySummon(ThisCard card, string tileName)
+    {
+        if (!NetworkServer.active) return false;
         if (ServerReject("Summon", SummonProblem(card, tileName)))
         {
-            if (card != null && OwnedByCaller(card.gameObject)) TargetReturnToHand(connectionToClient, card.gameObject);
-            return;
+            if (card != null && OwnedByCaller(card.gameObject) && !IsCpu) TargetReturnToHand(connectionToClient, card.gameObject);
+            return false;
         }
         if (card.stars >= 5) serverTributeCredit--;
         serverSummonsThisTurn++;
-        ServerSpawnMonster(card.thisId, tileName, cardNetId); // the card's own id, not the one sent
+        ServerSpawnMonster(card.thisId, tileName, card.GetComponent<NetworkIdentity>()); // the card's own id
+        return true;
     }
 
     string SummonProblem(ThisCard card, string tileName)

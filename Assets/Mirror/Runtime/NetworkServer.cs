@@ -273,7 +273,7 @@ namespace Mirror
                     foreach (KeyValuePair<int, NetworkConnection> kvp in identity.observers)
                     {
                         // use local connection directly because it doesn't send via transport
-                        if (kvp.Value is ULocalConnectionToClient)
+                        if (kvp.Value is ULocalConnectionToClient || kvp.Value is BotConnectionToClient) // [CardGameDemo] CPU player: dropped by its own Send
                             kvp.Value.Send(segment);
                         // gather all internet connections
                         else
@@ -331,7 +331,7 @@ namespace Mirror
                     count++;
 
                     // use local connection directly because it doesn't send via transport
-                    if (kvp.Value is ULocalConnectionToClient)
+                    if (kvp.Value is ULocalConnectionToClient || kvp.Value is BotConnectionToClient) // [CardGameDemo] CPU player: dropped by its own Send
                         result &= kvp.Value.Send(segment);
                     // gather all internet connections
                     else
@@ -406,7 +406,7 @@ namespace Mirror
                             count++;
 
                             // use local connection directly because it doesn't send via transport
-                            if (kvp.Value is ULocalConnectionToClient)
+                            if (kvp.Value is ULocalConnectionToClient || kvp.Value is BotConnectionToClient) // [CardGameDemo] CPU player: dropped by its own Send
                                 result &= kvp.Value.Send(segment);
                             // gather all internet connections
                             else

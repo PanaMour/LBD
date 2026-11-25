@@ -859,6 +859,60 @@ public class GridBehavior : MonoBehaviour
 
     // Turn change: drop any monster selection and clear every move, attack
     // and summon highlight still showing from the turn that just ended.
+    // ---- helpers for the CPU player (server side) ----
+
+    // Squares this monster could walk to this turn, with how many steps each
+    // takes: through open passages (any wall with Wallwalk), never through an
+    // occupied square, never into the opponent's Card Base.
+    public Dictionary<GridStat, int> ReachableSquares(LabyrinthObject monster)
+    {
+        var result = new Dictionary<GridStat, int>();
+        GridStat start = monster != null ? monster.GetComponentInParent<GridStat>() : null;
+        if (start == null || gridArray == null) return result;
+
+        bool wallwalk = MonsterHasWallwalk(monster.gameObject);
+        int range = monster.moveRange;
+        var steps = new int[columns, rows];
+        for (int x = 0; x < columns; x++)
+            for (int y = 0; y < rows; y++)
+                steps[x, y] = -1;
+
+        var queue = new Queue<(int x, int y)>();
+        steps[start.x, start.y] = 0;
+        queue.Enqueue((start.x, start.y));
+        while (queue.Count > 0)
+        {
+            var (x, y) = queue.Dequeue();
+            if (steps[x, y] >= range) continue;
+            for (int d = 0; d < 4; d++)
+            {
+                int nx = x + StepDX[d], ny = y + StepDY[d];
+                if (!PathOpen(x, y, d, wallwalk)) continue; // also rejects off-board squares
+                if (steps[nx, ny] >= 0) continue;
+                GameObject tile = gridArray[nx, ny];
+                if (tile.GetComponentInChildren<LabyrinthObject>() != null) continue;
+                if (IsEnemyBaseSquare(monster, nx, ny)) continue;
+                steps[nx, ny] = steps[x, y] + 1;
+                result[tile.GetComponent<GridStat>()] = steps[nx, ny];
+                queue.Enqueue((nx, ny));
+            }
+        }
+        return result;
+    }
+
+    // Is the way between two neighbouring squares open for this monster?
+    public bool OpenBetween(LabyrinthObject monster, int x, int y, int nx, int ny)
+    {
+        int d = AdjacentDirection(x, y, nx, ny);
+        return d >= 0 && PathOpen(x, y, d, MonsterHasWallwalk(monster.gameObject));
+    }
+
+    public GridStat SquareAt(int x, int y)
+    {
+        if (gridArray == null || x < 0 || y < 0 || x >= columns || y >= rows || gridArray[x, y] == null) return null;
+        return gridArray[x, y].GetComponent<GridStat>();
+    }
+
     public void ClearSelection()
     {
         objectToMove = null;

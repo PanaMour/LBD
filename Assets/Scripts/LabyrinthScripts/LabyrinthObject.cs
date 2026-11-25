@@ -405,6 +405,14 @@ public class LabyrinthObject : NetworkBehaviour
     [Command]
     public void CmdMoveToTile(string tileName)
     {
+        ServerTryMove(tileName);
+    }
+
+    // Server-side versions of a player's monster actions (the commands, and
+    // the CPU player). Same rule checks either way.
+    public void ServerTryMove(string tileName)
+    {
+        if (!NetworkServer.active) return;
         // A normal move by the owner: once per turn, on their own turn, never
         // into the opponent's Card Base. (Effects that move monsters call
         // ServerMoveToTile directly and skip these checks.)
@@ -458,6 +466,12 @@ public class LabyrinthObject : NetworkBehaviour
     [Command]
     public void CmdAttackMonster(GameObject targetObj)
     {
+        ServerTryAttack(targetObj);
+    }
+
+    public void ServerTryAttack(GameObject targetObj)
+    {
+        if (!NetworkServer.active) return;
         LabyrinthObject targetScript = targetObj != null ? targetObj.GetComponent<LabyrinthObject>() : null;
         if (targetScript == null) return;
         if (!ServerMayAttack()) return;
@@ -522,7 +536,7 @@ public class LabyrinthObject : NetworkBehaviour
             }
         }
 
-        if (validTrap != null && defenderPM != null)
+        if (validTrap != null && defenderPM != null && !defenderPM.IsCpu)
         {
             Debug.Log("Valid Trap found! Pausing attack to ask defender...");
             awaitingTrapAnswer = true;
@@ -790,6 +804,12 @@ public class LabyrinthObject : NetworkBehaviour
     [Command]
     public void CmdDirectAttack()
     {
+        ServerTryDirectAttack();
+    }
+
+    public void ServerTryDirectAttack()
+    {
+        if (!NetworkServer.active) return;
         ThisCard myCard = card.GetComponent<ThisCard>();
         if (myCard == null) return;
         if (!ServerMayAttack()) return;

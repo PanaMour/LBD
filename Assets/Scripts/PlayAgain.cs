@@ -71,6 +71,18 @@ public class PlayAgain : MonoBehaviour
             ? NetworkClient.connection.identity.GetComponent<PlayerManager>()
             : null;
 
+        // Against the CPU there's nobody to ask: restart straight away
+        // (the menu hosts a new CPU game by itself).
+        if (CpuPlayer.Requested && NetworkServer.active && GameManager.IsGameOver)
+        {
+            if (rematchLabel != null) rematchLabel.text = "Starting rematch...";
+            PlayerLP.staticLP = 4000;
+            OpponentLP.staticLP = 4000;
+            MainMenuController.AutoHost = true;
+            NetworkManager.singleton.StopHost();
+            return;
+        }
+
         if (pm != null && GameManager.IsGameOver && OpponentPresent())
         {
             if (!askedForRematch)
@@ -103,6 +115,7 @@ public class PlayAgain : MonoBehaviour
     {
         MainMenuController.AutoHost = false;
         MainMenuController.RejoinAddress = null;
+        CpuPlayer.Requested = false;
         PlayerLP.staticLP = 4000;
         OpponentLP.staticLP = 4000;
 
