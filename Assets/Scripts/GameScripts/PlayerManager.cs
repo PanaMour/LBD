@@ -64,9 +64,17 @@ public class PlayerManager : NetworkBehaviour
     [System.NonSerialized] int serverTributeCredit;
     [System.NonSerialized] bool serverDrewThisTurn;
     [System.NonSerialized] bool serverDealtHand;
+    // Extra draws a draw spell (Pot of Greed, Labyrinth Lootbox) has granted
+    // this turn, on top of the normal once-per-turn draw.
+    [System.NonSerialized] int serverSpellDraws;
     static readonly HashSet<uint> serverCardsOnField = new HashSet<uint>();   // monster cards the host summoned
     static readonly HashSet<uint> serverResolvedMagic = new HashSet<uint>();  // magic cards already used
     static readonly HashSet<uint> serverPositionChanged = new HashSet<uint>(); // battle position switched this turn
+    // Labyrinth monsters just picked up from a treasure chest, waiting for
+    // their owner to place them: a free Special Summon, so they skip the
+    // once-per-turn and tribute rules. Only until the end of that turn, and
+    // not once the card has gone to the hand instead.
+    static readonly HashSet<uint> serverPickupSummons = new HashSet<uint>();
 
     static void ServerResetMatchBookkeeping()
     {
@@ -74,6 +82,7 @@ public class PlayerManager : NetworkBehaviour
         serverCardsOnField.Clear();
         serverResolvedMagic.Clear();
         serverPositionChanged.Clear();
+        serverPickupSummons.Clear();
     }
 
     // ---- Rematch: once both players ask, the host restarts its game and the
@@ -905,6 +914,12 @@ public class PlayerManager : NetworkBehaviour
     public void ServerDrawCard()
     {
         if (!NetworkServer.active) return;
+        if (serverDrewThisTurn && serverSpellDraws > 0 && ServerTurnProblem() == null)
+        {
+            serverSpellDraws--; // a draw spell's card
+            StartCoroutine(DrawCard());
+            return;
+        }
         if (ServerReject("Draw", ServerTurnProblem() ?? (serverDrewThisTurn ? "already drew this turn" : null))) return;
         serverDrewThisTurn = true;
         StartCoroutine(DrawCard());
@@ -1416,10 +1431,32 @@ public class PlayerManager : NetworkBehaviour
         }
         else if (ServerReject("Card play", ServerTurnProblem()))
         {
-            TargetReturnToHand(connectionToClient, card);
+            if (!IsCpu) TargetReturnToHand(connectionToClient, card);
             return;
         }
+        ThisMagic spell = card.GetComponent<ThisMagic>();
+        if (spell != null)
+        {
+            Magic data = MagicData(spell.thisId);
+            if (data != null && data.drawXcards > 0) serverSpellDraws += data.drawXcards;
+        }
         RpcShowCard(card, "Played",index);
+    }
+
+    public static Magic MagicData(int id)
+    {
+        foreach (Magic m in MagicDataBase.magicList) if (m.id == id) return m;
+        return null;
+    }
+
+    // A spell without a target has done its job: it goes to the Graveyard
+    // and can't be used again. (A player's own screen does this for their
+    // spells; the CPU has no screen.)
+    public void ServerFinishSpell(GameObject card)
+    {
+        if (!NetworkServer.active || card == null) return;
+        serverResolvedMagic.Add(card.GetComponent<NetworkIdentity>().netId);
+        RpcShowCard(card, "PlayerDestroyed", 0);
     }
 
     [Command]
@@ -1732,6 +1769,14 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdGMChangeLP(int playerLP,int opponentLP)
     {
+        ServerChangeLP(playerLP, opponentLP);
+    }
+
+    // Same convention as GameManager.ChangeLP: positive values are LP lost,
+    // first for the caster, second for their opponent.
+    public void ServerChangeLP(int playerLP, int opponentLP)
+    {
+        if (!NetworkServer.active) return;
         if (ServerReject("Life point change", ServerTurnProblem())) return;
         RpcGMChangeLP(playerLP, opponentLP);
     }
@@ -1769,6 +1814,7 @@ public class PlayerManager : NetworkBehaviour
         serverHostHasTurn = !serverHostHasTurn;
         serverTurnNumber++;
 
+        serverPickupSummons.Clear();
         PlayerManager[] allPlayers = FindObjectsOfType<PlayerManager>();
         foreach (PlayerManager player in allPlayers)
         {
@@ -1776,6 +1822,7 @@ public class PlayerManager : NetworkBehaviour
             player.serverSummonsThisTurn = 0;
             player.serverTributeCredit = 0;
             player.serverDrewThisTurn = false;
+            player.serverSpellDraws = 0;
 
             player.honeySnareActive = false; 
 
@@ -1905,6 +1952,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdChangeBattlePosition(GameObject card, bool ATKDEF)
     {
+        ServerChangeBattlePosition(card, ATKDEF);
+    }
+
+    public void ServerChangeBattlePosition(GameObject card, bool ATKDEF)
+    {
+        if (!NetworkServer.active || card == null) return;
         string why = ServerTurnProblem();
         if (why == null && (!OwnedByCaller(card) || !CardOnField(card))) why = "not this player's monster on the field";
         if (why == null && serverPositionChanged.Contains(card.GetComponent<NetworkIdentity>().netId)) why = "already changed position this turn";
@@ -1988,8 +2041,11 @@ public class PlayerManager : NetworkBehaviour
             if (card != null && OwnedByCaller(card.gameObject) && !IsCpu) TargetReturnToHand(connectionToClient, card.gameObject);
             return false;
         }
-        if (card.stars >= 5) serverTributeCredit--;
-        serverSummonsThisTurn++;
+        if (!serverPickupSummons.Remove(card.netId)) // a treasure pickup is free
+        {
+            if (card.stars >= 5) serverTributeCredit--;
+            serverSummonsThisTurn++;
+        }
         ServerSpawnMonster(card.thisId, tileName, card.GetComponent<NetworkIdentity>()); // the card's own id
         return true;
     }
@@ -2000,8 +2056,9 @@ public class PlayerManager : NetworkBehaviour
         if (turn != null) return turn;
         if (card == null || !OwnedByCaller(card.gameObject)) return "not this player's monster card";
         if (card.beInGraveyard || serverCardsOnField.Contains(card.netId)) return "that card is already played";
-        if (serverSummonsThisTurn >= 1) return "already summoned this turn";
-        if (card.stars >= 5 && serverTributeCredit <= 0) return "a 5+ star monster needs a tribute";
+        bool treasurePickup = serverPickupSummons.Contains(card.netId);
+        if (!treasurePickup && serverSummonsThisTurn >= 1) return "already summoned this turn";
+        if (!treasurePickup && card.stars >= 5 && serverTributeCredit <= 0) return "a 5+ star monster needs a tribute";
 
         GridBehavior gb = FindGridBehavior();
         Transform tile = gb != null ? gb.transform.Find(tileName) : null;
@@ -2682,9 +2739,15 @@ public class PlayerManager : NetworkBehaviour
         cardScript.thisId = cardId;
         NetworkServer.Spawn(cardObj, connectionToClient);
 
+        serverPickupSummons.Add(cardObj.GetComponent<NetworkIdentity>().netId);
+
         // Give the new card a moment to reach the owner's machine and fill its
         // stats from thisId before the owner starts summoning it.
         yield return new WaitForSeconds(0.1f);
+
+        // The CPU has no screen to pick a square on: it places it right away.
+        CpuPlayer cpu = GetComponent<CpuPlayer>();
+        if (cpu != null) { cpu.PlaceTreasureMonster(cardScript); yield break; }
 
         // The owner picks the Card Base square themselves, through the same
         // flow as a normal summon (their own slots, their own base row).
@@ -2727,6 +2790,16 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     void CmdPickupToHand(GameObject cardObj)
     {
+        if (cardObj == null || !OwnedByCaller(cardObj)) return;
+        ServerShowInHand(cardObj);
+    }
+
+    // A picked-up Labyrinth monster that couldn't be summoned goes to the hand,
+    // where it's a normal card from now on.
+    public void ServerShowInHand(GameObject cardObj)
+    {
+        if (!NetworkServer.active || cardObj == null) return;
+        serverPickupSummons.Remove(cardObj.GetComponent<NetworkIdentity>().netId);
         RpcShowCard(cardObj, "Dealt", 0);
     }
 
@@ -2811,6 +2884,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdExecuteMagicEffect(GameObject magicCard, GameObject targetMonster, int slotIndex)
     {
+        ServerExecuteMagicEffect(magicCard, targetMonster);
+    }
+
+    public void ServerExecuteMagicEffect(GameObject magicCard, GameObject targetMonster)
+    {
+        if (!NetworkServer.active || magicCard == null || targetMonster == null) return;
         ThisMagic magicScript = magicCard.GetComponent<ThisMagic>();
         LabyrinthObject monsterScript = targetMonster.GetComponent<LabyrinthObject>();
 
@@ -3355,6 +3434,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdAnswerTrapPrompt(bool wantsToActivate, GameObject trapCard, GameObject attacker, GameObject defender)
     {
+        ServerAnswerTrapPrompt(wantsToActivate, trapCard, attacker, defender);
+    }
+
+    public void ServerAnswerTrapPrompt(bool wantsToActivate, GameObject trapCard, GameObject attacker, GameObject defender)
+    {
+        if (!NetworkServer.active) return;
         // Each prompt is answered once: a double-click (or Decline after
         // cancelling Echo of Silence's discard) must not fight the battle twice.
         LabyrinthObject pausedAttacker = attacker != null ? attacker.GetComponent<LabyrinthObject>() : null;
@@ -3377,9 +3462,25 @@ public class PlayerManager : NetworkBehaviour
             // the player cancels the discard prompt instead of completing it.
             if (actionScript.id == 1) // Echo of Silence
             {
-                TargetStartDiscardForEcho(connectionToClient, trapCard, attacker, defender);
-                return; // still paused until the discard is chosen
+                CpuPlayer cpu = GetComponent<CpuPlayer>();
+                if (cpu == null)
+                {
+                    TargetStartDiscardForEcho(connectionToClient, trapCard, attacker, defender);
+                    return; // still paused until the discard is chosen
+                }
+                GameObject discard = cpu.ChooseDiscard();
+                if (discard != null)
+                {
+                    ServerResolveEchoOfSilence(discard, trapCard, attacker, defender);
+                    return;
+                }
+                wantsToActivate = false; // nothing to pay the cost with
             }
+        }
+
+        if (wantsToActivate)
+        {
+            ThisAction actionScript = trapScript;
             if (pausedAttacker != null) pausedAttacker.ServerEndTrapPause();
 
             RpcShowCard(trapCard, "Played", 0);
@@ -3446,6 +3547,12 @@ public class PlayerManager : NetworkBehaviour
     [Command]
     public void CmdResolveEchoOfSilence(GameObject discardedCard, GameObject trapCard, GameObject attacker, GameObject defender)
     {
+        ServerResolveEchoOfSilence(discardedCard, trapCard, attacker, defender);
+    }
+
+    public void ServerResolveEchoOfSilence(GameObject discardedCard, GameObject trapCard, GameObject attacker, GameObject defender)
+    {
+        if (!NetworkServer.active) return;
         LabyrinthObject pausedAttacker = attacker != null ? attacker.GetComponent<LabyrinthObject>() : null;
         if (pausedAttacker == null || !pausedAttacker.awaitingTrapAnswer || discardedCard == null) return;
         pausedAttacker.ServerEndTrapPause();

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using Mirror;
 using System.Collections;
+using System.Collections.Generic;
 
 public class LabyrinthObject : NetworkBehaviour
 {
@@ -506,7 +507,8 @@ public class LabyrinthObject : NetworkBehaviour
         if (!targetScript.attackMode && myCard.actualATK > predictedDef) willDefenderDie = true;
 
 
-        GameObject validTrap = null;
+        // Every set trap of the defender's that this attack triggers.
+        List<ThisAction> validTraps = new List<ThisAction>();
 
         ThisAction[] allActions = FindObjectsOfType<ThisAction>();
         foreach (ThisAction action in allActions)
@@ -515,28 +517,41 @@ public class LabyrinthObject : NetworkBehaviour
             {
                 if (action.id == 4) // Last Stand Barrier
                 {
-                    if (targetScript.attackMode == true) { validTrap = action.gameObject; break; }
+                    if (targetScript.attackMode == true) validTraps.Add(action);
                 }
                 else if (action.id == 5) // Intercept
                 {
-                    if (CheckIfNextToWallOrInBase(targetObj)) { validTrap = action.gameObject; break; }
+                    if (CheckIfNextToWallOrInBase(targetObj)) validTraps.Add(action);
                 }
                 else if (action.id == 1) // Echo of Silence
                 {
-                    validTrap = action.gameObject; break;
+                    validTraps.Add(action);
                 }
                 else if (action.id == 2) // Phantom Binding
                 {
-                    if (willDefenderDie)
-                    {
-                        validTrap = action.gameObject;
-                        break;
-                    }
+                    if (willDefenderDie) validTraps.Add(action);
                 }
             }
         }
 
-        if (validTrap != null && defenderPM != null && !defenderPM.IsCpu)
+        // A player is asked about the first one; the CPU picks for itself.
+        GameObject validTrap = validTraps.Count > 0 ? validTraps[0].gameObject : null;
+        CpuPlayer cpuDefender = defenderPM != null ? defenderPM.GetComponent<CpuPlayer>() : null;
+        if (cpuDefender != null)
+        {
+            ThisAction chosen = cpuDefender.ChooseTrap(validTraps, this, targetScript, willDefenderDie);
+            if (chosen != null)
+            {
+                Debug.Log("[CPU] Activates " + chosen.cardName + ".");
+                awaitingTrapAnswer = true; // the answer below expects a paused attack
+                defenderPM.ServerAnswerTrapPrompt(true, chosen.gameObject, this.gameObject, targetObj);
+            }
+            else
+            {
+                ServerResolveAttack(targetObj, false, 0);
+            }
+        }
+        else if (validTrap != null && defenderPM != null)
         {
             Debug.Log("Valid Trap found! Pausing attack to ask defender...");
             awaitingTrapAnswer = true;

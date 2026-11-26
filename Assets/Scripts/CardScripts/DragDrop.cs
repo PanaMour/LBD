@@ -66,6 +66,7 @@ public class DragDrop : NetworkBehaviour
         }
 
         isDragging = true;
+        HighlightEquipTargets();
 
         gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
 
@@ -78,11 +79,33 @@ public class DragDrop : NetworkBehaviour
 
         if (!isDraggable) return;
         isDragging = false;
+        ClearEquipHighlights();
 
         gameObject.layer = LayerMask.NameToLayer("Default");
 
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit[] hits = Physics.RaycastAll(ray, 100f);
+
+        // An equip card can be dropped straight onto a monster in the
+        // labyrinth (its model or its square), not just onto its card.
+        ThisMagic dragged = GetComponent<ThisMagic>();
+        if (dragged != null && dragged.equip)
+        {
+            foreach (RaycastHit hit in hits)
+            {
+                LabyrinthObject monster = hit.collider.GetComponentInParent<LabyrinthObject>();
+                if (monster == null)
+                {
+                    GridStat square = hit.collider.GetComponentInParent<GridStat>();
+                    if (square != null) monster = square.GetComponentInChildren<LabyrinthObject>();
+                }
+                if (monster != null && monster.card != null)
+                {
+                    TryEquip(monster, 1);
+                    return;
+                }
+            }
+        }
 
         GameObject foundSlot = null;
 
@@ -122,72 +145,17 @@ public class DragDrop : NetworkBehaviour
 
         if (magicScript != null && magicScript.equip)
         {
-            if (slot.name.Contains("PlayerSlot") && existingCard != null)
+            if ((slot.name.Contains("PlayerSlot") || slot.name.Contains("EnemySlot")) && existingCard != null && existingCard.GetComponent<ThisCard>() != null)
             {
-                ThisCard monsterScript = existingCard.GetComponent<ThisCard>();
-                if (monsterScript != null)
-                {
-                    bool requiresSpecificType = false;
-                    Type requiredType = Type.Alien;
+                LabyrinthObject target3DMonster = null;
+                foreach (LabyrinthObject m in FindObjectsOfType<LabyrinthObject>())
+                    if (m.card == existingCard) { target3DMonster = m; break; }
 
-                    if (magicScript.id == 11) { requiresSpecificType = true; requiredType = Type.Mineral; }
-                    else if (magicScript.id == 12) { requiresSpecificType = true; requiredType = Type.Alien; }
-                    else if (magicScript.id == 13) { requiresSpecificType = true; requiredType = Type.Human; }
-                    else if (magicScript.id == 14) { requiresSpecificType = true; requiredType = Type.Animal; }
-
-                    if (requiresSpecificType && !monsterScript.currentTypes.Contains(requiredType))
-                    {
-                        Debug.Log($"Cannot equip! This card requires a {requiredType}.");
-                        ReturnToHand();
-                        return;
-                    }
-
-                    LabyrinthObject target3DMonster = null;
-                    LabyrinthObject[] allMonsters = FindObjectsOfType<LabyrinthObject>();
-                    foreach (LabyrinthObject m in allMonsters)
-                    {
-                        if (m.card == existingCard)
-                        {
-                            target3DMonster = m;
-                            break;
-                        }
-                    }
-
-                    if (target3DMonster == null)
-                    {
-                        Debug.Log("Monster is not on the board yet!");
-                        ReturnToHand();
-                        return;
-                    }
-
-                    int preferredIndex = 1;
-                    string numberOnly = System.Text.RegularExpressions.Regex.Match(slot.name, @"\d+").Value;
-                    if (int.TryParse(numberOnly, out int result)) preferredIndex = result;
-                    GameObject openSpellSlot = FindPreferredActionSlot(preferredIndex);
-
-                    if (openSpellSlot != null)
-                    {
-                        transform.SetParent(openSpellSlot.transform);
-                        transform.localPosition = slotPosition;
-                        transform.localRotation = Quaternion.Euler(90, 0, 0);
-                        transform.localScale = slotScale;
-                        magicScript.activated = true;
-
-                        int actualIndex = 0;
-                        string actualNumberStr = System.Text.RegularExpressions.Regex.Match(openSpellSlot.name, @"\d+").Value;
-                        if (int.TryParse(actualNumberStr, out int actualResult)) actualIndex = actualResult - 1;
-                        PlayerManager.CmdExecuteMagicEffect(gameObject, target3DMonster.gameObject, actualIndex);
-
-                        this.enabled = false;
-                        return;
-                    }
-                    else
-                    {
-                        Debug.Log("No empty Spell/Trap zones available!");
-                        ReturnToHand();
-                        return;
-                    }
-                }
+                int preferredIndex = 1;
+                string numberOnly = System.Text.RegularExpressions.Regex.Match(slot.name, @"\d+").Value;
+                if (int.TryParse(numberOnly, out int result)) preferredIndex = result;
+                TryEquip(target3DMonster, preferredIndex);
+                return;
             }
 
             Debug.Log("Equip Spell must be dropped ON TOP of a Monster Card!");
@@ -251,6 +219,83 @@ public class DragDrop : NetworkBehaviour
         }
 
         ReturnToHand();
+    }
+
+    // ---- equip cards ----
+
+    // Can this equip card go on that monster? Equips that may target any
+    // monster (Weighted Shackles, Fleetfoot Blessing, Mechanical Legs) go on
+    // either side's; the rest only on your own, and typed armour only on its type.
+    string EquipProblem(ThisMagic magic, LabyrinthObject target)
+    {
+        if (target == null || target.card == null) return "Monster is not on the board yet!";
+        if (!target.hasAuthority && magic.targetType != MagicTargetType.AnyUnit)
+            return magic.magicName + " can only be equipped to your own monsters.";
+        if (ThisMagic.TryGetRequiredEquipType(magic.id, out Type requiredType))
+        {
+            ThisCard monster = target.card.GetComponent<ThisCard>();
+            if (monster == null || !monster.currentTypes.Contains(requiredType))
+                return "Cannot equip! This card requires a " + requiredType + ".";
+        }
+        return null;
+    }
+
+    void TryEquip(LabyrinthObject target, int preferredIndex)
+    {
+        ThisMagic magicScript = GetComponent<ThisMagic>();
+        string problem = EquipProblem(magicScript, target);
+        if (problem != null)
+        {
+            Debug.Log(problem);
+            ReturnToHand();
+            return;
+        }
+
+        GameObject openSpellSlot = FindPreferredActionSlot(preferredIndex);
+        if (openSpellSlot == null)
+        {
+            Debug.Log("No empty Spell/Trap zones available!");
+            ReturnToHand();
+            return;
+        }
+
+        transform.SetParent(openSpellSlot.transform);
+        transform.localPosition = slotPosition;
+        transform.localRotation = Quaternion.Euler(90, 0, 0);
+        transform.localScale = slotScale;
+        magicScript.activated = true;
+
+        int actualIndex = 0;
+        string actualNumberStr = System.Text.RegularExpressions.Regex.Match(openSpellSlot.name, @"\d+").Value;
+        if (int.TryParse(actualNumberStr, out int actualResult)) actualIndex = actualResult - 1;
+        PlayerManager.CmdExecuteMagicEffect(gameObject, target.gameObject, actualIndex);
+
+        this.enabled = false;
+    }
+
+    // While an equip card is being dragged, the squares of the monsters it can
+    // go on glow, so it's clear where it can be dropped.
+    readonly List<LabyrinthTile> equipHighlights = new List<LabyrinthTile>();
+
+    void HighlightEquipTargets()
+    {
+        ThisMagic magic = GetComponent<ThisMagic>();
+        if (magic == null || !magic.equip) return;
+        foreach (LabyrinthObject m in FindObjectsOfType<LabyrinthObject>())
+        {
+            if (EquipProblem(magic, m) != null) continue;
+            LabyrinthTile tile = m.GetComponentInParent<LabyrinthTile>();
+            if (tile == null || tile.isHighlighted) continue;
+            tile.GlowBlock();
+            equipHighlights.Add(tile);
+        }
+    }
+
+    void ClearEquipHighlights()
+    {
+        foreach (LabyrinthTile tile in equipHighlights)
+            if (tile != null) tile.StopGlowBlock();
+        equipHighlights.Clear();
     }
 
     GameObject FindPreferredActionSlot(int preferredIndex)
